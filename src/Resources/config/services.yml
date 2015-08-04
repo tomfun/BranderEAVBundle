@@ -12,7 +12,7 @@ services:
     tags:
       - { name: doctrine.event_subscriber }
 
-  brander_eav.twig.iwinappextension:
+  brander_eav.twig.appextension:
     class: %brander_eav.twig.extension.class%
     public: false
     arguments:

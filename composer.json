@@ -40,7 +40,8 @@
   "require-dev":{
     "doctrine/doctrine-fixtures-bundle": "*",
     "nelmio/api-doc-bundle": "*",
-    "werkint/framework-extra-bundle": "dev-master"
+    "werkint/framework-extra-bundle": "dev-master",
+    "fzaninotto/faker": "*"
   },
   "autoload": {
     "psr-4": {

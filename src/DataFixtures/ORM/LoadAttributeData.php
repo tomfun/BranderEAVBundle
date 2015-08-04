@@ -1,13 +1,13 @@
 <?php
 namespace Brander\Bundle\EAVBundle\DataFixtures\ORM;
 
+use Brander\Bundle\EAVBundle\DataFixtures\AbstractFixture;
 use Brander\Bundle\EAVBundle\Entity\Attribute;
 use Brander\Bundle\EAVBundle\Entity\AttributeGroup;
 use Brander\Bundle\EAVBundle\Entity\AttributeSelect;
 use Brander\Bundle\EAVBundle\Entity\AttributeSelectOption;
 use Brander\Bundle\EAVBundle\Service\Holder;
 use Doctrine\Common\Persistence\ObjectManager;
-use Sdelka\Bundle\AppBundle\DataFixtures\AbstractFixture;//todo
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -21,14 +21,6 @@ class LoadAttributeData extends AbstractFixture
     protected static $attributeCount = 0;
     /** @var  Holder */
     protected $attribute;
-
-    /**
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this->getContainer()->getParameter('locale');
-    }
 
     /**
      * @return int
@@ -59,8 +51,7 @@ class LoadAttributeData extends AbstractFixture
      */
     public function initialize(ContainerInterface $container)
     {
-        //todo:
-        $this->faker = $container->get('sdelka_app.faker');
+        $this->faker = $this->getFaker();
         $this->attribute = $container->get('brander_eav.attribute.holder');
     }
 

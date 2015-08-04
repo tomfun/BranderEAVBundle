@@ -1,9 +1,9 @@
 <?php
 namespace Brander\Bundle\EAVBundle\DataFixtures\ORM;
 
+use Brander\Bundle\EAVBundle\DataFixtures\AbstractFixture;
 use Brander\Bundle\EAVBundle\Entity\AttributeGroup;
 use Doctrine\Common\Persistence\ObjectManager;
-use Sdelka\Bundle\AppBundle\DataFixtures\AbstractFixture;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -43,14 +43,6 @@ class LoadAttributeGroupData extends AbstractFixture
                                    'brander_eav.fixtures_directory'
                                ) . '/attribute_groups.yml'
         ));
-    }
-
-    /**
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this->getContainer()->getParameter('locale');
     }
 
     /**
