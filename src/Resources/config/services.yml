@@ -1,0 +1,51 @@
+parameters:
+  brander_eav.eventlistener.valueselectlistener.class: Brander\Bundle\EAVBundle\EventListener\ValueSelectListener
+  brander_eav.attribute.holder.class: Brander\Bundle\EAVBundle\Service\Holder
+  brander_eav.twig.extension.class: Brander\Bundle\EAVBundle\Service\Twig\BranderEAVExtension
+  brander_eav.extensible_entity.handler.class: Brander\Bundle\EAVBundle\Service\Serialize\SerializeHandler
+  brander_eav.security.universal_voter.class: Brander\Bundle\EAVBundle\Service\Security\UniversalManageVoter
+  brander_eav.attribute.serialize.query_handler.class: Brander\Bundle\EAVBundle\Service\Serialize\QueryDeserializeHandler
+
+services:
+  brander_eav.eventlistener.valueselectlistener:
+    class: %brander_eav.eventlistener.valueselectlistener.class%
+    tags:
+      - { name: doctrine.event_subscriber }
+
+  brander_eav.twig.iwinappextension:
+    class: %brander_eav.twig.extension.class%
+    public: false
+    arguments:
+      - @doctrine.orm.entity_manager
+      - %locales_supported%
+      - %locale%
+    tags:
+      - { name: twig.extension }
+
+  brander_eav.attribute.holder:
+    class: %brander_eav.attribute.holder.class%
+    arguments:
+      - @doctrine.orm.entity_manager
+    tags:
+      - { name: jms_serializer.event_subscriber }
+
+  brander_eav.attribute.serialize.query_handler:
+    class: %brander_eav.attribute.serialize.query_handler.class%
+    arguments:
+      - @brander_eav.repo.attribute
+    tags:
+      - { name: jms_serializer.event_subscriber }
+
+  brander_eav.extensible_entity.handler:
+    arguments:
+     - {}
+     - "@service_container"
+     - %locale%
+    class: %brander_eav.extensible_entity.handler.class%
+
+  brander_eav.security.universal_voter:
+    class: %brander_eav.security.universal_voter.class%
+    arguments:
+      - %brander_eav.managerole%
+    tags:
+      - { name: security.voter }

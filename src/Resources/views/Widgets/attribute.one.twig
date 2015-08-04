@@ -1,0 +1,138 @@
+<div class="col-lg-12">
+  <div class="ibox float-e-margins">
+    <div class="ibox-title">
+      <h5 class="show-form-link">
+        {% if model.isNew %}
+          New Attribute
+        {% else %}
+          Edit Attribute #{{ model.id }}
+          <small>{{ model.title }}</small>
+        {% endif %}
+      </h5>
+      <div class="ibox-tools">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false"
+           title="Изменитя редактируемы язык">
+          {{ currentLocale }}
+          <i class="fa fa-flag"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-user">
+          {% for lang in currentLanguages %}
+          <li>
+            <a href="#" class="language-item" data-language="{{ lang }}"><b>{{ lang }}</b></a>
+          </li>
+          {% endfor %}
+        </ul>
+
+        <a class="close-link save" title="Сохранить">
+          <i class="fa fa-check-square-o"></i>
+        </a>
+        <a class="close-link new-model" title="Новый атрибут">
+          <i class="fa fa-file-excel-o"></i>
+        </a>
+        <a class="collapse-link show-form"{% if not hide %} style="display: none"{% endif %} title="показать">
+          <i class="fa fa-chevron-down"></i>
+        </a>
+        <a class="collapse-link hide-form"{% if hide %} style="display: none"{% endif %} title="спрятать">
+          <i class="fa fa-chevron-up"></i>
+        </a>
+      </div>
+    </div>
+    <div class="ibox-content"{% if hide %} style="display: none"{% endif %}>
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Title</label>
+
+          <div class="col-sm-10">
+            <input type="text" name="translations[{{ lcl }}].title" class="form-control">
+          </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">Placeholder</label>
+
+          <div class="col-sm-10">
+            <input type="text" name="translations[{{ lcl }}].placeholder" class="form-control">
+            <span class="help-block m-b-none">
+              надпись в поле ввода
+            </span>
+          </div>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">Hint</label>
+
+          <div class="col-sm-10">
+            <input type="text" name="translations[{{ lcl }}].hint" class="form-control">
+            <span class="help-block m-b-none">
+              надпись подскзака
+            </span>
+          </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">Postfix</label>
+
+          <div class="col-sm-10">
+            <input type="text" name="translations[{{ lcl }}].postfix" placeholder="m^2" class="form-control">
+            <span class="help-block m-b-none">
+              единицы измерения
+            </span>
+          </div>
+        </div>
+
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">
+            <i class="fa fa-search"></i>&nbsp;&nbsp;
+            <i class="fa fa-bookmark"></i>&nbsp;&nbsp;
+            <i class="fa fa-sort-alpha-asc"></i>
+          </label>
+
+          <div class="col-sm-10">
+            <label class="checkbox-inline i-checks">
+              <div class="icheckbox_square-green" style="position: relative;">
+                <input type="checkbox" value="option2" style="position: absolute; opacity: 0;" name="isFilterable">
+                <ins class="iCheck-helper"></ins>
+              </div>
+              Filterable
+            </label>
+            <label class="checkbox-inline i-checks">
+              <div class="icheckbox_square-green" style="position: relative;">
+                <input type="checkbox" value="option3" name="isRequired" style="position: absolute; opacity: 0;">
+                <ins class="iCheck-helper"></ins>
+              </div>
+              Required
+            </label>
+            <label class="checkbox-inline i-checks">
+              <div class="icheckbox_square-green" style="position: relative;">
+                <input type="checkbox" value="option3" name="isSortable" style="position: absolute; opacity: 0;">
+                <ins class="iCheck-helper"></ins>
+              </div>
+              Sortable
+            </label>
+          </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">Attribute Type</label>
+
+          <div class="col-sm-10">
+            <select class="form-control m-b" name="discr">
+              {% for d in types.toArray %}
+                <option value="{{ d.descr }}">{{ d.class }}</option>
+              {% else %}
+                <option>loading...</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div id="model-options"></div>
+        <div class="attribute-changes">
+          <div class="changes"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+          <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-primary save">Save changes</button>
+            <button class="btn btn-white hide-form">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

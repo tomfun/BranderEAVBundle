@@ -1,0 +1,48 @@
+-
+  type: numeric
+  postfix: грн
+  title: Стоимость бизнеса
+  group: advanced-info
+
+-
+  type: textarea
+  title: Причина продажи бизнеса
+  placeholder: Ваши вопросы, уточнения, предложения по объявлению
+  group: advanced-info
+  filterable: true
+#-
+#  type: textarea
+#  title: Краткое описание
+#  placeholder: Если вы не хотите ограничиваться только характеристиками, напишите краткое описание к объявлению
+#  group: advanced-info
+-
+  type: numeric
+  title: Цфровой
+  placeholder: 100
+-
+  type: input
+  title: немного текста
+  placeholder: фыва
+-
+  type: textarea
+  title: много текста
+  placeholder: фыва олдж
+-
+  type: select
+  title: выбор
+  placeholder: опции
+  options:
+   - val1
+   - val2
+-
+  type: boolean
+  title: ограниченный выбор
+  placeholder: опции 1/0
+-
+  type: date
+  title: дата
+  placeholder: 12.11.13
+-
+  type: location
+  title: latLan
+  placeholder: 40.01,70.58

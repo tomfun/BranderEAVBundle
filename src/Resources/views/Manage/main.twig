@@ -1,0 +1,25 @@
+<h5 style="
+    color: #707;
+    margin: auto;
+    padding: 0.3em;
+    background-color: wheat;
+    text-align: center;
+    font-size: 0.75em;
+    letter-spacing: 1px;
+{% if app.debug %}font-weight: bold;{% endif %}
+    ">
+  Изменения атрибутов, наборо и прочего, могут повлечь за собой необратимы изменения базы, будьте предельно бдительны.
+  Лучше вностить изменения на стадии проектирования сайте. Если это не так, убедитель в наличии бэкапа базы.
+</h5>
+<div id="attribute"><!-- редактирование аттрибута --></div>
+<div class="flex-container">
+  <div class="right flex-item" id="attributes"><!-- список аттрибутов --></div>
+  <div class="left flex-item">
+    <div id="attribute-set"><!-- редактирование сета --></div>
+    <div id="attribute-set-list"><!-- список сетов --></div>
+  </div>
+  <div class="left flex-item">
+    <div id="attribute-group"><!-- редактирование группы --></div>
+    <div id="attribute-group-list"><!-- список групп --></div>
+  </div>
+</div>

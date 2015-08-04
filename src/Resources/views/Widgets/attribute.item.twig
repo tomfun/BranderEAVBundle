@@ -1,0 +1,26 @@
+<a href="#attribute-{{ id }}" class="edit">
+  {% if discr == 'textarea' %}
+    <i class="fa fa-book"></i>
+  {% endif %}
+  {% if discr == 'select' %}
+    <i class="fa fa-level-down"></i>
+  {% endif %}
+  {% if discr == 'numeric' %}
+    <i class="fa fa-plus"></i>
+  {% endif %}
+  {% if discr == 'input' %}
+    <i class="fa fa-pencil-square-o"></i>
+  {% endif %}
+  {% if discr == 'boolean' %}
+    <i class="fa fa-check"></i>
+  {% endif %}
+  {% if discr == 'date' %}
+    <i class="fa fa-clock-o"></i>
+  {% endif %}
+  {% if discr == 'location' %}
+    <i class="fa fa-map-marker"></i>
+  {% endif %}
+  {{ title }}
+  <small>#{{ id }}</small>
+</a>
+<a href="#attribute-remove-{{ id }}" class="remove"><i class="fa fa-times"></i></a>

@@ -1,0 +1,13 @@
+brander_eav:
+  resource: "@BranderEAVBundle/Controller"
+  type: annotation
+  prefix: "public"
+  options:
+    expose: true
+
+brander_eav_manage:
+  resource: "@BranderEAVBundle/Controller/ManageController.php"
+  type: annotation
+  prefix: "admin/"
+  options:
+    expose: true

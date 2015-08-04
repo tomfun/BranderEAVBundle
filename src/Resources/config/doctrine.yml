@@ -1,0 +1,33 @@
+parameters:
+  # Repo
+  brander_eav.repo.value.class:
+    Brander\Bundle\EAVBundle\Repo\Value
+  brander_eav.repo.group.class:
+    Doctrine\ORM\EntityRepository
+  brander_eav.repo.set.class:
+    Doctrine\ORM\EntityRepository
+  brander_eav.repo.attribute.class:
+    Doctrine\ORM\EntityRepository
+
+services:
+  # Repo
+  brander_eav.repo.value:
+    class:            %brander_eav.repo.value.class%
+    factory_service:  doctrine.orm.entity_manager
+    factory_method:   getRepository
+    arguments: [BranderEAVBundle:Value]
+  brander_eav.repo.attribute:
+    class:            %brander_eav.repo.attribute.class%
+    factory_service:  doctrine.orm.entity_manager
+    factory_method:   getRepository
+    arguments: [BranderEAVBundle:Attribute]
+  brander_eav.repo.group:
+    class:            %brander_eav.repo.group.class%
+    factory_service:  doctrine.orm.entity_manager
+    factory_method:   getRepository
+    arguments: [BranderEAVBundle:AttributeGroup]
+  brander_eav.repo.set:
+    class:            %brander_eav.repo.set.class%
+    factory_service:  doctrine.orm.entity_manager
+    factory_method:   getRepository
+    arguments: [BranderEAVBundle:AttributeSet]

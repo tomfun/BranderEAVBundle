@@ -1,0 +1,50 @@
+{
+  "name": "tomfun/brander-eav",
+  "type": "symfony-bundle",
+  "description": "helps to create entity that have different attributes (fields) in same database. Also provide integration with elastic search friendsofsymfony/elastica-bundle",
+  "keywords": [
+    "elastica",
+    "elasticsearch",
+    "EAV",
+    "entity attribute value",
+    "search"
+  ],
+  "license": "MIT",
+  "version": "0.0.1-alpha",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:igrvak/FOSElasticaBundle.git"
+    }
+  ],
+  "authors": [
+    {
+      "name": "Grigory Kotov",
+      "email": "tomfun1990@gmail.com"
+    },
+    {
+      "name": "Bogdan Yurov",
+      "email": "bogdan@yurov.me"
+    },
+    {
+      "name": "Vladimir Odesskij",
+      "email": "odesskij1992@gmail.com"
+    }
+  ],
+  "require": {
+    "tomfun/brander-elastica-skeleton": "0.0.1",
+    "friendsofsymfony/rest-bundle": "*",
+    "jms/di-extra-bundle": "*",
+    "doctrine/orm": "*"
+  },
+  "require-dev":{
+    "doctrine/doctrine-fixtures-bundle": "*",
+    "nelmio/api-doc-bundle": "*",
+    "werkint/framework-extra-bundle": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Brander\\Bundle\\EAVBundle\\": "src/"
+    }
+  }
+}

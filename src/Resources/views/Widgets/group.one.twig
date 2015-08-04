@@ -1,0 +1,50 @@
+<div class="ibox float-e-margins">
+  <div class="ibox-title">
+    <h5 class="show-form-link">
+      {% if model.isNew %}
+        New Attribute Group
+      {% else %}
+        Edit Attribute Group #{{ model.id }}
+        <small>{{ model.title }}</small>
+      {% endif %}
+      &nbsp;
+    </h5>
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false"
+       style="color: #c4c4c4; font-size: .6em;">
+      {{ currentLocale }}
+      <i class="fa fa-flag"></i>
+    </a>
+  </div>
+  <div class="ibox-content">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Title</label>
+
+        <div class="col-sm-10">
+          <input type="text" name="translations[{{ lcl }}].title" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Class</label>
+
+        <div class="col-sm-10">
+          <input type="text" name="class" class="form-control">
+        </div>
+      </div>
+      <div class="hr-line-dashed"></div>
+
+      <div class="model-attributes">
+        загрузка<!-- attributes -->
+      </div>
+      <div class="for-draggable">перетащить сюда атрибут</div>
+      <div class="hr-line-dashed"></div>
+      <div class="error-container"><!-- --></div>
+      <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">
+          <button class="btn btn-primary save">Save changes</button>
+          <button class="btn btn-white hide-form">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

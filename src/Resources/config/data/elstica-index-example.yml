@@ -1,0 +1,123 @@
+fos_elastica:
+#  serializer: #also changed by default, if use use 'searchable_auto_index'
+#    callback_class: FOS\ElasticaBundle\Serializer\Callback
+#    serializer: serializer
+#  clients:
+#    default: { host: localhost, port: 9200 }
+  indexes:
+    namespace_entity: #some name. example: sdelka_advert
+      index_name: namespace_entity_%kernel.environment% #add environment. example: sdelka_advert_dev
+      settings:
+        analysis:
+          analyzer:
+            my_full_text_analyzer_ru:
+              type: custom
+              tokenizer: standard
+              filter:
+                - my_word_delimiter
+                - standard
+                - lowercase
+                - my_stop_ru
+                - my_stemmer_ru
+            my_full_text_analyzer_en:
+              type: custom
+              tokenizer: standard
+              filter:
+                - english_possessive_stemmer
+                - my_word_delimiter
+                - lowercase
+                - my_stop_en
+                - my_stemmer_en
+            my_full_text_analyzer_fr:
+              type: custom
+              tokenizer: standard
+              filter:
+                - my_word_delimiter
+                - standard
+                - lowercase
+                - my_stop_fr
+                - my_stemmer_fr
+            my_full_text_analyzer_es:
+              type: custom
+              tokenizer: standard
+              filter:
+                - my_word_delimiter
+                - standard
+                - asciifolding
+                - lowercase
+                - my_stop_es
+                - my_stemmer_es
+          filter:
+            my_stemmer_ru:
+              type: stemmer
+              language: russian
+            my_stop_ru:
+              type: stop
+              stopwords: _russian_
+            my_stemmer_en:
+              type: stemmer
+              language: english
+            english_possessive_stemmer:
+              type: "stemmer"
+              language: possessive_english
+            my_stop_en:
+              type: stop
+              stopwords: _english_
+            my_stemmer_fr:
+              type: stemmer
+              language: french
+            my_stop_fr:
+              type: stop
+              stopwords: _french_
+            my_stemmer_es:
+              type: stemmer
+              language: spanish
+            my_stop_es:
+              type: stop
+              stopwords: _spanish_
+            my_word_delimiter:
+              type: word_delimiter
+              stem_english_possessive: false
+
+      types:
+        entity: # one ore more types, but               # example: advert
+          indexable_callback: needIndex #use other callbacks. needIndex - insert/delete from elastica
+          updatable_callback: needUpdate #whether need update data in elastica or not
+          persistence:
+            driver: orm
+            model: Iwin\Bundle\AdvertBundle\Entity\Advert #entity class
+            provider: ~
+            finder: ~
+            listener: ~
+          serializer:
+            groups: [elastica] #exactly this serialization groups
+          dynamic_templates:
+            eavfltxt_ru:
+              match: "*_eavfltxt_ru"
+              match_mapping_type: string
+              mapping:
+                type: string
+                analyzer: my_full_text_analyzer_ru
+            eavfltxt_en:
+              match: "*_eavfltxt_en"
+              match_mapping_type: string
+              mapping:
+                type: string
+                analyzer: my_full_text_analyzer_en
+            eavfltxt_es:
+              match: "*_eavfltxt_es"
+              match_mapping_type: string
+              mapping:
+                type: string
+                analyzer: my_full_text_analyzer_es
+            eavfltxt_fr:
+              match: "*_eavfltxt_fr"
+              match_mapping_type: string
+              mapping:
+                type: string
+                analyzer: my_full_text_analyzer_fr
+            eavpnt_geo:
+              match: "*_eavpnt_geo"
+              mapping:
+                type: geo_point
+                lat_lon: true

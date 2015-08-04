@@ -1,0 +1,14 @@
+<span data-id="{{ id }}" class="edit">
+  {% if state == 'edit' %}
+    <input name="translations[{{ lcl }}].title" value="{{ translations[lcl].title }}">
+  {% else %}
+    {{ translations[lcl].title }}
+  {% endif %}
+  {% if id %}
+    <small>#{{ id }}</small>
+  {% else %}
+    <small>new</small>
+  {% endif %}
+  <small>({{ translations[lcl].locale }})</small>
+</span>
+<a href="#option-{{ id }}" class="remove"><i class="fa fa-times"></i></a>

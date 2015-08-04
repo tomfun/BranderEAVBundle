@@ -1,0 +1,28 @@
+<div class="hr-line-dashed"></div>
+
+{% if recreate %}<h5 class="error">аттрибут будет удалён и затем будет создан новый</h5>{% endif %}
+{% if optionsNew.length > 0 %}
+  <h6>Новые опции</h6>
+  <ul>
+    {% for opt in optionsNew|slice(0, 4) %}
+      <li>{{ opt.title }}</li>
+    {% endfor %}
+  </ul>
+  {% if optionsNew.length > 4 %}
+    <small>и ещё</small>{{ optionsNew.length - 4 }}
+  {% endif %}
+{% endif %}
+{% if optionsRemoveUsed.length > 0 %}
+  <h6>будут удалены опции, которые использовались</h6>
+  <ul>
+    {% for opt in optionsRemoveUsed|slice(0, 10) %}
+      <li>{{ opt.title }} #{{ opt.id }}</li>
+    {% endfor %}
+  </ul>
+  {% if optionsRemoveUsed.length > 10 %}
+    <small>и ещё</small>{{ optionsRemoveUsed.length - 10 }}
+  {% endif %}
+{% endif %}
+{% if optionsRemove.length > 0 %}
+  <h6>будет удалено опций: {{ optionsRemove.length }}</h6>
+{% endif %}
