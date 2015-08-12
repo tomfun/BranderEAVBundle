@@ -32,7 +32,7 @@
     }
   ],
   "require": {
-    "tomfun/brander-elastica-skeleton": "0.0.1",
+    "tomfun/brander-elastica-skeleton": "0.0.3",
     "friendsofsymfony/rest-bundle": "*",
     "jms/di-extra-bundle": "*",
     "doctrine/orm": "*"
