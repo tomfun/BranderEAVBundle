@@ -20,7 +20,7 @@ brander_eav:
       entity: Sdelka\Bundle\AdvertBundle\Entity\Advert #orm entity
       query: Sdelka\Bundle\AdvertBundle\Model\AdvertQuery #query class. must exist.
       result: Sdelka\Bundle\AdvertBundle\Model\AdvertQuery #result class. must exist.
-      serviceClass: Brander\Bundle\EAVBundle\Model\Elastica\EavList #service class
+      serviceClass: Brander\Bundle\EAVBundle\Service\Elastica\EavList #service class
 ```
 also **you must implement** some interfaces (e.g. *SearchableEntityInterface*).
 name of listing service in this case:

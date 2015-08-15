@@ -118,6 +118,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
      * Add geo distance filter. $value must consist of lat,lng,distance.
      * Example $value = '17.95,14.91distance:1'//km
      * Example $value = '17.95, 14.91 distance: 12.07 mi'
+     * value format: 'LAT, LON distance: DIST UNIT'
      *
      * @see https://www.elastic.co/guide/en/elasticsearch/guide/current/filter-by-geopoint.html
      *
@@ -164,6 +165,8 @@ abstract class EavElasticaQuery extends ElasticaQuery
     }
 
     /**
+     * @example "gt:0;lt:101;" - number range
+     * @example "gte:5;lte:15;" - number range
      * @param string $value
      * @param callable|null $formatter
      * @return array|null
@@ -204,6 +207,9 @@ abstract class EavElasticaQuery extends ElasticaQuery
         $res = [];
         if ($this->getAttributesRaw()) {
             foreach ($this->getAttributesRaw() as $attrId => $value) {
+                if (!isset($this->attributes[$attrId])) {
+                    continue;
+                }
                 $attr = $this->attributes[$attrId];
                 if (!$attr->isFilterable()) {
                     if (isset($this->attributesRaw[$attrId])) {
@@ -238,6 +244,9 @@ abstract class EavElasticaQuery extends ElasticaQuery
     {
         if ($this->getAttributesRaw()) {
             foreach ($this->getAttributesRaw() as $attrId => $value) {
+                if (!isset($this->attributes[$attrId]) || $value === '') {
+                    continue;
+                }
                 $attr = $this->attributes[$attrId];
                 if (!$attr->isFilterable()) {
                     if (isset($this->attributesRaw[$attrId])) {
@@ -304,12 +313,49 @@ abstract class EavElasticaQuery extends ElasticaQuery
             $usedIds[] = $attrId;
         }
 
-        /** @var Attribute[] $attributes */
-        $attributes = $this->getAttributeRepository()->findBy(['id' => $usedIds]);
+        $attributes = $this->getAvailableAttributes($usedIds);
 
         foreach ($attributes as $attribute) {
             $this->attributes[$attribute->getId()] = $attribute;
         }
+    }
+
+    /**
+     * You should rewrite this method. This method return list of attributes - available filters; and for validation.
+     *
+     * @param array $usedIds attribute ids
+     * @return \Brander\Bundle\EAVBundle\Entity\Attribute[]
+     */
+    protected function getAvailableAttributes(array $usedIds = [])
+    {
+        $qb = $this->getAttributeRepository()->createQueryBuilder('a');
+        $qb->where('a.isSortable = 1 or a.isFilterable = 1');
+        if (count($usedIds)) {
+            $qb->andWhere('a.id in (:ids)')
+               ->setParameter('ids', $usedIds);
+        }
+        /** @var Attribute[] $attributes */
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return FilterableAttribute[]
+     */
+    public function getFilterableAttributes()
+    {
+        $res = [];
+        $attributes = $this->getAvailableAttributes();
+        foreach ($attributes as $attribute) {
+            $item = new FilterableAttribute();
+            $item->setIsSortable($attribute->isSortable())
+                 ->setIsFilterable($attribute->isFilterable())
+                 ->setField(['attributes', $attribute->getId()])
+                 ->setView($attribute->getFilterType())
+                 ->setViewOrder($attribute->getFilterOrder());
+            $item->setAttribute($attribute);
+            $res[] = $item;
+        }
+        return $res;
     }
 
     /**

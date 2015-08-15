@@ -1,6 +1,9 @@
 <?php
-namespace Brander\Bundle\EAVBundle\Model\Elastica;
+namespace Brander\Bundle\EAVBundle\Service\Elastica;
 
+use Brander\Bundle\EAVBundle\Model\Elastica\EavElasticaQuery;
+use Brander\Bundle\EAVBundle\Model\Elastica\EavElasticaResult;
+use Brander\Bundle\EAVBundle\Service\Serialize\QueryDeserializeHolder;
 use Brander\Bundle\ElasticaSkeletonBundle\Service\Elastica\ElasticaList;
 use Pagerfanta\Pagerfanta;
 
@@ -13,6 +16,8 @@ class EavList extends ElasticaList
     protected $resultClass;
     /** @var string */
     protected $queryClass;
+    /** @var QueryDeserializeHolder */
+    protected $queryHolder;
 
     /**
      * @return string
@@ -52,7 +57,24 @@ class EavList extends ElasticaList
         return $this;
     }
 
+    /**
+     * @return QueryDeserializeHolder
+     */
+    public function getQueryHolder()
+    {
+        return $this->queryHolder;
+    }
 
+    /**
+     * @param QueryDeserializeHolder $queryHolder
+     *
+     * @return $this
+     */
+    public function setQueryHolder(QueryDeserializeHolder $queryHolder)
+    {
+        $this->queryHolder = $queryHolder;
+        return $this;
+    }
 
     /**
      * @example return new ElasticaResult($rows, $page, $countPage, $countTotal);
@@ -71,13 +93,14 @@ class EavList extends ElasticaList
 
     /**
      * @param EavElasticaQuery $query
-     * @param array|null $orderMap
+     * @param array|null       $orderMap
      * @return EavElasticaResult
      * @throws \Exception
      */
     public function result($query, array $orderMap = null)
     {
         if (is_subclass_of($query, $this->getQueryClass()) || get_class($query) === $this->getQueryClass()) {
+            $this->getQueryHolder()->initializeQuery($query);
             return parent::result($query, $orderMap);
         }
         throw new \Exception('Wrong query');

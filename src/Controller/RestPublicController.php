@@ -4,6 +4,7 @@ namespace Brander\Bundle\EAVBundle\Controller;
 use Brander\Bundle\EAVBundle\Entity\Attribute;
 use Brander\Bundle\EAVBundle\Entity\AttributeGroup;
 use Brander\Bundle\EAVBundle\Entity\AttributeSet;
+use Brander\Bundle\EAVBundle\Service\Filter\FilterHolder;
 use Brander\Bundle\EAVBundle\Service\Holder;
 use Brander\Bundle\EAVBundle\Service\Security\FakeCollection;
 use Brander\Bundle\EAVBundle\Service\Security\UniversalManageVoter;
@@ -63,6 +64,12 @@ class RestPublicController
      * @DI\Inject("security.authorization_checker")
      */
     private $securityChecker;
+    /**
+     * @var FilterHolder
+     *
+     * @DI\Inject("brander_eav.filter.holder")
+     */
+    private $holder;
 
     /**
      * @param array|ArrayCollection $list
@@ -174,5 +181,20 @@ class RestPublicController
     public function collectionAttributeTypesAction()
     {
         return $this->attributeHolder->getAttributeMap();
+    }
+
+    /**
+     * @ApiDoc(
+     *      output="array", description="get data about filters"
+     * )
+     *
+     * @Rest\Get("/filter-view-list", name="brander_eav_filter_list", defaults={"_format": "json"})
+     * @Cache(expires="+1 day", public=true)
+     * @Rest\View()
+     * @return array<string, string>
+     */
+    public function getFiltersAction()
+    {
+        return $this->holder->getJsModels();
     }
 }

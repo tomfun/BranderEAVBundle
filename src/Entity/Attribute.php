@@ -114,6 +114,16 @@ abstract class Attribute
      * RESERVED
      * @var string
      *
+     * @ORM\Column(type="integer", nullable=true)
+     * @Serializer\Groups("=read || g('admin')")
+     * @Serializer\Expose()
+     */
+    protected $filterOrder;
+
+    /**
+     * RESERVED
+     * @var string
+     *
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
@@ -361,6 +371,44 @@ abstract class Attribute
     public function setIsSortable($isSortable)
     {
         $this->isSortable = (bool)$isSortable;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilterType()
+    {
+        return $this->filterType;
+    }
+
+    /**
+     * @param string $filterType
+     *
+     * @return $this
+     */
+    public function setFilterType($filterType)
+    {
+        $this->filterType = $filterType;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilterOrder()
+    {
+        return $this->filterOrder;
+    }
+
+    /**
+     * @param string $filterOrder
+     *
+     * @return $this
+     */
+    public function setFilterOrder($filterOrder)
+    {
+        $this->filterOrder = $filterOrder;
         return $this;
     }
 

@@ -9,12 +9,14 @@ define([
 
     'brander-eav/view/optionItem',
     'brander-eav/view/validation',
+    'jquery',
+    'routing',
 
     'backbone.chaining',
     'backbone.modelbinder',
     'jquery-ui'
 ], function (_, Base, Backbone, AttributeModel, AttributeTypes, OptionCollectionModel, OptionCollectionView,
-             OptionItemView, validate) {
+             OptionItemView, validate, $, Routing) {
     'use strict';
 
     var BaseProto = Base.prototype;
@@ -40,6 +42,13 @@ define([
                 this.render({noEffect: true});
             }, this);
             this.types.fetch();
+            $.ajax({
+                url:     Routing.generate('brander_eav_filter_list'),
+                success: function (data) {
+                    this.filterModels = data;
+                    this.render({noEffect: true});
+                }.bind(this)
+            });
             this.channel.on('select', function (model) {
                 this.unbindModelEvents();
                 this.model = model;
@@ -172,6 +181,7 @@ define([
                 model:            this.model,
                 hide:             this.hide,
                 types:            this.types,
+                filterModels: this.filterModels,
                 currentLocale:    this.currentLocale,
                 lcl:              this.model.get('translations').indexOfLocale(this.currentLocale),
                 currentLanguages: this.currentLocales,
@@ -190,7 +200,7 @@ define([
                     this.$el.slideDown();
                 }
                 var bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
-                _.each(bindings, function (v, i) {
+                _.each(bindings, function (v) {
                     var element = this.$(v.selector),
                         has     = element.closest('.icheckbox_square-green');
                     if (element.is(':checkbox') && has && has.size()) {

@@ -1,0 +1,10 @@
+<label>
+  {% if attribute %}
+    {{ attribute.title }}:
+  {% endif %}
+  <input name="{{ field|join('.') }}"
+         placeholder="{{ attribute.holder }}"
+         class="filter-type-{{ attribute.discr }}"
+         type="{% if attribute.discr == 'numeric' %}number{% else %}search{% endif %}"
+      />
+</label>

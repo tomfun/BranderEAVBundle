@@ -10,7 +10,7 @@
     "search"
   ],
   "license": "MIT",
-  "version": "0.0.1-alpha",
+  "version": "0.0.3",
   "repositories": [
     {
       "type": "vcs",

@@ -1,0 +1,10 @@
+<label>
+  {% if attribute %}
+    {{ attribute.title }}:
+  {% endif %}
+  <select name="{{ field|join('.') }}">
+    <option value="">{{ attribute.hint }}</option>
+    <option value="1">yes</option>
+    <option value="0">no</option>
+  </select>
+</label>

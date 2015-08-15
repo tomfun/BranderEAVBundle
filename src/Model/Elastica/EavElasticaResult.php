@@ -1,7 +1,6 @@
 <?php
 namespace Brander\Bundle\EAVBundle\Model\Elastica;
 
-use Brander\Bundle\EAVBundle\Entity\Attribute;
 use Brander\Bundle\ElasticaSkeletonBundle\Service\Elastica\ElasticaResult;
 use JMS\Serializer\Annotation as Serializer;
 
@@ -25,10 +24,24 @@ class EavElasticaResult extends ElasticaResult
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"=read"})
      * @Serializer\SerializedName("filterableAttributes")
-     * @return Attribute[]|null
+     * @Serializer\Type("array<Brander\Bundle\EAVBundle\Model\Elastica\FilterableAttribute>")
+     * @return FilterableAttribute[]|null
      */
     public function getFilterableAttributes()
     {
-        return $this->get('filterableAttributes');//todo: in query make filterable attrs
+        return $this->get('filterableAttributes');
+    }
+
+    /**
+     * @param FilterableAttribute[] $filters
+     * @return $this
+     */
+    public function setFilterableAttributes($filters)
+    {
+        if (!is_array($this->extra)) {
+            $this->extra = [];
+        }
+        $this->extra['filterableAttributes'] = $filters;
+        return $this;
     }
 }

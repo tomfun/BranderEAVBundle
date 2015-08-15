@@ -1,0 +1,16 @@
+{
+  "name": "brander-eav",
+  "main": "bower.json",
+  "dependencies": {
+    "backbone.marionette": "*",
+    "backbone.relational": "*",
+    "backbone": "*",
+    "jquery": "*",
+    "lodash": "*",
+    "underscore": "*",
+    "twig": "*"
+  },
+  "ignore": [
+    "**/*"
+  ]
+}

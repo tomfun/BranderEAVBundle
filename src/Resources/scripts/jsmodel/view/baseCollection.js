@@ -4,7 +4,7 @@ define([
     'templating',
     'underscore',
     'jquery',
-], function (Backbone, Marionette, Templating, _, $) {
+], function (Backbone, Marionette, templating, _, $) {
     'use strict';
 
     /*globals console*/
@@ -47,7 +47,7 @@ define([
                     }
                 }, this);
             }
-            this.template = Templating.get(this.templateName);
+            this.template = templating.get(this.templateName);
             this.collection.on('sync', this.collectionSync, this);
             this.applyChildViewHandlers();
             if (options) {

@@ -109,6 +109,19 @@
           </div>
         </div>
         <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">Filter Type</label>
+
+          <div class="col-sm-10">
+            <select class="form-control m-b" name="filterType">
+              {% for d in filterModels %}
+                <option value="{{ d }}">{{ d }}</option>
+              {% else %}
+                <option>loading...</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="hr-line-dashed"></div>
         <div class="form-group"><label class="col-sm-2 control-label">Attribute Type</label>
 
           <div class="col-sm-10">

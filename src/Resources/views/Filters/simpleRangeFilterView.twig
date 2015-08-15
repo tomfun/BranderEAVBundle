@@ -1,0 +1,30 @@
+<div class="value-range">
+  {% if attribute %}
+    <span>{{ attribute.title }}:</span>
+  {% endif %}
+  {% if discriminator == 'location' %}
+    <label>
+      lat
+      <input type="text" name="lat">
+    </label>
+    <label>
+      lon
+      <input type="text" name="lon">
+    </label>
+    <label>
+      radius
+      <input type="text" name="distance">
+      ({{ unit }})
+    </label>
+    <span class="error"></span>
+  {% else %}
+    <label>
+      from
+      <input type="text" name="gte">
+    </label>
+    <label>
+      to
+      <input type="text" name="lte">
+    </label>
+  {% endif %}
+</div>
