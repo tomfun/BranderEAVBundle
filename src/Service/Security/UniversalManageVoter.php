@@ -101,6 +101,9 @@ class UniversalManageVoter extends AbstractVoter
         if ($object instanceof Attribute && $attribute === self::VIEW) {
             return self::ACCESS_GRANTED;
         }
-        return in_array($this->role, $user->getRoles()) ? self::ACCESS_GRANTED : self::ACCESS_DENIED;
+        if ($user) {
+            return in_array($this->role, $user->getRoles()) ? self::ACCESS_GRANTED : self::ACCESS_DENIED;
+        }
+        return self::ACCESS_DENIED;
     }
 }
