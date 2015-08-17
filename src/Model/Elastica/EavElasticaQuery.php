@@ -364,5 +364,14 @@ abstract class EavElasticaQuery extends ElasticaQuery
     public function prettify()
     {
         $this->convertUsedAttributes();
+        $this->convertEavOrder();
+    }
+
+    protected function convertEavOrder()
+    {
+        $order = $this->getOrder();
+        if ($order && count($order)) {
+            $this->order[0] = preg_replace('/^(attributes)\.(\d+)$/', 'eav_values.$2', $order[0]);
+        }
     }
 }

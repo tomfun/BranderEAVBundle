@@ -74,7 +74,6 @@ define([
             };
         },
         "getGeoFilterData":   function (string) {
-            debugger;
             var value = string.trim();
             if (value) {
                 if (value.indexOf('distance:') !== -1) {
