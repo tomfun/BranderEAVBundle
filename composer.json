@@ -10,7 +10,6 @@
     "search"
   ],
   "license": "MIT",
-  "version": "0.0.3",
   "repositories": [
     {
       "type": "vcs",
@@ -32,7 +31,7 @@
     }
   ],
   "require": {
-    "tomfun/brander-elastica-skeleton": "0.0.3",
+    "tomfun/brander-elastica-skeleton": "0.0.4",
     "friendsofsymfony/rest-bundle": "*",
     "jms/di-extra-bundle": "*",
     "doctrine/orm": "*"
