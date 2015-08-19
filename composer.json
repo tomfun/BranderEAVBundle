@@ -32,6 +32,7 @@
   ],
   "require": {
     "tomfun/brander-elastica-skeleton": "0.0.4",
+    "werkint/stats-bundle": "*",
     "friendsofsymfony/rest-bundle": "*",
     "jms/di-extra-bundle": "*",
     "doctrine/orm": "*"

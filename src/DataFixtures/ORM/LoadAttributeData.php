@@ -103,6 +103,12 @@ class LoadAttributeData extends AbstractFixture
                 $manager->persist($option);
             }
         }
+        if (isset($attribute['filterType'])) {
+            $attr->setFilterType($attribute['filterType']);
+        }
+        if (isset($attribute['filterOrder'])) {
+            $attr->setFilterOrder((int)$attribute['filterOrder']);
+        }
 
         $localized = $attr->translate($this->getLocale());
         $localized->setTitle($attribute['title']);
@@ -118,7 +124,6 @@ class LoadAttributeData extends AbstractFixture
         if (isset($attribute['postfix'])) {
             $localized->setPostfix($attribute['postfix']);
         }
-
         $attr->mergeNewTranslations();
 
         $attr->setIsRequired(
@@ -132,7 +137,6 @@ class LoadAttributeData extends AbstractFixture
         );
 
         return $attr;
-
     }
 
     /**

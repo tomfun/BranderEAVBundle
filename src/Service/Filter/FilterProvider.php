@@ -10,15 +10,18 @@ use Brander\Bundle\EAVBundle\Model\Filter\FilterModelProviderInterface;
  */
 class FilterProvider implements FilterModelProviderInterface
 {
+    const RANGE_FILTER_SIMPLE = 'brander-eav/listing/simpleRangeFilterView';
+    const RANGE_FILTER_CUSTOM = 'brander-eav/listing/bucketRangeFilterView';
+
     /**
      * @inheritdoc
      */
     public function getAvailableFilterModels()
     {
         return [
-            'brander-eav/listing/bucketRangeFilterView',
             'brander-eav/listing/simpleFilterView',
-            'brander-eav/listing/simpleRangeFilterView',
+            self::RANGE_FILTER_SIMPLE,
+            self::RANGE_FILTER_CUSTOM,
         ];
     }
 }

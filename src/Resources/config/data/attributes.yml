@@ -19,6 +19,8 @@
   type: numeric
   title: Цфровой
   placeholder: 100
+  filterable: true
+  filterType: 'brander-eav/listing/simpleRangeFilterView'
 -
   type: input
   title: немного текста
@@ -42,6 +44,8 @@
   type: date
   title: дата
   placeholder: 12.11.13
+  filterable: true
+  filterType: 'brander-eav/listing/bucketRangeFilterView'
 -
   type: location
   title: latLan

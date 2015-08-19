@@ -14,10 +14,13 @@ use JMS\Serializer\Annotation as Serializer;
  */
 class ValueBoolean extends Value
 {
-    public function __construct()
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
     {
-        // TODO: удалять, если false
-        $this->setValue(true);
+        return !($this->value == true || $this->value === false);
     }
 
     /**
