@@ -83,6 +83,7 @@ define([
                         this.filter.set(field, this.getRangeQuery(this.lt, this.gt, this.lte, this.gte));
                     } catch (e) {
                         this.drawError(e);
+                        return;
                     }
                     break;
                 case 'location':
@@ -94,6 +95,7 @@ define([
                         this.filter.set(field, this.getGeoPointFilter(this.lat, this.lon, this.distance, this.unit));
                     } catch (e) {
                         this.drawError(e);
+                        return;
                     }
                     break;
             }

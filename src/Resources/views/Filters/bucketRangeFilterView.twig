@@ -1,24 +1,47 @@
 <div class="slide-drop">
-  <a href="#" class="opener"><span>Стоимость</span><i class="icon-arrow-down-small"></i></a>
-
+  <a href="#" class="opener">
+    <span>{% if title %}{{ title }}{% else %}{{ attribute.title }}{% endif %}</span>
+    <i class="icon-arrow-down-small"></i></a>
+{# look at field key_as_string, don't forget to add twigjs transchoice #}
   <div class="slide-holder">
     <div class="slide-frame">
       <div class="frame">
         <div class="value-range">
-          <input type="text">
+          <input type="text" name="gte">
 
           <div class="divider"></div>
-          <input type="text">
-          <span class="currency">грн</span>
+          <input type="text" name="lt">
+          <span class="currency">{{ unit|trans }}</span>
         </div>
-        <a href="#" class="btn-small">Применить</a>
+        <a href="#" class="btn-small apply">Применить</a>
       </div>
       <ul class="value-list">
-        <li><a href="#">До <b>100 000</b> грн</a></li>
-        <li><a href="#"><b>100 000</b> – <b>250 000</b> грн</a></li>
-        <li><a href="#"><b>250 000</b> – <b>500 000</b> грн</a></li>
-        <li><a href="#"><b>500 000</b> грн – <b>750 000</b> грн</a></li>
-        <li><a href="#">Больше <b>750 000</b> грн</a></li>
+        {% if aggregations is defined and aggregations|length > 1 %}
+          <li>
+            <a href="#" class="bucket-range" data-lt="{{ aggregations[1].key_value }}">
+              До <b>{{ aggregations[1].key_view }}</b> {{ unit|transchoice(aggr.key) }}
+              <span class="bucket-count">({{ aggregations[0].doc_count }})</span>
+            </a>
+          </li>
+        {% endif %}
+        {% for i, agg in aggregations|slice(2, aggregations|length - 3) %}
+          <li>
+            <a href="#" class="bucket-range"
+               data-gte="{{ aggregations[i+1].key_value }}" data-lt="{{ aggregations[i+2].key_value }}">
+              <b>{{ aggregations[i+1].key_view }}</b> – <b>{{ aggregations[2+i].key_view }}</b> {{ unit|transchoice(aggr.key) }}
+              <span class="bucket-count">({{ aggregations[0].doc_count }})</span>
+            </a>
+          </li>
+        {% endfor %}
+        {% if aggregations is defined and aggregations|length > 1 %}
+          {% set aggr = aggregations[aggregations|length - 2] %}
+          <li>
+            <a href="#" class="bucket-range" data-gte="{{ aggr.key_value }}">
+              Больше <b>{{ aggr.key_view }}</b> {{ unit|transchoice(aggr.key) }}
+              <span class="bucket-count">({{ aggr.doc_count + aggregations[aggregations|length - 1].doc_count }})</span>
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   </div>

@@ -10,6 +10,10 @@ define([
             BaseView.prototype.initialize.apply(this, arguments);
             Marionette.ItemView.prototype.initialize.apply(this, arguments);
         },
+        "onChangeAggregations": function(aggregations) {
+            //may be implement
+            return false;//doesn't need redraw
+        },
         "getGeoPointFilter":  function (latitude, longitude, distance, unit) {
             latitude = parseFloat(latitude);
             longitude = parseFloat(longitude);

@@ -8,7 +8,9 @@
     "jquery": "*",
     "lodash": "*",
     "underscore": "*",
-    "twig": "*"
+    "twig": "*",
+    "moment": "*",
+    "underscore.string": "*"
   },
   "ignore": [
     "**/*"

@@ -1,12 +1,4 @@
 <?php
-/**
- * EavElasticaResult.php
- *
- * @category   Brander
- * @package    Brander_EavElasticaResult.php
- * @author     brander.ua
- */
-
 namespace Brander\Bundle\EAVBundle\Model\Elastica;
 
 use Brander\Bundle\EAVBundle\Entity\Attribute;
@@ -57,7 +49,8 @@ abstract class EavElasticaQuery extends ElasticaQuery
      *  "10": "1"//10 - id of AttributeSelect entity that can be filtered
      *  "11": "buy milk"// 11 - id of AttributeInput or AttributeTextarea, full text search
      *  "2": "gte:2003-06-15T00:00:00+02:00;"// 2 - AttributeDate
-     *  "2": "2003-06-15"// 2 - AttributeDate, but this is bad idea (this not the range as above, this exact field search)
+     *  "2": "2003-06-15"// 2 - AttributeDate, but this is bad idea (this not the range as above, this exact field
+     * search)
      *  "8": "lt:255;"// AttributeInput
      * }
      * @Serializer\SerializedName("attributes")
@@ -151,7 +144,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
      * @see https://www.elastic.co/guide/en/elasticsearch/guide/current/filter-by-geopoint.html
      *
      * @param AttributeLocation $attr
-     * @param mixed $value
+     * @param mixed             $value
      * @return \Elastica\Filter\GeoDistance
      */
     protected function getGeoLocationFilter(AttributeLocation $attr, $value)
@@ -256,8 +249,8 @@ abstract class EavElasticaQuery extends ElasticaQuery
     }
 
     /**
-     * Add just geo distance filters
-     * @return \Elastica\Filter\GeoDistance[]
+     * Add just geo distance filters and range filters
+     * @return \Elastica\Filter\AbstractFilter[]
      */
     public function getFilters()
     {
@@ -274,14 +267,14 @@ abstract class EavElasticaQuery extends ElasticaQuery
                         $res[] = $filter;
                     }
                 } elseif ($attr instanceof AttributeNumeric) {
-                    if ($value = $this->parseRange($value, 'floatval')) {
-                        $filter = new \Elastica\Filter\NumericRange($fieldName, $value);
+                    if ($range = $this->parseRange($value, 'floatval')) {
+                        $filter = new \Elastica\Filter\NumericRange($fieldName, $range);
                         $res[] = $filter;
                     }
                 } elseif ($attr instanceof AttributeDate) {
                     $value = trim($value);
                     if ($range = $this->parseRange($value, [$this, 'dateFormatter'])) {
-                        $filter = new \Elastica\Filter\Range($fieldName, $value);
+                        $filter = new \Elastica\Filter\Range($fieldName, $range);
                         $res[] = $filter;
                     }
                 }
@@ -410,6 +403,112 @@ abstract class EavElasticaQuery extends ElasticaQuery
     /**
      * @param string[] $fieldName
      * @param string   $indexName
+     * @return Aggregation[]
+     */
+    protected function getAutoAggregationRange(array $fieldName, $indexName)
+    {
+        return [
+            new Aggregation(
+                $fieldName . '_max',
+                'max',
+                $indexName,
+                'setAutoAggregation',
+                ['type' => 'range', 'serializeName' => $fieldName,]
+            ),
+            new Aggregation(
+                $fieldName . '_min',
+                'min',
+                $indexName,
+                'setAutoAggregation',
+                ['type' => 'range', 'serializeName' => $fieldName,]
+            ),
+        ];
+    }
+
+    /**
+     * @param            $arr
+     * @param            $interval
+     * @param int        $size
+     * @param bool|float $rounding
+     */
+    protected function calculateIntervalByStats($arr, &$interval, $size = 10, $rounding = false)
+    {
+        if ($arr) {
+            $min = floor($arr['min']);
+            $max = ceil($arr['max']);
+        } else {
+            $max = $min = 0;
+        }
+        if ($max > $min) {
+            $interval = ($max - $min) / $size;
+        }
+        if ($rounding !== false) {
+            $digits = log10($interval);
+            $digits = round($digits);
+            $rounding = pow(10, $digits - 2) * 25;
+            $interval = round($interval / $rounding) * $rounding;
+        }
+    }
+
+    /**
+     * @param string[] $fieldName
+     * @param string   $indexName
+     * @param array    $options
+     * @return Aggregation[]
+     */
+    protected function getAutoAggregationHistogram(array $fieldName, $indexName, array $options = [])
+    {
+        $fieldName = implode('.', $fieldName);
+        if (isset($options['interval'])) {
+            $interval = $options['interval'];
+            $type = $options['type'];
+            if (!in_array($type, ['histogram', 'dateHistogram'])) {
+                throw new \InvalidArgumentException(
+                    "empty or wrong option['type']. You must set interval with type."
+                );
+            }
+        } else {
+            $interval = 100 * 1000 * 1000;
+            $size = isset($options['size']) ?: 10;
+            if (!isset($options['attribute_id'])) {
+                throw new \InvalidArgumentException(
+                    "empty option['attribute_id']. You must set interval or attribute_id."
+                );
+            }
+
+            /** @var Attribute $attr */
+            $attr = $this->getAttributeRepository()->findOneBy(['id' => $options['attribute_id']]);
+            $arr = $this->stats->getStat(ValueStatsProvider::VALUE_STAT, $options['attribute_id']);
+            $rounding = isset($options['rounding']) ? (float)$options['rounding'] : false;
+            $this->calculateIntervalByStats($arr, $size, $interval, $rounding);
+            if ($attr instanceof AttributeDate) {
+                $interval .= 's';
+            }
+            $type = $attr instanceof AttributeDate ? 'dateHistogram' : 'histogram';
+        }
+        return [
+            new Aggregation(
+                $fieldName . '_histogram',
+                $type,
+                $indexName,
+                'setAutoAggregation',
+                [
+                    'type'               => 'range_basket',
+                    'constructArguments' => [
+                        $fieldName . '_histogram',//name
+                        $indexName,//elastica field name
+                        $interval,
+                    ],
+                    'extractValueField'  => 'buckets',
+                    'serializeName'      => $fieldName,
+                ]
+            ),
+        ];
+    }
+
+    /**
+     * @param string[] $fieldName
+     * @param string   $indexName
      * @param string   $aggregationType
      * @return Aggregation[]
      */
@@ -419,58 +518,10 @@ abstract class EavElasticaQuery extends ElasticaQuery
         $fieldName = implode('.', $fieldName);
         switch ($aggregationType) {
             case 'range':
-                return [
-                    new Aggregation(
-                        $fieldName . '_max',
-                        'max',
-                        $indexName,
-                        'setAutoAggregation',
-                        ['type' => $aggregationType, 'serializeName' => $fieldName,]
-                    ),
-                    new Aggregation(
-                        $fieldName . '_min',
-                        'min',
-                        $indexName,
-                        'setAutoAggregation',
-                        ['type' => $aggregationType, 'serializeName' => $fieldName,]
-                    ),
-                ];
+                return $this->getAutoAggregationRange($fieldName, $indexName);
                 break;
             case 'range_basket':
-                /** @var Attribute $attr */
-                $attr = $this->getAttributeRepository()->findOneBy(['id' => $attrId]);
-                $arr = $this->stats->getStat(ValueStatsProvider::VALUE_STAT, ['attribute_id' => $attrId]);
-                if ($arr) {
-                    $min = floor($arr['min']);
-                    $max = ceil($arr['max']);
-                } else {
-                    $max = $min = 0;
-                }
-                $interval = 100 * 1000 * 1000;
-                if ($max != $min) {
-                    $interval = ($max - $min) / 10;
-                }
-                if ($attr instanceof AttributeDate) {
-                    $interval .= 's';
-                }
-                return [
-                    new Aggregation(
-                        $fieldName . '_histogram',
-                        $attr instanceof AttributeDate ? 'dateHistogram' : 'histogram',
-                        $indexName,
-                        'setAutoAggregation',
-                        [
-                            'type'               => $aggregationType,
-                            'constructArguments' => [
-                                $fieldName . '_histogram',//name
-                                $indexName,//elastica field name
-                                $interval,
-                            ],
-                            'extractValueField'  => 'buckets',
-                            'serializeName'      => $fieldName,
-                        ]
-                    ),
-                ];
+                return $this->getAutoAggregationHistogram($fieldName, $indexName, ['attribute_id' => $attrId]);
                 break;
         }
         return [];

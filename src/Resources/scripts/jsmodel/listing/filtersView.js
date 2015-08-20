@@ -17,12 +17,26 @@ define([
 
         "childViewOptions": function (model) {
             return _.merge(model.get('viewOptions'), {
-                filter: this.listing.get('filter')
+                filter: this.listing.get('filter'),
+                aggregations: this.aggregations
             });
         },
 
         "redrawOnChange": function () {
             this.listing.get('filters').on('sync', this.render, this);
+        },
+
+
+        "setAggregations": function (aggregations) {
+            var need;
+            _.each(this.children._views, function (view, id) {
+                if (view.onChangeAggregations(aggregations)) {
+                    need = true;
+                }
+            });
+            if (need) {
+                this.render();
+            }
         },
 
         "getCollection": function () {
@@ -31,6 +45,7 @@ define([
 
         "initialize": function (options) {
             this.listing = options.listing;
+            this.aggregations = options.aggregations;
             this.collection = this.getCollection();
             this.redrawOnChange();
             if (!this.collection.length) {
