@@ -13,6 +13,7 @@ interface SearchableCustomMappingsInterface extends SearchableEntityInterface
     const ELASTICA_MAPPING_FULLTEXT_ES = 'my_full_text_analyzer_es';
     const ELASTICA_MAPPING_FULLTEXT_EN = 'my_full_text_analyzer_en';
     const ELASTICA_MAPPING_GEO_POINT = 'geo_point';
+    const ELASTICA_MAPPING_NOT_ANALYZED = 'not_analyzed';
 
     /**
      * Customization elastica mappings. Used to set elastica analyzers on mapping field
