@@ -81,8 +81,7 @@ define([
             },
 
             "routingSet": function (attributes) {
-                debugger;
-                this.set(attributes, false);//todo: ?! check router
+                this.set(attributes, false);
                 return this;
             },
         };
