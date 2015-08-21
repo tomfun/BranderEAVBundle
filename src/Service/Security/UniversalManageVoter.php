@@ -89,21 +89,21 @@ class UniversalManageVoter extends AbstractVoter
     {
         if ($object instanceof FakeCollection) {
             if (!$this->supportsClass($object->getCollectionClass())) {
-                return self::ACCESS_ABSTAIN;
+                return false;
             }
         }
         if ($object instanceof AttributeGroup && $attribute === self::VIEW) {
-            return self::ACCESS_GRANTED;
+            return true;
         }
         if ($object instanceof AttributeSet && $attribute === self::VIEW) {
-            return self::ACCESS_GRANTED;
+            return true;
         }
         if ($object instanceof Attribute && $attribute === self::VIEW) {
-            return self::ACCESS_GRANTED;
+            return true;
         }
         if ($user) {
-            return in_array($this->role, $user->getRoles()) ? self::ACCESS_GRANTED : self::ACCESS_DENIED;
+            return in_array($this->role, $user->getRoles());
         }
-        return self::ACCESS_DENIED;
+        return false;
     }
 }
