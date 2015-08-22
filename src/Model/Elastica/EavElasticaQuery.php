@@ -478,9 +478,9 @@ abstract class EavElasticaQuery extends ElasticaQuery
 
             /** @var Attribute $attr */
             $attr = $this->getAttributeRepository()->findOneBy(['id' => $options['attribute_id']]);
-            $arr = $this->stats->getStat(ValueStatsProvider::VALUE_STAT, $options['attribute_id']);
+            $arr = $this->stats->getStat(ValueStatsProvider::VALUE_STAT, $options);
             $rounding = isset($options['rounding']) ? (float)$options['rounding'] : false;
-            $this->calculateIntervalByStats($arr, $size, $interval, $rounding);
+            $this->calculateIntervalByStats($arr, $interval, $size, $rounding);
             if ($attr instanceof AttributeDate) {
                 $interval .= 's';
             }
@@ -515,7 +515,6 @@ abstract class EavElasticaQuery extends ElasticaQuery
     protected function getAutoAggregation(array $fieldName, $indexName, $aggregationType)
     {
         $attrId = $fieldName[1];
-        $fieldName = implode('.', $fieldName);
         switch ($aggregationType) {
             case 'range':
                 return $this->getAutoAggregationRange($fieldName, $indexName);
