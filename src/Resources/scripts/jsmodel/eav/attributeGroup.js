@@ -4,7 +4,7 @@ define([
     'util/basemodel',
     './attribute',
     './attributeCollection',
-    'routing',
+    'router',
     './translationCollection',
 
     'backbone.chaining'

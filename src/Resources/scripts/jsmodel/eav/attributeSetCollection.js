@@ -2,7 +2,7 @@ define([
     'lodash',
     'backbone',
     './attributeSet',
-    'routing'
+    'router'
 ], function (_, Backbone, Model, Routing) {
     'use strict';
 

@@ -3,7 +3,7 @@ define([
     'jquery',
     'backbone',
     'util/basemodel',
-    'routing',
+    'router',
     './optionCollection',
     './translationCollection'
 ], function (_, $, Backbone, BaseModel, Routing, OptionCollection, TranslationCollection) {

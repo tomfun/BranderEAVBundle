@@ -1,7 +1,7 @@
 define([
     'lodash',
     'backbone',
-    'routing',
+    'router',
     'util/basemodel',
     './attribute',
     './attributeCollection'

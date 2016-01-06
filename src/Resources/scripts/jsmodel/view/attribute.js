@@ -10,7 +10,7 @@ define([
     'brander-eav/view/optionItem',
     'brander-eav/view/validation',
     'jquery',
-    'routing',
+    'router',
 
     'backbone.chaining',
     'backbone.modelbinder',
