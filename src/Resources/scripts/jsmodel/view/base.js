@@ -1,6 +1,6 @@
 define([
     'backbone',
-    'templating',
+    'werkint-templating/templating',
     'underscore'
 ], function (Backbone, Templating, _) {
     'use strict';

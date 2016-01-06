@@ -1,7 +1,7 @@
 define([
     'lodash',
     'backbone.marionette',
-    'templating',
+    'werkint-templating/templating',
     'brander-eav/listing/filtersLoader!',
 ], function (_, Marionette, templating, ChildViews) {
     'use strict';

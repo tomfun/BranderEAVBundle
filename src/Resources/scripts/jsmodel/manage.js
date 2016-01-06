@@ -1,7 +1,7 @@
 define([
     'jquery',
     'backbone',
-    'templating',
+    'werkint-templating/templating',
     './eav',
     './view/attributeCollection',
     './view/attributeItem',

@@ -1,7 +1,7 @@
 define([
     'backbone',
     'backbone.marionette',
-    'templating',
+    'werkint-templating/templating',
     'underscore',
     'jquery',
 ], function (Backbone, Marionette, templating, _, $) {

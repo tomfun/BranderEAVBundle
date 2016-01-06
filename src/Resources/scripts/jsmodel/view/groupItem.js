@@ -1,7 +1,6 @@
 define([
     'underscore',
     './setItem',
-    'templating'
 ], function (_, SetItemView) {
     'use strict';
 
