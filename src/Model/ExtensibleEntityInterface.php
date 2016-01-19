@@ -3,6 +3,7 @@ namespace Brander\Bundle\EAVBundle\Model;
 
 use Brander\Bundle\EAVBundle\Entity\AttributeSet;
 use Brander\Bundle\EAVBundle\Entity\Value;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * ExtensibleEntityInterface.
@@ -16,7 +17,7 @@ interface ExtensibleEntityInterface
     public function getAttributeSet();
 
     /**
-     * @return Value[]
+     * @return Value[]|Collection
      */
     public function getValues();
 

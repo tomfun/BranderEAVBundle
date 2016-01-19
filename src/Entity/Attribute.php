@@ -50,6 +50,8 @@ use Werkint\Bundle\FrameworkExtraBundle\Model\Translatable;
  */
 abstract class Attribute
 {
+    protected $defaultLocale = 'ru';
+
     /**
      * Constructor
      */

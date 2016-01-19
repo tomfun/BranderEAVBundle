@@ -19,6 +19,7 @@ use Werkint\Bundle\FrameworkExtraBundle\Model\Translatable;
  */
 class AttributeSelectOption
 {
+    protected $defaultLocale = 'ru';
 
     // -- Entity ---------------------------------------
 

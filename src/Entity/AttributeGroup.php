@@ -26,6 +26,8 @@ use Werkint\Bundle\FrameworkExtraBundle\Model\Translatable;
  */
 class AttributeGroup
 {
+    protected $defaultLocale = 'ru';
+
     /**
      * @inheritdoc
      */

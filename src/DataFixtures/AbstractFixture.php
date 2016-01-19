@@ -1,6 +1,11 @@
 <?php
 namespace Brander\Bundle\EAVBundle\DataFixtures;
 
+use Brander\Bundle\EAVBundle\Entity as EAV;
+use Brander\Bundle\EAVBundle\Model\ExtensibleEntityInterface;
+use Brander\Bundle\EAVBundle\Model\GeoLocation;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\DataFixtures\AbstractFixture as BaseAbstractFixture;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
@@ -94,9 +99,68 @@ abstract class AbstractFixture extends BaseAbstractFixture implements
         if (!self::$faker) {
             $localeFull = $this->getLocale();
             $localeFull .= '_' . strtoupper($localeFull);
-            self::$faker = \Faker\Factory::create();
+            self::$faker = \Faker\Factory::create($localeFull);
         }
         return self::$faker;
+    }
+
+    /**
+     * @param EAV\Attribute $attribute
+     * @return EAV\Value
+     */
+    public function createValue(EAV\Attribute $attribute)
+    {
+        if ($attribute instanceof EAV\AttributeNumeric) {
+            $value = new EAV\ValueNumeric();
+            $value->setValue($this->getFaker()->numberBetween(0, 200));
+
+        } elseif ($attribute instanceof EAV\AttributeInput) {
+            $value = new EAV\ValueInput();
+            $value->setValue($this->getFaker()->name);
+
+        } elseif ($attribute instanceof EAV\AttributeTextarea) {
+            $value = new EAV\ValueTextarea();
+            $value->setValue($this->getFaker()->realText(mt_rand(20, 200)));
+
+        } elseif ($attribute instanceof EAV\AttributeSelect) {
+            $value = new EAV\ValueSelect();
+            $index = mt_rand(0, $attribute->getOptions()->count() - 1);
+            $value->setValue($attribute->getOptions()[$index]);
+        } elseif ($attribute instanceof EAV\AttributeBoolean) {
+            $value = new EAV\ValueBoolean();
+            $value->setValue($this->getFaker()->boolean());
+        } elseif ($attribute instanceof EAV\AttributeDate) {
+            $value = new EAV\ValueDate();
+            $value->setValue($this->getFaker()->date());
+        } elseif ($attribute instanceof EAV\AttributeLocation) {
+            $value = new EAV\ValueLocation();
+            $location = new GeoLocation();
+            $location->setLat($this->getFaker()->latitude);
+            $location->setLon($this->getFaker()->longitude);
+            $value->setValue($location);
+        } else {
+            throw new \InvalidArgumentException('Wrong attribute class ' . get_class($attribute));
+        }
+
+        $value->setAttribute($attribute);
+
+
+        return $value;
+    }
+
+    /**
+     * @param ExtensibleEntityInterface $entity
+     */
+    public function setEavValues(ExtensibleEntityInterface $entity)
+    {
+        $values = $entity->getValues();
+        if (!($values instanceof Collection)) {
+            $values = new ArrayCollection(is_array($values) ? $values : []);
+            $entity->setValues($values);
+        }
+        foreach ($entity->getAttributeSet()->getAttributes() as $attribute) {
+            $values->add($this->createValue($attribute));
+        }
     }
 
     /**
