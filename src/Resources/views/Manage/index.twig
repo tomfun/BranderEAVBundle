@@ -14,7 +14,13 @@
 {% twigjs '@BranderEAV/Widgets/group.item.twig' %}
 {% twigjs '@BranderEAV/Widgets/group.one.twig' %}
 
-{% block baseScripts %}
+{% block stylesheets %}
+  <link rel="stylesheet" type="text/css" href="{{ asset('/bundles/brandereav/css/font-awesome.min.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ asset('/bundles/brandereav/css/bootstrap.min.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ asset('/bundles/brandereav/css/manage.css') }}" />
+{% endblock %}
+
+{% block javascripts %}
   {{ parent() }}
   <script type="text/javascript">
     requirejs(['brander-eav/manage'], function(ManageView) {
@@ -27,6 +33,6 @@
   </script>
 {% endblock %}
 
-{% block page %}
-
+{% block body %}
+<div id="page_content"></div>
 {% endblock %}

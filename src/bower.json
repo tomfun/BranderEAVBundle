@@ -4,13 +4,16 @@
   "dependencies": {
     "backbone.marionette": "*",
     "backbone.relational": "*",
+    "backbone-chaining": "*",
     "backbone": "*",
     "jquery": "*",
+    "jquery-ui": "*",
     "lodash": "*",
     "underscore": "*",
-    "twig": "*",
+    "twig.js": "*",
     "moment": "*",
-    "underscore.string": "*"
+    "underscore.string": "*",
+    "requirejs-domready": "*"
   },
   "ignore": [
     "**/*"

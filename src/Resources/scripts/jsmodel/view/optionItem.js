@@ -1,6 +1,6 @@
 define([
     'backbone.marionette',
-    'templating',
+    'werkint-templating/templating',
     'backbone',
 
     'backbone.modelbinder'

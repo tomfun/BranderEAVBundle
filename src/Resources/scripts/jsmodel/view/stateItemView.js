@@ -1,7 +1,7 @@
 define([
     'underscore',
     'backbone.marionette',
-    'templating'
+    'werkint-templating/templating'
 ], function (_, Marionette, templating) {
     'use strict';
 
