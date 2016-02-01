@@ -263,7 +263,7 @@ class RestAttributeController
      * )
      *
      * @Rest\Get("/{attribute}", name="brander_eav_attribute_get", defaults={"_format": "json"})
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"Default"})
      * @param Attribute $attribute
      * @return Attribute
      */

@@ -63,7 +63,7 @@ class UniversalManageVoter extends AbstractVoter
      */
     protected function getSupportedAttributes()
     {
-        RETURN [
+        return [
             self::CREATE,
             self::VIEW,
             self::UPDATE,
@@ -102,7 +102,11 @@ class UniversalManageVoter extends AbstractVoter
             return true;
         }
         if ($user) {
-            return in_array($this->role, $user->getRoles());
+            if ($user === 'anon.' && $this->role === $user) {
+                return true;
+            } elseif (method_exists($user, 'getRoles')) {
+                return in_array($this->role, $user->getRoles());
+            }
         }
         return false;
     }
