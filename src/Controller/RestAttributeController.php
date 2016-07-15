@@ -47,70 +47,6 @@ class RestAttributeController
     private $securityChecker;
 
     /**
-     * @param Attribute $attribute
-     * @param Attribute $attributeNew
-     * @return array
-     */
-    protected function check(Attribute $attribute, Attribute $attributeNew)
-    {
-        $oldOptions = [];
-        $usedOptions = [];
-        $newOptions = [];
-
-        $used = $this->repoValue->getUsed($attribute);
-
-        if ($attribute instanceof AttributeSelect) {
-            foreach ($attribute->getOptions() as $option) {
-                $oldOptions[$option->getId()] = $option;
-            }
-            foreach ($used as $value) {
-                $usedOptions[$value->getOption()->getId()] = $value->getOption();
-            }
-        }
-        if (($attributeNew instanceof AttributeSelect)) {
-            if ($attribute instanceof AttributeSelect && $attributeNew->getOptions()) {
-                foreach ($attributeNew->getOptions() as $option) {
-                    if ($option->getId() && isset($oldOptions[$option->getId()])) {
-                        unset($oldOptions[$option->getId()]);
-                    }
-                    if ($option->getId() && isset($usedOptions[$option->getId()])) {
-                        unset($usedOptions[$option->getId()]);
-                    }
-                    if (!$option->getId()) {
-                        $newOptions[] = $option;
-                    }
-                }
-            }
-        }
-
-        return [
-            'optionsNew'        => array_values($newOptions),
-            'optionsUsed'       => array_values($usedOptions),
-            'optionsRemove'     => array_values($oldOptions),
-            'optionsRemoveUsed' => array_values(array_intersect_key($oldOptions, $usedOptions)),
-            'recreate'          => get_class($attribute) != get_class($attributeNew),
-        ];
-    }
-
-    /**
-     * @param string $content
-     * @return Attribute
-     */
-    protected function deserialize($content)
-    {
-        $context = DeserializationContext::create();
-        $context->setGroups(["admin", "Default"]);
-
-        $contentJson = json_decode($content, true);
-        if (isset($contentJson['id'])) {
-            unset($contentJson['id']);
-            $content = json_encode($contentJson);
-        }
-        /** @var Attribute $attributeNew */
-        return $this->serializer->deserialize($content, Attribute::class, 'json', $context);
-    }
-
-    /**
      * @ApiDoc(
      *      output="Brander\Bundle\EAVBundle\Entity\Attribute"
      * )
@@ -119,6 +55,7 @@ class RestAttributeController
      * @Rest\View()
      * @param Request $request
      * @return Attribute
+     * @throws AccessDeniedException
      */
     public function postAction(Request $request)
     {
@@ -132,6 +69,7 @@ class RestAttributeController
                 $this->em->persist($option->setAttribute($attribute));
             }
         }
+
         return $this->flush($attribute);
     }
 
@@ -142,9 +80,10 @@ class RestAttributeController
      *
      * @Rest\Put("/{attribute}", name="brander_eav_attribute_put", defaults={"_format": "json"})
      * @Rest\View(serializerGroups={"Default", "translations"})
-     * @param Request $request
+     * @param Request   $request
      * @param Attribute $attribute
      * @return Attribute
+     * @throws AccessDeniedException
      */
     public function putAction(Request $request, Attribute $attribute)
     {
@@ -212,6 +151,7 @@ class RestAttributeController
                 $this->em->persist($option);
             }
         }
+
         return $this->flush($attributeNew);
     }
 
@@ -222,9 +162,10 @@ class RestAttributeController
      *
      * @Rest\Patch("/{attribute}", name="brander_eav_attribute_check", defaults={"_format": "json"})
      * @Rest\View()
-     * @param Request $request
+     * @param Request   $request
      * @param Attribute $attribute
      * @return Attribute
+     * @throws AccessDeniedException
      */
     public function checkAction(Request $request, Attribute $attribute)
     {
@@ -232,9 +173,9 @@ class RestAttributeController
             throw new AccessDeniedException();
         }
         $attributeNew = $this->deserialize($request->getContent());
+
         return $this->check($attribute, $attributeNew);
     }
-
 
     /**
      * @ApiDoc(
@@ -245,7 +186,7 @@ class RestAttributeController
      * @Rest\View()
      * @param Attribute $attribute
      * @return array
-     * @internal param Request $request
+     * @throws AccessDeniedException
      */
     public function deleteAction(Attribute $attribute)
     {
@@ -254,6 +195,7 @@ class RestAttributeController
         }
         $this->em->remove($attribute);
         $this->em->flush();
+
         return ['ok' => true];
     }
 
@@ -266,12 +208,80 @@ class RestAttributeController
      * @Rest\View(serializerGroups={"Default"})
      * @param Attribute $attribute
      * @return Attribute
+     * @throws AccessDeniedException
      */
     public function getAction(Attribute $attribute)
     {
         if (!$this->securityChecker->isGranted(UniversalManageVoter::VIEW, $attribute)) {
             throw new AccessDeniedException();
         }
+
         return $attribute;
+    }
+
+    /**
+     * @param Attribute $attribute
+     * @param Attribute $attributeNew
+     * @return array
+     */
+    protected function check(Attribute $attribute, Attribute $attributeNew)
+    {
+        $oldOptions = [];
+        $usedOptions = [];
+        $newOptions = [];
+
+        $used = $this->repoValue->getUsed($attribute);
+
+        if ($attribute instanceof AttributeSelect) {
+            foreach ($attribute->getOptions() as $option) {
+                $oldOptions[$option->getId()] = $option;
+            }
+            foreach ($used as $value) {
+                $usedOptions[$value->getOption()->getId()] = $value->getOption();
+            }
+        }
+        if (($attributeNew instanceof AttributeSelect)) {
+            if ($attribute instanceof AttributeSelect && $attributeNew->getOptions()) {
+                foreach ($attributeNew->getOptions() as $option) {
+                    if ($option->getId() && isset($oldOptions[$option->getId()])) {
+                        unset($oldOptions[$option->getId()]);
+                    }
+                    if ($option->getId() && isset($usedOptions[$option->getId()])) {
+                        unset($usedOptions[$option->getId()]);
+                    }
+                    if (!$option->getId()) {
+                        $newOptions[] = $option;
+                    }
+                }
+            }
+        }
+
+        return [
+            'optionsNew'        => array_values($newOptions),
+            'optionsUsed'       => array_values($usedOptions),
+            'optionsRemove'     => array_values($oldOptions),
+            'optionsRemoveUsed' => array_values(array_intersect_key($oldOptions, $usedOptions)),
+            'recreate'          => get_class($attribute) != get_class($attributeNew),
+        ];
+    }
+
+    /**
+     * @param string $content
+     * @return Attribute
+     */
+    protected function deserialize($content)
+    {
+        $context = DeserializationContext::create();
+        $context->setGroups(["admin", "Default"]);
+
+        $contentJson = json_decode($content, true);
+        if (isset($contentJson['id'])) {
+            unset($contentJson['id']);
+            $content = json_encode($contentJson);
+        }
+
+        /** @var Attribute $attributeNew */
+
+        return $this->serializer->deserialize($content, Attribute::class, 'json', $context);
     }
 }

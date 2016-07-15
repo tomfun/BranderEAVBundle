@@ -36,18 +36,6 @@ class RestSetController
     private $securityChecker;
 
     /**
-     * @param string $content
-     * @return AttributeSet
-     */
-    protected function deserializeSet($content)
-    {
-        $context = DeserializationContext::create();
-        $context->setGroups(["Default", "attributes", "admin"]);
-
-        return $this->serializer->deserialize($content, AttributeSet::class, 'json', $context);
-    }
-
-    /**
      * @ApiDoc(
      *      output="Brander\Bundle\EAVBundle\Entity\AttributeSet"
      * )
@@ -65,9 +53,9 @@ class RestSetController
             throw new AccessDeniedException();
         }
         $this->em->persist($attributeSet);
+
         return $this->flush($attributeSet);
     }
-
 
     /**
      * @ApiDoc(
@@ -77,7 +65,7 @@ class RestSetController
      * @Rest\Put("/{attributeSet}", name="brander_eav_attribute_set_put", defaults={"_format": "json"})
      * @Rest\View(serializerGroups={"attributes", "Default"})
      * *Cache(expires="+3 hours")
-     * @param Request $request
+     * @param Request      $request
      * @param AttributeSet $attributeSet
      * @return AttributeSet
      */
@@ -87,9 +75,9 @@ class RestSetController
             throw new AccessDeniedException();
         }
         $attributeSetNew = $this->deserializeSet($request->getContent());
+
         return $this->flush($attributeSetNew);
     }
-
 
     /**
      * @ApiDoc(
@@ -107,6 +95,7 @@ class RestSetController
             throw new AccessDeniedException();
         }
         $this->em->flush();
+
         return ['ok' => true];
     }
 
@@ -125,6 +114,19 @@ class RestSetController
         if (!$this->securityChecker->isGranted(UniversalManageVoter::VIEW, $attributeSet)) {
             throw new AccessDeniedException();
         }
+
         return $attributeSet;
+    }
+
+    /**
+     * @param string $content
+     * @return AttributeSet
+     */
+    protected function deserializeSet($content)
+    {
+        $context = DeserializationContext::create();
+        $context->setGroups(["Default", "attributes", "admin"]);
+
+        return $this->serializer->deserialize($content, AttributeSet::class, 'json', $context);
     }
 }

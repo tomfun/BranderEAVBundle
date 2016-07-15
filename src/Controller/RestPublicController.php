@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-
 /**
  * @author tomfun
  * @Rest\Route("/eav/collections")
@@ -72,22 +71,6 @@ class RestPublicController
     private $holder;
 
     /**
-     * @param array|ArrayCollection $list
-     * @param bool $manage
-     * @param null|SerializationContext $cxt
-     * @return Response
-     */
-    protected function response($list, $manage, SerializationContext $cxt = null)
-    {
-        $data = $this->serializer->serialize($list, 'json', $cxt);
-        $resp = new Response($data);
-        if (!$manage) {
-            $resp->setPublic()->setMaxAge(6 * 60 * 60)->setExpires(new \DateTime("+4 hours"));
-        }
-        return $resp;
-    }
-
-    /**
      * @ApiDoc(
      *      output="array<Brander\Bundle\EAVBundle\Entity\AttributeSet>"
      * )
@@ -109,9 +92,9 @@ class RestPublicController
                 throw new AccessDeniedException();
             }
         }
+
         return $this->response($list, $manage);
     }
-
 
     /**
      * @ApiDoc(
@@ -137,6 +120,7 @@ class RestPublicController
             }
             $cxt->setGroups(['Default', 'translations']);
         }
+
         return $this->response($list, $manage, $cxt);
 
     }
@@ -165,6 +149,7 @@ class RestPublicController
             }
             $cxt->setGroups(['Default', 'translations']);
         }
+
         return $this->response($list, $manage, $cxt);
     }
 
@@ -196,5 +181,22 @@ class RestPublicController
     public function getFiltersAction()
     {
         return $this->holder->getJsModels();
+    }
+
+    /**
+     * @param array|ArrayCollection     $list
+     * @param bool                      $manage
+     * @param null|SerializationContext $cxt
+     * @return Response
+     */
+    protected function response($list, $manage, SerializationContext $cxt = null)
+    {
+        $data = $this->serializer->serialize($list, 'json', $cxt);
+        $resp = new Response($data);
+        if (!$manage) {
+            $resp->setPublic()->setMaxAge(6 * 60 * 60)->setExpires(new \DateTime("+4 hours"));
+        }
+
+        return $resp;
     }
 }

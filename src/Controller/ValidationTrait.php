@@ -37,8 +37,10 @@ trait ValidationTrait
             $this->em->flush();
         } catch (\Exception $e) {
             $errorsList[] = $e->getMessage();
+
             return new Response(json_encode($errorsList), 418);
         }
+
         return $object;
     }
 }

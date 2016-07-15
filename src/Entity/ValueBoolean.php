@@ -14,7 +14,6 @@ use JMS\Serializer\Annotation as Serializer;
  */
 class ValueBoolean extends Value
 {
-
     /**
      * @return bool
      */

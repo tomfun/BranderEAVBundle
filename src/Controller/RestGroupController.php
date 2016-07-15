@@ -34,18 +34,6 @@ class RestGroupController
     use ValidationTrait;
 
     /**
-     * @param string $content
-     * @return AttributeGroup
-     */
-    protected function deserializeGroup($content)
-    {
-        $context = DeserializationContext::create();
-        $context->setGroups(["Default", "attributes", "admin"]);
-
-        return $this->serializer->deserialize($content, AttributeGroup::class, 'json', $context);
-    }
-
-    /**
      * @ApiDoc(
      *      output="Brander\Bundle\EAVBundle\Entity\AttributeGroup"
      * )
@@ -64,6 +52,7 @@ class RestGroupController
         }
         $attributeGroup->mergeNewTranslations();
         $this->em->persist($attributeGroup);
+
         return $this->flush($attributeGroup);
     }
 
@@ -83,6 +72,7 @@ class RestGroupController
         if (!$this->securityChecker->isGranted(UniversalManageVoter::VIEW, $attributeGroup)) {
             throw new AccessDeniedException();
         }
+
         return $attributeGroup;
     }
 
@@ -104,9 +94,9 @@ class RestGroupController
             throw new AccessDeniedException();
         }
         $attributeGroupNew->mergeNewTranslations();
+
         return $this->flush($attributeGroupNew);
     }
-
 
     /**
      * @ApiDoc(
@@ -126,7 +116,19 @@ class RestGroupController
         }
         $this->em->remove($attributeGroup);
         $this->em->flush();
+
         return ['ok' => true];
     }
 
+    /**
+     * @param string $content
+     * @return AttributeGroup
+     */
+    protected function deserializeGroup($content)
+    {
+        $context = DeserializationContext::create();
+        $context->setGroups(["Default", "attributes", "admin"]);
+
+        return $this->serializer->deserialize($content, AttributeGroup::class, 'json', $context);
+    }
 }

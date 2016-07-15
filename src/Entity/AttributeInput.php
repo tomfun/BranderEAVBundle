@@ -15,4 +15,5 @@ use JMS\Serializer\Annotation as Serializer;
  */
 class AttributeInput extends Attribute
 {
+
 }

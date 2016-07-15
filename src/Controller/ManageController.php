@@ -10,7 +10,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-
 /**
  * Return views and js for managing attributes
  *
@@ -31,12 +30,14 @@ class ManageController
      * @Rest\View()
      * @Cache(expires="+3 hours", public=true)
      * @return array
+     * @throws AccessDeniedException
      */
     public function indexAction()
     {
         if (!$this->securityChecker->isGranted(UniversalManageVoter::MANAGE, new FakeCollection(Attribute::class))) {
             throw new AccessDeniedException();
         }
+
         return [];
     }
 }
