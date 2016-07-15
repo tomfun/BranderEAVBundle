@@ -32,6 +32,14 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
     const JMS_SERIALIZER_CLASS = 'FOS\ElasticaBundle\Serializer\Callback';
 
     /**
+     * {@inheritdoc}
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($this->getAlias(), $container->getParameter('locale'));
+    }
+
+    /**
      * Use
      * @param ContainerBuilder $container
      */
@@ -73,11 +81,11 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configDir = realpath(__DIR__ . '/../Resources/config');
+        $configDir = realpath(__DIR__.'/../Resources/config');
 
         $processor = new Processor();
         $config = $processor->processConfiguration(
-            new Configuration($this->getAlias()),
+            $this->getConfiguration($configs, $container),
             $configs
         );
 
@@ -88,38 +96,43 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
             $config
         );
         $container->setParameter(
-            $this->getAlias() . '.config_directory',
+            $this->getAlias().'.config_directory',
             $configDir
         );
+        $container->setParameter(
+            $this->getAlias().'.locales_supported',
+            $config['locales_supported']
+        );
+
         // fixtures config
         if ($config['fixturesDirectory']) {
             $fixturesDir = rtrim($config['fixturesDirectory'], '\/');
             $fixturesDir = str_replace('%kernel.root_dir%', $container->getParameter('kernel.root_dir'), $fixturesDir);
             $fixturesDir = realpath($fixturesDir);
         } else {
-            $fixturesDir = $configDir . '/data';
+            $fixturesDir = $configDir.'/data';
         }
         $container->setParameter(
-            $this->getAlias() . '.fixtures_directory',
+            $this->getAlias().'.fixtures_directory',
             $fixturesDir
         );
         //old style
         $container->setParameter(
-            $this->getAlias() . '.jsmodeldir',
-            realpath(__DIR__ . '/../Resources/scripts/jsmodel')
+            $this->getAlias().'.jsmodeldir',
+            realpath(__DIR__.'/../Resources/scripts/jsmodel')
         );
         //new style
         $container->setParameter(
-            $this->getAlias() . '.' . 'frontend_config', //JsmodelProviderPass::PARAMETER_POSTFIX,
+            $this->getAlias().'.'.'frontend_config', //JsmodelProviderPass::PARAMETER_POSTFIX,
             [
                 [
-                    'path' => realpath(__DIR__ . '/../Resources/scripts/jsmodel'),
+                    'path' => realpath(__DIR__.'/../Resources/scripts/jsmodel'),
                     'name' => 'brander-eav',
                 ],
             ]
         );
 
-        $container->setParameter($this->getAlias() . '.manageRole', $config['manageRole']);
+        $container->setParameter($this->getAlias().'.manageRole', $config['manageRole']);
 
         $loader = new YamlFileLoader(
             $container,
@@ -149,26 +162,26 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
             $class = $classMap['entity'];
             if (!class_exists($class, true)) {
                 throw new \InvalidArgumentException(
-                    'in brander_eav.list_class_map.entity class: ' . $class . ' not found'
+                    'in brander_eav.list_class_map.entity class: '.$class.' not found'
                 );
             }
             if (!is_subclass_of($class, self::MODEL_SEARCHABLE_INTERFACE)) {
                 throw new \InvalidArgumentException(
                     'in brander_eav.list_class_map.entity class: '
-                    . $class
-                    . ' not implement '
-                    . self::MODEL_SEARCHABLE_INTERFACE
+                    .$class
+                    .' not implement '
+                    .self::MODEL_SEARCHABLE_INTERFACE
                 );
             }
 
             $lastNameCamel = substr($class, strrpos($class, '\\') + 1);
             $lastName = strtolower($lastNameCamel);
-            $name = substr($class, 0, strpos($class, '\\')) . '_' . $lastName;
+            $name = substr($class, 0, strpos($class, '\\')).'_'.$lastName;
             $name = strtolower($name);
             $classMap['lastName'] = $lastName;
             $classMap['name'] = $name;
-            $classMap['finder'] = 'fos_elastica.finder.' . $name . '.' . $lastName;
-            $classMap['list'] = 'brander_eav.model.elastica.list.' . $name . '.' . $lastName;
+            $classMap['finder'] = 'fos_elastica.finder.'.$name.'.'.$lastName;
+            $classMap['list'] = 'brander_eav.model.elastica.list.'.$name.'.'.$lastName;
 
             $elasticaNameSpace = substr(
                 $class,
@@ -179,22 +192,22 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
 
             $resultClass = $classMap['result'];
             if (!$resultClass) {
-                $resultClass = $elasticaNameSpace . '\\' . $lastNameCamel . 'Result';
+                $resultClass = $elasticaNameSpace.'\\'.$lastNameCamel.'Result';
             }
             if (!is_subclass_of($resultClass, EavElasticaResult::class) && $resultClass !== EavElasticaResult::class) {
                 throw new \InvalidArgumentException(
-                    "Class map element: '" . $resultClass . "' is not extended from  '" . EavElasticaResult::class
+                    "Class map element: '".$resultClass."' is not extended from  '".EavElasticaResult::class
                 );
             }
             $classMap['result'] = $resultClass;
 
             $queryClass = $classMap['query'];
             if (!$queryClass) {
-                $queryClass = $elasticaNameSpace . '\\' . $lastNameCamel . 'Query';
+                $queryClass = $elasticaNameSpace.'\\'.$lastNameCamel.'Query';
             }
             if (!is_subclass_of($queryClass, EavElasticaQuery::class) && $queryClass !== EavElasticaQuery::class) {
                 throw new \InvalidArgumentException(
-                    "Class map key: '" . $queryClass . "' is not extended from  '" . EavElasticaQuery::class
+                    "Class map key: '".$queryClass."' is not extended from  '".EavElasticaQuery::class
                 );
             }
             $classMap['query'] = $queryClass;
@@ -205,9 +218,9 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
     /**
      * Subscribe on serialize event
      *
-     * @param array $classes An array of searchable classes
+     * @param array            $classes An array of searchable classes
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param bool $useJmsSerializer
+     * @param bool             $useJmsSerializer
      */
     private function makeSerializeHandlers(array $classes, ContainerBuilder $container, $useJmsSerializer = true)
     {
@@ -218,17 +231,17 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
         }
         foreach ($classes as $class) {
             if (!class_exists($class, true)) {
-                throw new \InvalidArgumentException('in brander_eav.searchable class: ' . $class . ' not found');
+                throw new \InvalidArgumentException('in brander_eav.searchable class: '.$class.' not found');
             }
             if (!is_subclass_of($class, self::MODEL_SEARCHABLE_INTERFACE)) {
                 throw new \InvalidArgumentException(
-                    'in brander_eav.searchable class: ' . $class . ' not implement ' . self::MODEL_SEARCHABLE_INTERFACE
+                    'in brander_eav.searchable class: '.$class.' not implement '.self::MODEL_SEARCHABLE_INTERFACE
                 );
             }
             $serializeHandler->addTag(
                 "jms_serializer.handler",
                 [
-                    'type'   => $class,
+                    'type' => $class,
                     'format' => "json",
                     'method' => "serializeToJson",
                 ]
@@ -237,10 +250,10 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * @param array $config
-     * @param array $classMap
+     * @param array  $config
+     * @param array  $classMap
      * @param string $env
-     * @param bool $useJmsSerializer
+     * @param bool   $useJmsSerializer
      * @return array
      */
     private function makeElasticaConfig($config, $classMap, $env, $useJmsSerializer = true)
@@ -254,12 +267,12 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
                 $newConfig['serializer']['serializer'] = 'serializer';
             }
         } else {
-            if (!isset($newConfig['serializer']['callback_class'])) {
+            if (!isset($newConfig['serializer']['calfllback_class'])) {
                 $newConfig['serializer']['callback_class'] = SimpleSerializer::class;
             }
         }
 
-        $template = Yaml::parse(realpath(__DIR__ . self::ELASTICA_TEMPLATE_FILE));
+        $template = Yaml::parse(file_get_contents(realpath(__DIR__.self::ELASTICA_TEMPLATE_FILE)));
         $template = $template['fos_elastica']['indexes']['namespace_entity'];
 
         foreach ($classMap as $entityConfig) {
@@ -272,7 +285,7 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
                 continue;//if already present => skip !
             }
 
-            $index['index_name'] = $name . '_' . $env;
+            $index['index_name'] = $name.'_'.$env;
             if (!is_subclass_of($class, self::MODEL_SEARCHABLE_NEED_INDEX_INTERFACE)) {
                 unset($index['types']['entity']['indexable_callback']);
             }
@@ -285,7 +298,7 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
                 foreach ($mappings as $fieldName => $analyzer) {
                     if ($analyzer === SearchableCustomMappingsInterface::ELASTICA_MAPPING_GEO_POINT) {
                         $index['types']['entity']['mappings'][$fieldName] = [
-                            'type'    => 'geo_point',
+                            'type' => 'geo_point',
                             'lat_lon' => 'true',
                         ];
                         continue;
@@ -297,7 +310,7 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
                         continue;
                     }
                     $index['types']['entity']['mappings'][$fieldName] = [
-                        'type'     => 'string',
+                        'type' => 'string',
                         'analyzer' => $analyzer,
                     ];
                 }

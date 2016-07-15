@@ -8,21 +8,28 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 /**
  * Configuration for BranderEAVBundle.
  *
- * @author Vladimir Odesskij <odesskij1992@gmail.com>
+ * @author tomfun
  */
 class Configuration implements ConfigurationInterface
 {
     /**
+     * @var string brander_eav
+     */
+    private $alias;
+
+    /**
      * @var string
      */
-    protected $alias;
+    private $locale;
 
     /**
      * @param string $alias
+     * @param string $locale %locale%
      */
-    public function __construct($alias)
+    public function __construct($alias, $locale)
     {
         $this->alias = $alias;
+        $this->locale = $locale;
     }
 
     /**
@@ -47,7 +54,9 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then(function ($v) { return ['entity' => $v]; })
+                                    ->then(function ($v) {
+                                        return ['entity' => $v];
+                                    })
                                 ->end()
                                 ->children()
                                     ->scalarNode('query')->defaultNull()->end()
@@ -57,6 +66,11 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                    ->arrayNode('locales_supported')
+                        ->defaultValue([$this->locale])
+                        ->prototype('scalar')
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

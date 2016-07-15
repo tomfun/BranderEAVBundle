@@ -14,11 +14,12 @@ use Werkint\Bundle\FrameworkExtraBundle\Twig\AbstractExtension;
  *
  * @author Kate Shcherbak <katescherbak@gmail.com>
  */
-class BranderEAVExtension extends AbstractExtension
+class BranderEAVExtension extends \Twig_Extension
 {
-
     const EXT_NAME = 'brander_eav';
 
+    /** @var ObjectManager */
+    protected $manager;
     /**
      * @var array
      */
@@ -27,23 +28,116 @@ class BranderEAVExtension extends AbstractExtension
      * @var string
      */
     private $locale;
-    /** @var ObjectManager */
-    protected $manager;
+
+    /** @var \Twig_SimpleFilter[] */
+    protected $filters = [];
 
     /**
-     * @param $manager
-     * @param array $locales
+     * @param string   $name
+     * @param bool     $isSafe
+     * @param callable $callable
+     */
+    protected function addFilter(
+        $name,
+        $isSafe,
+        callable $callable
+    ) {
+        $safe = ['is_safe' => ['all']];
+        $this->filters[$name] = new \Twig_SimpleFilter($name, $callable, $isSafe ? $safe : []);
+    }
+
+    /**
+     * @param string $name
+     * @throws \InvalidArgumentException
+     * @return callable
+     */
+    public function getFilter($name)
+    {
+        if (!isset($this->filters[$name])) {
+            throw new \InvalidArgumentException('Filter not found: ' . $name);
+        }
+        return $this->filters[$name]->getCallable();
+    }
+
+    /**
+     * @param string   $name
+     * @param bool     $isSafe
+     * @param callable $callable
+     */
+    protected function addFunction(
+        $name,
+        $isSafe,
+        callable $callable
+    ) {
+        $safe = ['is_safe' => ['all']];
+        $this->functions[$name] = new \Twig_SimpleFunction($name, $callable, $isSafe ? $safe : []);
+    }
+
+    /**
+     * @param string $name
+     * @throws \InvalidArgumentException
+     * @return callable
+     */
+    public function getFunction($name)
+    {
+        if (!isset($this->functions[$name])) {
+            throw new \InvalidArgumentException('Function not found: ' . $name);
+        }
+        return $this->functions[$name]->getCallable();
+    }
+
+    // -- Stuff ---------------------------------------
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return static::EXT_NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return $this->filters;
+    }
+
+    /** @var \Twig_SimpleFunction[] */
+    protected $functions = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFunctions()
+    {
+        return $this->functions;
+    }
+
+    protected $globals = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGlobals()
+    {
+        return $this->globals;
+    }
+    
+    /**
+     * @param ObjectManager       $manager
+     * @param array  $locales
      * @param string $locale
      * @throws \Exception
      */
-    public function __construct($manager, array $locales, $locale)
+    public function __construct(ObjectManager $manager, array $locales, $locale)
     {
         $this->manager = $manager;
         $this->locales = $locales;
         $this->locale = $locale;
-        parent::__construct();
+        $this->init();
     }
-
 
     /**
      * {@inheritdoc}
@@ -52,18 +146,20 @@ class BranderEAVExtension extends AbstractExtension
     {
         $type = function ($entity) {
             $metadata = $this->manager->getClassMetadata(is_object($entity) ? get_class($entity) : $entity);
+
             return $metadata;
         };
 
         $this->globals = [
             'brander_eav_global' => [
-                'localeDefault'    => $this->locale,
+                'localeDefault' => $this->locale,
                 'localesSupported' => $this->locales,
             ],
         ];
         $postfix = function ($postfix) {
             $postfix = preg_replace('/(\^(\w+))/', '<sup>$2</sup>', $postfix);
             $postfix = preg_replace('/(_(\w+))/', '<sub>$2</sub>', $postfix);
+
             return $postfix;
         };
         $this->addFilter('format_postfix', true, $postfix);
@@ -118,8 +214,9 @@ class BranderEAVExtension extends AbstractExtension
                 }
                 if (isset($format['postfix']) && $format['postfix'] && ($pf = $value->getAttribute()->getPostfix())) {
                     $pf = $postfix($pf);
-                    $out = $out . ($format['postfix'] === true ? ' ' . $pf : sprintf($format['postfix'], $pf));
+                    $out = $out.($format['postfix'] === true ? ' '.$pf : sprintf($format['postfix'], $pf));
                 }
+
                 return $out;
             },
             ['needs_environment' => true, 'is_safe' => ['all']]
