@@ -15,6 +15,7 @@ use Brander\Bundle\EAVBundle\Service\Filter\FilterProvider;
 use Brander\Bundle\ElasticaSkeletonBundle\Entity\Aggregation;
 use Brander\Bundle\ElasticaSkeletonBundle\Service\Elastica\ElasticaQuery;
 use Doctrine\ORM\EntityRepository;
+use Elastica\Query\BoolQuery;
 use JMS\Serializer\Annotation as Serializer;
 use Werkint\Bundle\StatsBundle\Service\StatsDirectorInterface;
 
@@ -37,12 +38,6 @@ abstract class EavElasticaQuery extends ElasticaQuery
 
     /** @var  EntityRepository */
     protected $attributeRepository;
-
-    /**
-     * @var StatsDirectorInterface
-     */
-    private $stats;
-
     /**
      * 'attribute' field comes from frontend can be some like:
      * {
@@ -58,26 +53,27 @@ abstract class EavElasticaQuery extends ElasticaQuery
      * @var string[]
      */
     protected $attributesRaw;
-
     /**
      * Если установлен в тру, при поиске атрибутов типа инпат будут более жёсткие критерии поиска
      * @Serializer\Type("boolean")
      * @var bool
      */
     protected $findOptionInputHard = false;
-
     /**
      * Если установлен в тру, при поиске атрибутов типа текстовое поле будут более жёсткие критерии поиска
      * @Serializer\Type("boolean")
      * @var bool
      */
     protected $findOptionTextareaHard = false;
-
     /**
      * @Serializer\Exclude()
      * @var Attribute[]
      */
     protected $attributes;
+    /**
+     * @var StatsDirectorInterface
+     */
+    private $stats;
 
     /**
      * @return EntityRepository
@@ -136,6 +132,151 @@ abstract class EavElasticaQuery extends ElasticaQuery
     }
 
     /**
+     * Add just geo distance filters and range filters
+     * @return \Elastica\Filter\AbstractFilter[]
+     */
+    public function getFilters()
+    {
+        $res = [];
+        if ($this->getAttributesRaw()) {
+            foreach ($this->getAttributesRaw() as $attrId => $value) {
+                if (!($attr = $this->needAddToFilter($attrId, $value))) {
+                    continue;
+                }
+                $fieldName = 'eav_values.'.$attrId;
+                if ($attr instanceof AttributeLocation) {
+                    $filter = $this->getGeoLocationFilter($attr, $value);
+                    if ($filter) {
+                        $res[] = $filter;
+                    }
+                } elseif ($attr instanceof AttributeNumeric) {
+                    if ($range = $this->parseRange($value, 'floatval')) {
+                        $filter = new \Elastica\Filter\NumericRange($fieldName, $range);
+                        $res[] = $filter;
+                    }
+                } elseif ($attr instanceof AttributeDate) {
+                    $value = trim($value);
+                    if ($range = $this->parseRange($value, [$this, 'dateFormatter'])) {
+                        $filter = new \Elastica\Filter\Range($fieldName, $range);
+                        $res[] = $filter;
+                    }
+                }
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addQueries(BoolQuery $query)
+    {
+        if ($this->getAttributesRaw()) {
+            foreach ($this->getAttributesRaw() as $attrId => $value) {
+                if (!($attr = $this->needAddToQuery($attrId, $value))) {
+                    continue;
+                }
+                $fieldName = 'eav_values.'.$attrId;
+                if ($attr instanceof AttributeDate) {
+                    $value = trim($value);
+                    if ($range = $this->parseRange($value, [$this, 'dateFormatter'])) {
+                        $query->addMust(
+                            new \Elastica\Query\Range($fieldName, $range)
+                        );
+                        continue;
+                    }
+                    $value = $this->dateFormatter($value);
+                } elseif ($attr instanceof AttributeBoolean) {
+                    $value = boolval($value);
+                } elseif ($attr instanceof AttributeInput || $attr instanceof AttributeTextarea) {
+                    $tmp = new \Elastica\Query\MultiMatch();
+                    $tmp->setFields($fieldName.'*');
+                    $tmp->setType(\Elastica\Query\MultiMatch::TYPE_MOST_FIELDS);
+                    $tmp->setQuery($value);
+
+                    if ($this->findOptionTextareaHard && $attr instanceof AttributeTextarea) {
+                        $tmp->setOperator('and');
+                    } elseif ($this->findOptionInputHard && $attr instanceof AttributeInput) {
+                        $tmp->setOperator('and');
+                    }
+                    $query->addMust($tmp);
+
+                    $tmp = new \Elastica\Query\Term();
+                    $tmp->setTerm($fieldName, $value, 3);
+                    $query->addShould($tmp);
+                    continue;
+                } elseif ($attr instanceof AttributeNumeric) {
+                    $value = trim($value);
+                    if ($range = $this->parseRange($value)) {
+                        $query->addMust(
+                            new \Elastica\Query\Range($fieldName, $range)
+                        );
+                        continue;
+                    }
+                    $value = (float) $value;
+                } elseif ($attr instanceof AttributeLocation) {
+                    continue;//Filter
+                }
+
+                $query->addMust(
+                    new \Elastica\Query\Term([$fieldName => $value,])
+                );
+            }
+        }
+    }
+
+    /**
+     * @return array|Aggregation[]
+     */
+    public function getAggregations()
+    {
+        $res = [];
+        $filterables = $this->getFilterableAttributes();
+        foreach ($filterables as $filterable) {
+            $fieldName = '';
+            $aggregationType = $this->needAddToAggregation(
+                $filterable->getField(),
+                $filterable->getView(),
+                $fieldName
+            );
+            if (!$aggregationType) {
+                continue;
+            }
+            $res = array_merge($res, $this->getAutoAggregation($filterable->getField(), $fieldName, $aggregationType));
+        }
+        return $res;
+    }
+
+    /**
+     * @return FilterableAttribute[]
+     */
+    public function getFilterableAttributes()
+    {
+        $res = [];
+        $attributes = $this->getAvailableAttributes();
+        foreach ($attributes as $attribute) {
+            $item = new FilterableAttribute();
+            $item->setIsSortable($attribute->isSortable())
+                ->setIsFilterable($attribute->isFilterable())
+                ->setField(['attributes', $attribute->getId()])
+                ->setView($attribute->getFilterType())
+                ->setViewOrder($attribute->getFilterOrder());
+            $item->setAttribute($attribute);
+            $res[] = $item;
+        }
+        return $res;
+    }
+
+    /**
+     * @return void
+     */
+    public function prettify()
+    {
+        $this->convertUsedAttributes();
+        $this->convertEavOrder();
+    }
+
+    /**
      * Add geo distance filter. $value must consist of lat,lng,distance.
      * Example $value = '17.95,14.91distance:1'//km
      * Example $value = '17.95, 14.91 distance: 12.07 mi'
@@ -174,8 +315,8 @@ abstract class EavElasticaQuery extends ElasticaQuery
                         $unit = self::GEO_UNITS_KM;
                     }
                     $distance .= $unit;
-                    $fieldName = $attr->getId() . ValueLocation::ELASTICA_POSTFIX;
-                    $geoQuery = new \Elastica\Filter\GeoDistance($fieldName, (string)$value, $distance);
+                    $fieldName = $attr->getId().ValueLocation::ELASTICA_POSTFIX;
+                    $geoQuery = new \Elastica\Filter\GeoDistance($fieldName, (string) $value, $distance);
                     return $geoQuery;
                 } else {
                     throw new \InvalidArgumentException("wrong geo format");
@@ -188,7 +329,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
     /**
      * @example "gt:0;lt:101;" - number range
      * @example "gte:5;lte:15;" - number range
-     * @param string $value
+     * @param string        $value
      * @param callable|null $formatter
      * @return array|null
      */
@@ -203,8 +344,8 @@ abstract class EavElasticaQuery extends ElasticaQuery
         $result = [];
         $res = [];
         foreach ($keywords as $keyword) {
-            $format = $keyword . ':\s*(.+?)\s*;';
-            preg_match('/' . $format . '/i', $value, $res);
+            $format = $keyword.':\s*(.+?)\s*;';
+            preg_match('/'.$format.'/i', $value, $res);
             if ($res && count($res) > 1) {
                 if ($formatter) {
                     $result[$keyword] = call_user_func($formatter, $res[1]);
@@ -216,6 +357,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
         if (count($result)) {
             return $result;
         }
+
         return null;
     }
 
@@ -234,53 +376,20 @@ abstract class EavElasticaQuery extends ElasticaQuery
             if (isset($this->attributesRaw[$attrId])) {
                 unset($this->attributesRaw[$attrId]);
             }
+
             return false;
         }
         if ($attr instanceof AttributeLocation) {
             return $attr;
         }
-        if (
-            in_array($attr->getFilterType(), [FilterProvider::RANGE_FILTER_CUSTOM, FilterProvider::RANGE_FILTER_SIMPLE])
-            && ($attr instanceof AttributeNumeric || $attr instanceof AttributeDate)
-        ) {
+        $whiteList = [FilterProvider::RANGE_FILTER_CUSTOM, FilterProvider::RANGE_FILTER_SIMPLE];
+        $need = ($attr instanceof AttributeNumeric || $attr instanceof AttributeDate)
+            && in_array($attr->getFilterType(), $whiteList);
+        if ($need) {
             return $attr;
         }
-        return false;
-    }
 
-    /**
-     * Add just geo distance filters and range filters
-     * @return \Elastica\Filter\AbstractFilter[]
-     */
-    public function getFilters()
-    {
-        $res = [];
-        if ($this->getAttributesRaw()) {
-            foreach ($this->getAttributesRaw() as $attrId => $value) {
-                if (!($attr = $this->needAddToFilter($attrId, $value))) {
-                    continue;
-                }
-                $fieldName = 'eav_values.' . $attrId;
-                if ($attr instanceof AttributeLocation) {
-                    $filter = $this->getGeoLocationFilter($attr, $value);
-                    if ($filter) {
-                        $res[] = $filter;
-                    }
-                } elseif ($attr instanceof AttributeNumeric) {
-                    if ($range = $this->parseRange($value, 'floatval')) {
-                        $filter = new \Elastica\Filter\NumericRange($fieldName, $range);
-                        $res[] = $filter;
-                    }
-                } elseif ($attr instanceof AttributeDate) {
-                    $value = trim($value);
-                    if ($range = $this->parseRange($value, [$this, 'dateFormatter'])) {
-                        $filter = new \Elastica\Filter\Range($fieldName, $range);
-                        $res[] = $filter;
-                    }
-                }
-            }
-        }
-        return $res;
+        return false;
     }
 
     /**
@@ -322,65 +431,6 @@ abstract class EavElasticaQuery extends ElasticaQuery
     }
 
     /**
-     * @inheritdoc
-     */
-    public function addQueries(\Elastica\Query\Bool $query)
-    {
-        if ($this->getAttributesRaw()) {
-            foreach ($this->getAttributesRaw() as $attrId => $value) {
-                if (!($attr = $this->needAddToQuery($attrId, $value))) {
-                    continue;
-                }
-                $fieldName = 'eav_values.' . $attrId;
-                if ($attr instanceof AttributeDate) {
-                    $value = trim($value);
-                    if ($range = $this->parseRange($value, [$this, 'dateFormatter'])) {
-                        $query->addMust(
-                            new \Elastica\Query\Range($fieldName, $range)
-                        );
-                        continue;
-                    }
-                    $value = $this->dateFormatter($value);
-                } elseif ($attr instanceof AttributeBoolean) {
-                    $value = boolval($value);
-                } elseif ($attr instanceof AttributeInput || $attr instanceof AttributeTextarea) {
-                    $tmp = new \Elastica\Query\MultiMatch();
-                    $tmp->setFields($fieldName . '*');
-                    $tmp->setType(\Elastica\Query\MultiMatch::TYPE_MOST_FIELDS);
-                    $tmp->setQuery($value);
-
-                    if ($this->findOptionTextareaHard && $attr instanceof AttributeTextarea) {
-                        $tmp->setOperator('and');
-                    } elseif ($this->findOptionInputHard && $attr instanceof AttributeInput) {
-                        $tmp->setOperator('and');
-                    }
-                    $query->addMust($tmp);
-
-                    $tmp = new \Elastica\Query\Term();
-                    $tmp->setTerm($fieldName, $value, 3);
-                    $query->addShould($tmp);
-                    continue;
-                } elseif ($attr instanceof AttributeNumeric) {
-                    $value = trim($value);
-                    if ($range = $this->parseRange($value)) {
-                        $query->addMust(
-                            new \Elastica\Query\Range($fieldName, $range)
-                        );
-                        continue;
-                    }
-                    $value = (float)$value;
-                } elseif ($attr instanceof AttributeLocation) {
-                    continue;//Filter
-                }
-
-                $query->addMust(
-                    new \Elastica\Query\Term([$fieldName => $value,])
-                );
-            }
-        }
-    }
-
-    /**
      * @param string[] $fieldName
      * @param string   $jsView
      * @param string   $indexName - return
@@ -389,7 +439,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
     protected function needAddToAggregation(array $fieldName, $jsView, &$indexName)
     {
         if (count($fieldName) === 2 && $fieldName[0] === 'attributes' && is_numeric($attrId = $fieldName[1])) {
-            $indexName = 'eav_values.' . $attrId;
+            $indexName = 'eav_values.'.$attrId;
             if ($jsView === FilterProvider::RANGE_FILTER_CUSTOM) {
                 return 'range_basket';
             }
@@ -409,14 +459,14 @@ abstract class EavElasticaQuery extends ElasticaQuery
     {
         return [
             new Aggregation(
-                $fieldName . '_max',
+                $fieldName.'_max',
                 'max',
                 $indexName,
                 'setAutoAggregation',
                 ['type' => 'range', 'serializeName' => $fieldName,]
             ),
             new Aggregation(
-                $fieldName . '_min',
+                $fieldName.'_min',
                 'min',
                 $indexName,
                 'setAutoAggregation',
@@ -479,7 +529,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
             /** @var Attribute $attr */
             $attr = $this->getAttributeRepository()->findOneBy(['id' => $options['attribute_id']]);
             $arr = $this->stats->getStat(ValueStatsProvider::VALUE_STAT, $options);
-            $rounding = isset($options['rounding']) ? (float)$options['rounding'] : false;
+            $rounding = isset($options['rounding']) ? (float) $options['rounding'] : false;
             $this->calculateIntervalByStats($arr, $interval, $size, $rounding);
             if ($attr instanceof AttributeDate) {
                 $interval .= 's';
@@ -488,19 +538,19 @@ abstract class EavElasticaQuery extends ElasticaQuery
         }
         return [
             new Aggregation(
-                $fieldName . '_histogram',
+                $fieldName.'_histogram',
                 $type,
                 $indexName,
                 'setAutoAggregation',
                 [
-                    'type'               => 'range_basket',
+                    'type' => 'range_basket',
                     'constructArguments' => [
-                        $fieldName . '_histogram',//name
+                        $fieldName.'_histogram',//name
                         $indexName,//elastica field name
                         $interval,
                     ],
-                    'extractValueField'  => 'buckets',
-                    'serializeName'      => $fieldName,
+                    'extractValueField' => 'buckets',
+                    'serializeName' => $fieldName,
                 ]
             ),
         ];
@@ -524,28 +574,6 @@ abstract class EavElasticaQuery extends ElasticaQuery
                 break;
         }
         return [];
-    }
-
-    /**
-     * @return array|Aggregation[]
-     */
-    public function getAggregations()
-    {
-        $res = [];
-        $filterables = $this->getFilterableAttributes();
-        foreach ($filterables as $filterable) {
-            $fieldName = '';
-            $aggregationType = $this->needAddToAggregation(
-                $filterable->getField(),
-                $filterable->getView(),
-                $fieldName
-            );
-            if (!$aggregationType) {
-                continue;
-            }
-            $res = array_merge($res, $this->getAutoAggregation($filterable->getField(), $fieldName, $aggregationType));
-        }
-        return $res;
     }
 
     protected function convertUsedAttributes()
@@ -577,39 +605,10 @@ abstract class EavElasticaQuery extends ElasticaQuery
         $qb->where('a.isSortable = 1 or a.isFilterable = 1');
         if (count($usedIds)) {
             $qb->andWhere('a.id in (:ids)')
-               ->setParameter('ids', $usedIds);
+                ->setParameter('ids', $usedIds);
         }
         /** @var Attribute[] $attributes */
         return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * @return FilterableAttribute[]
-     */
-    public function getFilterableAttributes()
-    {
-        $res = [];
-        $attributes = $this->getAvailableAttributes();
-        foreach ($attributes as $attribute) {
-            $item = new FilterableAttribute();
-            $item->setIsSortable($attribute->isSortable())
-                 ->setIsFilterable($attribute->isFilterable())
-                 ->setField(['attributes', $attribute->getId()])
-                 ->setView($attribute->getFilterType())
-                 ->setViewOrder($attribute->getFilterOrder());
-            $item->setAttribute($attribute);
-            $res[] = $item;
-        }
-        return $res;
-    }
-
-    /**
-     * @return void
-     */
-    public function prettify()
-    {
-        $this->convertUsedAttributes();
-        $this->convertEavOrder();
     }
 
     protected function convertEavOrder()
