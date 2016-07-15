@@ -5,7 +5,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
-use Werkint\Bundle\FrameworkExtraBundle\Model\Translatable;
 
 /**
  * AttributeGroup.
@@ -27,13 +26,6 @@ use Werkint\Bundle\FrameworkExtraBundle\Model\Translatable;
 class AttributeGroup
 {
     protected $defaultLocale = 'ru';
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct(){
-        $this->setAttributes(new ArrayCollection());
-    }
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -42,7 +34,6 @@ class AttributeGroup
      * @var int
      */
     protected $id;
-
     /**
      * @var string
      *
@@ -51,7 +42,6 @@ class AttributeGroup
      * @Serializer\Type("string")
      */
     protected $class;
-
     /**
      * @ORM\ManyToMany(targetEntity="\Brander\Bundle\EAVBundle\Entity\Attribute", cascade={"persist"}, inversedBy="groups")
      * @ORM\JoinTable(name="brander_eav_attribute_groups_attributes",
@@ -62,28 +52,33 @@ class AttributeGroup
      * @var Attribute[]|ArrayCollection
      */
     protected $attributes;
-
-    // -- Translations ------------------------------------
-
-    use Translatable;
-
     /**
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeGroupTranslation>")
      * @Serializer\Accessor(getter="getATranslations", setter="setATranslations")
-     * @Serializer\Groups({"=g('translations') || g('admin')"})
+     * @Serializer\Groups({"translations", "admin"})
      * @Serializer\Expose()
      * @Assert\Valid
      */
     protected $translations;
 
+    // -- Translations ------------------------------------
+
+    use Translatable;
     /**
      * *virtual
-     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
+     * @Serializer\Accessor(getter="getTitle")
      * @Serializer\Type("string")
-     * @Serializer\Groups({"=read && !g('minimal')"})
      * @Serializer\Expose()
      */
     protected $title;
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct()
+    {
+        $this->setAttributes(new ArrayCollection());
+    }
 
     // -- Accessors ---------------------------------------
 
@@ -110,6 +105,7 @@ class AttributeGroup
     public function setClass($class)
     {
         $this->class = $class;
+
         return $this;
     }
 
@@ -128,6 +124,7 @@ class AttributeGroup
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
+
         return $this;
     }
 }
