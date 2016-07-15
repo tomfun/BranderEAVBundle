@@ -11,32 +11,32 @@ parameters:
 
 services:
   brander_eav.eventlistener.valueselectlistener:
-    class: %brander_eav.eventlistener.valueselectlistener.class%
+    class: "%brander_eav.eventlistener.valueselectlistener.class%"
     tags:
       - { name: doctrine.event_subscriber }
 
   brander_eav.twig.appextension:
-    class: %brander_eav.twig.extension.class%
+    class: "%brander_eav.twig.extension.class%"
     public: false
     arguments:
-      - @doctrine.orm.entity_manager
-      - %locales_supported%
-      - %locale%
+      - "@doctrine.orm.entity_manager"
+      - "%brander_eav.locales_supported%"
+      - "%locale%"
     tags:
       - { name: twig.extension }
 
   brander_eav.attribute.holder:
-    class: %brander_eav.attribute.holder.class%
+    class: "%brander_eav.attribute.holder.class%"
     arguments:
-      - @doctrine.orm.entity_manager
+      - "@doctrine.orm.entity_manager"
     tags:
       - { name: jms_serializer.event_subscriber }
 
   brander_eav.attribute.serialize.query_holder:
-    class: %brander_eav.attribute.serialize.query_holder.class%
+    class: "%brander_eav.attribute.serialize.query_holder.class%"
     arguments:
-      - @brander_eav.repo.attribute
-      - @werkint_stats.statsdirector
+      - "@brander_eav.repo.attribute"
+      - "@cache.app"
     tags:
       - { name: jms_serializer.event_subscriber }
 
@@ -44,29 +44,29 @@ services:
     arguments:
      - {}
      - "@service_container"
-     - %locale%
-    class: %brander_eav.extensible_entity.handler.class%
+     - "%locale%"
+    class: "%brander_eav.extensible_entity.handler.class%"
 
   brander_eav.security.universal_voter:
-    class: %brander_eav.security.universal_voter.class%
+    class: "%brander_eav.security.universal_voter.class%"
     arguments:
-      - %brander_eav.managerole%
+      - "%brander_eav.managerole%"
     tags:
       - { name: security.voter }
 
   brander_eav.filter.holder:
     arguments: {}
-    class: %brander_eav.filter.holder.class%
+    class: "%brander_eav.filter.holder.class%"
 
   brander_eav.filter.provider.standard_models:
     arguments: {}
-    class: %brander_eav.filter.standard_models.class%
+    class: "%brander_eav.filter.standard_models.class%"
     tags:
       - { name: brander_eav.filter.provider }
 
   brander_eav.elastica.value_stats_provider:
-      class: %brander_eav.elastica.value_stats_provider.class%
+      class: "%brander_eav.elastica.value_stats_provider.class%"
       arguments:
-        - @brander_eav.repo.value
+        - "@brander_eav.repo.value"
       tags:
         - { name: werkint_stats.provider }

@@ -1,14 +1,13 @@
 <?php
 namespace Brander\Bundle\EAVBundle\Service\Elastica;
 
-
 use Brander\Bundle\EAVBundle\Repo\Value;
 use Werkint\Bundle\StatsBundle\Service\Provider\StatsProviderInterface;
 
 /**
- * @author mom <alinyonish@gmail.com>
+ * @author tomfun
  */
-class ValueStatsProvider implements StatsProviderInterface
+class ValueStatsProvider
 {
 
     const VALUE_STAT = 'Brander\Bundle\EAVBundle\Repo\ValueMin';
