@@ -14,15 +14,19 @@ abstract class AbstractTranslation extends AbstractTranslationBase
      * Will be mapped to translatable entity
      * by TranslatableSubscriber
      * @Serializer\Groups("=false")
+     * @Serializer\Exclude()
      */
     protected $translatable;
     /**
-     * @var string
+     * *Serializer\Type("string")
+     * *ORM\Column(name="id", type="string", length=Werkint\Bundle\FrameworkExtraBundle\Service\Util\IdGenerator::MAX_LENGTH, nullable=false)
+     * *ORM\GeneratedValue(strategy="CUSTOM")
+     * *ORM\CustomIdGenerator(class="Werkint\Bundle\FrameworkExtraBundle\Service\Util\IdGenerator")
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
-     * @Serializer\Type("string")
-     * @ORM\Column(name="id", type="string", length=Werkint\Bundle\FrameworkExtraBundle\Service\Util\IdGenerator::MAX_LENGTH, nullable=false)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class="Werkint\Bundle\FrameworkExtraBundle\Service\Util\IdGenerator")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
 
@@ -30,7 +34,6 @@ abstract class AbstractTranslation extends AbstractTranslationBase
      * @ORM\Column(type="string")
      * @Assert\NotBlank(message="brander.eav.locale")
      * @Serializer\Type("string")
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
      * @var string
      */
@@ -40,7 +43,6 @@ abstract class AbstractTranslation extends AbstractTranslationBase
      * @ORM\Column(type="string")
      * @Assert\NotBlank(message="brander.eav.title")
      * @Serializer\Type("string")
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
      * @var string
      */
@@ -62,6 +64,7 @@ abstract class AbstractTranslation extends AbstractTranslationBase
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 

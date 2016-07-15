@@ -34,6 +34,7 @@ class ValueSelect extends Value
     public function setOption(AttributeSelectOption $option = null)
     {
         $this->option = $option;
+
         return $this;
     }
 
@@ -55,6 +56,7 @@ class ValueSelect extends Value
             $this->setOption($value);
             $value = $value->getId();
         }
+
         return parent::setValue($value);
     }
 
@@ -63,8 +65,9 @@ class ValueSelect extends Value
      */
     public function isValid()
     {
-        $attr = $this->getAttribute();
         /** @var AttributeSelect $attr */
+        $attr = $this->getAttribute();
+
         return parent::isValid() && $attr->getOptions()->contains($this->getOption());
     }
 }

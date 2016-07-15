@@ -4,7 +4,6 @@ namespace Brander\Bundle\EAVBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
-use Werkint\Bundle\FrameworkExtraBundle\Model\Translatable;
 
 /**
  * Варианты для селекта
@@ -55,13 +54,19 @@ class AttributeSelectOption
 
     /**
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\OptionTranslation>")
-     * @Serializer\Groups({"=read || g('admin')"})
      * @Serializer\Accessor(getter="getATranslations", setter="setATranslations")
-     * @Serializer\Groups({"=g('translations') || g('admin')"})
+     * @Serializer\Groups({"translations", "admin"})
      * @Serializer\Expose()
      * @Assert\Valid
      */
     protected $translations;
+    /**
+     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
+     * @Serializer\Type("string")
+     * @Serializer\Groups({"=read && !g('minimal')"})
+     * @Serializer\Expose()
+     */
+    protected $title;
 
     /**
      * Returns translation entity class name.
@@ -72,14 +77,6 @@ class AttributeSelectOption
     {
         return OptionTranslation::class;
     }
-
-    /**
-     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
-     * @Serializer\Type("string")
-     * @Serializer\Groups({"=read && !g('minimal')"})
-     * @Serializer\Expose()
-     */
-    protected $title;
 
 
     // -- Accessors ---------------------------------------
@@ -107,6 +104,7 @@ class AttributeSelectOption
     public function setAttribute(AttributeSelect $attribute = null)
     {
         $this->attribute = $attribute;
+
         return $this;
     }
 //

@@ -74,7 +74,7 @@ abstract class Value
      */
     public function isEmpty()
     {
-        return !(bool)$this->getValue();
+        return !(bool) $this->getValue();
     }
 
     /**
@@ -96,12 +96,14 @@ abstract class Value
     }
 
     /**
-     * @param $id
+     * @deprecated
+     * @param int $id
      * @return $this
      */
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -114,21 +116,22 @@ abstract class Value
     }
 
     /**
-     * @return string|null
-     */
-    final public function getValueRaw()
-    {
-        return $this->value;
-    }
-
-    /**
      * @param string|null $value
      * @return $this
      */
     public function setValue($value)
     {
         $this->value = $value;
+
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    final public function getValueRaw()
+    {
+        return $this->value;
     }
 
     /**
@@ -146,6 +149,7 @@ abstract class Value
     public function setAttribute(Attribute $attribute = null)
     {
         $this->attribute = $attribute;
+
         return $this;
     }
 }

@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
-use Werkint\Bundle\FrameworkExtraBundle\Model\Translatable;
 
 /**
  * Аттрибут
@@ -51,17 +50,6 @@ use Werkint\Bundle\FrameworkExtraBundle\Model\Translatable;
 abstract class Attribute
 {
     protected $defaultLocale = 'ru';
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->sets = new ArrayCollection();
-        $this->groups = new ArrayCollection();
-        $this->translations = new ArrayCollection();
-    }
-
     /**
      * @var int
      *
@@ -73,89 +61,129 @@ abstract class Attribute
      * @Serializer\Expose()
      */
     protected $id;
-
     /**
      * @var boolean
      *
      * @ORM\Column(type="boolean")
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
+     * @Serializer\SerializedName("isRequired")
      */
     protected $isRequired;
-
     /**
      * @var boolean
      *
      * @ORM\Column(type="boolean")
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
+     * @Serializer\SerializedName("isFilterable")
      */
     protected $isFilterable;
-
     /**
      * @var boolean
      *
      * @ORM\Column(type="boolean")
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
+     * @Serializer\SerializedName("isSortable")
      */
     protected $isSortable;
-
-
     /**
      * RESERVED
      * @var string
      *
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
+     * @Serializer\SerializedName("filterType")
      */
     protected $filterType;
-
     /**
      * RESERVED
      * @var string
      *
      * @ORM\Column(type="integer", nullable=true)
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
+     * @Serializer\SerializedName("filterOrder")
      */
     protected $filterOrder;
-
     /**
      * RESERVED
      * @var string
      *
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
+     * @Serializer\SerializedName("showType")
      */
     protected $showType;
-
     /**
      * @ORM\OneToMany(targetEntity="Value", cascade={"all"}, mappedBy="attribute")
      * @var Value[]
      */
     protected $values;
-
     /**
      * @ORM\ManyToMany(targetEntity="Brander\Bundle\EAVBundle\Entity\AttributeSet", cascade={"persist"}, mappedBy="attributes")
      * @var AttributeSet[]|Collection
      */
     protected $sets;
-
     /**
      * @ORM\ManyToMany(targetEntity="\Brander\Bundle\EAVBundle\Entity\AttributeGroup", cascade={"persist"}, mappedBy="attributes")
      * @var AttributeGroup[]|Collection
      */
     protected $groups;
-
-    // -- Value ---------------------------------------
-
     /**
      * @var string
      */
     protected $valueClass;
+
+    // -- Value ---------------------------------------
+    /**
+     * @ORM\OneToMany(targetEntity="AttributeTranslation", cascade={"all"}, mappedBy="translatable", orphanRemoval=true)
+     * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeTranslation>")
+     * @Serializer\Accessor(getter="getATranslations", setter="setATranslations")
+     * @Serializer\Groups({"translations", "admin"})
+     * @Serializer\Expose()
+     * @Assert\Valid
+     */
+    protected $translations;
+    /**
+     * *virtual
+     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
+     * @Serializer\Type("string")
+     * @Serializer\Expose()
+     */
+    protected $title;
+    /**
+     * *virtual
+     * @Serializer\Accessor(getter="getHint")
+     * @Serializer\Type("string")
+     * @Serializer\Expose()
+     */
+    protected $hint;
+    /**
+     * *virtual
+     * @Serializer\Accessor(getter="getPlaceholder")
+     * @Serializer\Type("string")
+     * @Serializer\Expose()
+     */
+    protected $placeholder;
+
+    // -- Translations ------------------------------------
+
+    use Translatable;
+    /**
+     * *virtual
+     * @Serializer\Accessor(getter="getPostfix")
+     * @Serializer\Type("string")
+     * @Serializer\Expose()
+     */
+    protected $postfix;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->sets = new ArrayCollection();
+        $this->groups = new ArrayCollection();
+        $this->translations = new ArrayCollection();
+    }
 
     /**
      * @param string $valueClass
@@ -170,12 +198,13 @@ abstract class Attribute
      */
     public function createValue()
     {
-        $row = new $this->valueClass;
+        $valueClass = $this->valueClass;
+        $row = new $valueClass();
         /** @var Value $row */
         $row->setAttribute($this);
+
         return $row;
     }
-
 
     /**
      * @param Value $value
@@ -185,64 +214,27 @@ abstract class Attribute
     {
         if (get_class($value) != $this->valueClass) {
             /** @var Value $tmp */
-            $tmp = new $this->valueClass;
+            $valueClass = $this->valueClass;
+            $tmp = new $valueClass();
             $tmp->setId($value->getId())->setAttribute($this);
+
             return $tmp;
         }
         $value->setAttribute($this);
+
         return $value;
     }
 
-    // -- Translations ------------------------------------
-
-    use Translatable;
-
     /**
-     * *virtual
-     * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeTranslation>")
-     * @Serializer\Groups({"=read || g('admin')"})
-     * @Serializer\Accessor(getter="getATranslations", setter="setATranslations")
-     * @Serializer\Groups({"=g('translations') || g('admin')"})
-     * @Serializer\Expose()
-     * @Assert\Valid
-     */
-    protected $translations;
-
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
+     * @Serializer\VirtualProperty()
+     * @Serializer\SerializedName("title")
      * @Serializer\Type("string")
-     * @Serializer\Groups({"=read && !g('minimal')"})
-     * @Serializer\Expose()
+     * @return string
      */
-    protected $title;
-
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getHint", setter="setHint")
-     * @Serializer\Type("string")
-     * @Serializer\Groups({"=read && !g('minimal')"})
-     * @Serializer\Expose()
-     */
-    protected $hint;
-
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getPlaceholder", setter="setPlaceholder")
-     * @Serializer\Type("string")
-     * @Serializer\Groups({"=read && !g('minimal')"})
-     * @Serializer\Expose()
-     */
-    protected $placeholder;
-
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getPostfix", setter="setPostfix")
-     * @Serializer\Type("string")
-     * @Serializer\Groups({"=read && !g('minimal')"})
-     * @Serializer\Expose()
-     */
-    protected $postfix;
+    public function _title()
+    {
+        return $this->getTitle();
+    }
 
     // -- Accessors ---------------------------------------
 
@@ -255,12 +247,13 @@ abstract class Attribute
     }
 
     /**
-     * @param int
+     * @param int $id
      * @return $this
      */
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -280,6 +273,7 @@ abstract class Attribute
     public function setValues(array $values)
     {
         $this->values = $values;
+
         return $this;
     }
 
@@ -299,6 +293,7 @@ abstract class Attribute
     public function setSets($sets)
     {
         $this->sets = $sets;
+
         return $this;
     }
 
@@ -318,6 +313,7 @@ abstract class Attribute
     public function setGroups($groups)
     {
         $this->groups = $groups;
+
         return $this;
     }
 
@@ -335,7 +331,8 @@ abstract class Attribute
      */
     public function setIsRequired($isRequired)
     {
-        $this->isRequired = (bool)$isRequired;
+        $this->isRequired = (bool) $isRequired;
+
         return $this;
     }
 
@@ -353,7 +350,8 @@ abstract class Attribute
      */
     public function setIsFilterable($isFilterable)
     {
-        $this->isFilterable = (bool)$isFilterable;
+        $this->isFilterable = (bool) $isFilterable;
+
         return $this;
     }
 
@@ -372,7 +370,8 @@ abstract class Attribute
      */
     public function setIsSortable($isSortable)
     {
-        $this->isSortable = (bool)$isSortable;
+        $this->isSortable = (bool) $isSortable;
+
         return $this;
     }
 
@@ -392,6 +391,7 @@ abstract class Attribute
     public function setFilterType($filterType)
     {
         $this->filterType = $filterType;
+
         return $this;
     }
 
@@ -411,6 +411,7 @@ abstract class Attribute
     public function setFilterOrder($filterOrder)
     {
         $this->filterOrder = $filterOrder;
+
         return $this;
     }
 

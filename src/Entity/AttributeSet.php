@@ -52,8 +52,8 @@ class AttributeSet
      *   inverseJoinColumns={@ORM\JoinColumn(name="attribute_id", referencedColumnName="id")}
      * )
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\Attribute>")
-     * @Serializer\Groups("=(read || (g('admin')) && g('attributes')")
-     * @Serializer\Groups(groups={"attributes"})
+     * *Serializer\Groups({"Default", "admin", "attributes"})
+     * @Serializer\Groups({"attributes"})
      * @Serializer\Expose()
      * @var Attribute[]|Collection
      */
@@ -92,6 +92,7 @@ class AttributeSet
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -110,6 +111,7 @@ class AttributeSet
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
+
         return $this;
     }
 

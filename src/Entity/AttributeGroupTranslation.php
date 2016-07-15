@@ -15,12 +15,13 @@ class AttributeGroupTranslation extends AbstractTranslation
 {
     /**
      * spike
-     * @param $id
+     * @param int $id
      * @return $this
      */
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 }

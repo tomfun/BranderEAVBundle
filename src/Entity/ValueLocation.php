@@ -28,10 +28,10 @@ class ValueLocation extends Value
     public function setValue($value)
     {
         $this->valueTyped = $value instanceof GeoLocation ? $value : new GeoLocation($value);
-        $this->value = (string)$this->valueTyped;
+        $this->value = (string) $this->valueTyped;
+
         return $this;
     }
-
 
     /**
      * @return GeoLocation|null
@@ -43,7 +43,8 @@ class ValueLocation extends Value
                 $this->valueTyped = new GeoLocation($this->value);
             }
         }
+
         return $this->valueTyped;
     }
-
 }
+

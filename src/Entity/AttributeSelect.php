@@ -16,21 +16,23 @@ use JMS\Serializer\Annotation as Serializer;
  */
 class AttributeSelect extends Attribute
 {
+    /**
+     * @ORM\OneToMany(targetEntity="AttributeSelectOption", mappedBy="attribute", cascade={"persist", "remove"})
+     * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeSelectOption>")
+     * @Serializer\Expose()
+     * @var AttributeSelectOption[]|Collection
+     **/
+    protected $options;
+
+    /**
+     * AttributeSelect constructor.
+     */
     public function __construct()
     {
         $this->setOptions(new ArrayCollection());
 
         parent::__construct();
     }
-
-    /**
-     * @ORM\OneToMany(targetEntity="AttributeSelectOption", mappedBy="attribute", cascade={"persist", "remove"})
-     * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeSelectOption>")
-     * @Serializer\Expose()
-     * @Serializer\Groups("=read || g('admin')")
-     * @var AttributeSelectOption[]|Collection
-     **/
-    protected $options;
 
     // -- Accessors ---------------------------------------
 
@@ -49,6 +51,7 @@ class AttributeSelect extends Attribute
     public function setOptions(Collection $options)
     {
         $this->options = $options;
+
         return $this;
     }
 }

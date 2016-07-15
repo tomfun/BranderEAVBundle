@@ -16,19 +16,21 @@ class OptionTranslation extends AbstractTranslation
     /**
      * @return mixed
      */
-    static public function getTranslatableEntityClass()
+    public static function getTranslatableEntityClass()
     {
         return AttributeSelectOption::class;
     }
 
     /**
      * spike
-     * @param $id
+     * @deprecated
+     * @param int $id
      * @return $this
      */
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 }

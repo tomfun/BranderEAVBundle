@@ -28,18 +28,6 @@ class ValueDate extends Value
     protected $valueTyped = null;
 
     /**
-     * @param \DateTime|string $value
-     * @return $this
-     */
-    public function setValue($value)
-    {
-        $this->valueTyped = $value instanceof \DateTime ? $value : new \DateTime($value);
-        $this->value = $this->valueTyped->getTimestamp();
-        return $this;
-    }
-
-
-    /**
      * @return \DateTime|null
      */
     public function getValue()
@@ -50,6 +38,19 @@ class ValueDate extends Value
                 $this->valueTyped->setTimestamp($this->value);
             }
         }
+
         return $this->valueTyped;
+    }
+
+    /**
+     * @param \DateTime|string $value
+     * @return $this
+     */
+    public function setValue($value)
+    {
+        $this->valueTyped = $value instanceof \DateTime ? $value : new \DateTime($value);
+        $this->value = $this->valueTyped->getTimestamp();
+
+        return $this;
     }
 }

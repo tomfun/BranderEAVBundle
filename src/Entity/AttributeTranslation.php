@@ -14,12 +14,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AttributeTranslation extends AbstractTranslation
 {
     /**
+     * todo
+     * @ORM\ManyToOne(targetEntity="Attribute", inversedBy="translations", fetch="EAGER")
+     * @var
+     */
+    protected $translatable;
+    /**
      * Подсказка
      *
      * @var string
      *
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
      */
     protected $hint;
@@ -28,7 +33,6 @@ class AttributeTranslation extends AbstractTranslation
      * @var string
      *
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
      */
     protected $placeholder;
@@ -37,19 +41,20 @@ class AttributeTranslation extends AbstractTranslation
      * @var string
      *
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Groups("=read || g('admin')")
      * @Serializer\Expose()
      */
     protected $postfix;
 
     /**
      * spike
-     * @param $id
+     * @deprecated
+     * @param int $id
      * @return $this
      */
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -68,6 +73,7 @@ class AttributeTranslation extends AbstractTranslation
     public function setHint($hint)
     {
         $this->hint = $hint;
+
         return $this;
     }
 
@@ -86,6 +92,7 @@ class AttributeTranslation extends AbstractTranslation
     public function setPlaceholder($placeholder)
     {
         $this->placeholder = $placeholder;
+
         return $this;
     }
 
@@ -104,6 +111,7 @@ class AttributeTranslation extends AbstractTranslation
     public function setPostfix($postfix)
     {
         $this->postfix = $postfix;
+
         return $this;
     }
 
