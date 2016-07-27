@@ -1,3 +1,52 @@
+/* inspinia */
+.icheckbox_square-green, .iradio_square-green {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    background: url(green.png) no-repeat;
+    border: none;
+    cursor: pointer;
+    margin-right: .5em;
+}
+.icheckbox_square-green.checked {
+    background-position: -48px 0;
+}
+.ibox-tools {
+    display: inline-block;
+    float: right;
+    margin-top: 0;
+    position: relative;
+    padding: 0;
+}
+.ibox-title {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #ffffff;
+    border-color: #e7eaec;
+    border-image: none;
+    border-style: solid solid none;
+    border-width: 4px 0px 0;
+    color: inherit;
+    margin-bottom: 0;
+    padding: 14px 15px 7px;
+    height: 48px;
+}
+.ibox-content {
+    background-color: #ffffff;
+    color: inherit;
+    padding: 15px 20px 20px 20px;
+    border-color: #e7eaec;
+    border-image: none;
+    border-style: solid solid none;
+    border-width: 1px 0px;
+}
+/* custom */
+
 @charset "UTF-8";
 .checkbox-inline.i-checks .icheckbox_square-green .ins.iCheck-helper {
     position: absolute;
@@ -66,7 +115,7 @@ li.item-error {
 #attribute #model-options div.form-group > div > ul > li > span.edit {
     cursor: pointer; }
 #attribute > div > div > div.ibox-title > h5 {
-    display: block;
+    display: inline-block;
     min-width: 24em;
     max-width: 93%; }
 #attribute .show-form-link {
