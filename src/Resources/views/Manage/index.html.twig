@@ -1,1 +1,23 @@
-index.twig
+{% extends "BranderEAVBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" type="text/css" href="{{ asset('/bundles/brandereav/css/font-awesome.min.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ asset('/bundles/brandereav/css/bootstrap.min.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ asset('/bundles/brandereav/css/manage.css') }}" />
+{% endblock %}
+
+{% block javascripts %}
+  {% set jsEntryPoint = "brander-eav/EntryPoint/manage.js" %}
+  <script type="text/javascript">
+    window.brndreavinitialdata =         {
+      el:            '#page_content',
+      currentLocale: '{{ brander_eav_global.localeDefault }}',
+      currentLocales: {{ brander_eav_global.localesSupported|json_encode|raw }}
+    };
+  </script>
+  {{ parent() }}
+{% endblock %}
+
+{% block body %}
+<div id="page_content"></div>
+{% endblock %}
