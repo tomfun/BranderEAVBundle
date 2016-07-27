@@ -1,9 +1,10 @@
 import _ from 'underscore';
 import Marionette from 'backbone.marionette';
-import attributeTemplate from 'templates/brander-eav/Widgets/attribute.item.twig';
+import {render as attributeTemplate} from 'templates/brander-eav/Widgets/attribute.item.twig';
 
 
 export default Marionette.ItemView.extend({
+  template: attributeTemplate,
 //        "tagName":           'li',
   'changeStateEvents':   [
     // 'processing',

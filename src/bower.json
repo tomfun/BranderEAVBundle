@@ -3,7 +3,7 @@
   "main": "bower.json",
   "dependencies": {
     "backbone.marionette": "*",
-    "backbone.relational": "*",
+    "backbone-relational": "*",
     "backbone-chaining": "*",
     "backbone": "*",
     "jquery": "*",

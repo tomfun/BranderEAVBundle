@@ -1,2 +1,3 @@
 import Backbone from 'backbone';
-export default Backbone.Model;
+import 'backbone-relational';
+export default Backbone.RelationalModel;

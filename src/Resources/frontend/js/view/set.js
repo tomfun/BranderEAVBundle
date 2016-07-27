@@ -4,17 +4,16 @@ import Backbone from 'backbone';
 import ViewAttributeCollection from 'brander-eav/view/attributeCollection';
 import ViewAttributeItem from 'brander-eav/view/attributeItem';
 import validate from 'brander-eav/view/validation';
+import {render as template} from 'templates/brander-eav/Widgets/set.one.twig';
+import {render as templateCollection} from 'templates/brander-eav/Widgets/set.attribute.collection.twig';
 import 'backbone.modelbinder';
 import 'jquery-ui';
-
 
 var BaseProto = Base.prototype;
 
 export default Base.extend({
-  templateCollection: '@BranderEAV/Widgets/set.attribute.collection.twig',
-  templateName:       {
-    template: '@BranderEAV/Widgets/set.one.twig',
-  },
+  templateCollection,
+  template,
 
   initialize(options) {
     BaseProto.initialize.apply(this, arguments);
@@ -114,7 +113,7 @@ export default Base.extend({
     this.collectionView = new ViewAttributeCollection({
       'channel':      undefined,
       'softRemove':   true,
-      'templateName': this.templateCollection,
+      'template':     this.templateCollection,
       'collection':   model.get('attributes'),
       'childView':    ViewAttributeItem,
     });

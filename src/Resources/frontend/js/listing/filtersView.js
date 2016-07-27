@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import containerTemplate from 'templates/brander-eav/Filters/container.twig';
+import {render as containerTemplate} from 'templates/brander-eav/Filters/container.twig';
 import Marionette from 'backbone.marionette';
 import ChildViews from 'brander-eav/listing/filtersLoader!';
 

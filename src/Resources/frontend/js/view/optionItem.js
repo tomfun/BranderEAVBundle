@@ -1,16 +1,15 @@
 import Marionette from 'backbone.marionette';
-import optionTemplate from 'templates/brander-eav/Widgets/option.item.twig';
+import {render as optionTemplate} from 'templates/brander-eav/Widgets/option.item.twig';
 import Backbone from 'backbone';
 import 'backbone.modelbinder';
 
 
 export default Marionette.ItemView.extend({
-  'tagName':      'li',
-  'templateName': '@BranderEAV/Widgets/option.item.twig',
+  'tagName': 'li',
+  template:  optionTemplate,
 
   'initialize'(options) {
     this.currentLocale = options.currentLocale;
-    this.template = optionTemplate,
       this.optionBinder = new Backbone.ModelBinder();
     this.on('processing', function () {
       this.state = 'edit';

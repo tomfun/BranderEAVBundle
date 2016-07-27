@@ -1,8 +1,6 @@
 import BaseModel from 'brander-eav/basemodel';
 import Backbone from 'backbone';
 import AttributeModel from 'brander-eav/eav/attribute';
-import 'backbone.relational';
-
 
 var Model = BaseModel.extend({
   'defaults':  {

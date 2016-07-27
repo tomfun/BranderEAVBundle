@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 import ViewAttrCollection from './view/attributeCollection';
 import ViewAttrItem from './view/attributeItem';
 import ViewAttribute from './view/attribute';
-import mainTemplate from 'templates/brander-eav/Manage/main.twig';
+import {render as mainTemplate} from 'templates/brander-eav/Manage/main.twig';
 import ViewSetCollection from './view/setCollection';
 import ViewSetItem from './view/setItem';
 import ViewSet from './view/set';

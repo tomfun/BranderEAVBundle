@@ -7,7 +7,9 @@ import OptionCollectionView from 'brander-eav/view/optionCollection';
 import OptionItemView from 'brander-eav/view/optionItem';
 import validate from 'brander-eav/view/validation';
 import $ from 'jquery';
-import Routing from 'router';
+import router from 'router';
+import {render as template} from 'templates/brander-eav/Widgets/attribute.one.twig';
+import {render as templateChanges} from 'templates/brander-eav/Widgets/attribute.changes.twig';
 import 'backbone-chaining';
 import 'backbone.modelbinder';
 import 'jquery-ui';
@@ -16,10 +18,8 @@ import 'jquery-ui';
 var BaseProto = Base.prototype;
 
 export default Base.extend({
-  templateName: {
-    template:        '@BranderEAV/Widgets/attribute.one.twig',
-    templateChanges: '@BranderEAV/Widgets/attribute.changes.twig',
-  },
+  template,
+  templateChanges,
 
   initialize(options) {
     BaseProto.initialize.apply(this, arguments);
@@ -37,7 +37,7 @@ export default Base.extend({
     }, this);
     this.types.fetch();
     $.ajax({
-      url:     Routing.router.generate('brander_eav_filter_list'), // !!
+      url:     router.generate('brander_eav_filter_list'),
       success: function (data) {
         this.filterModels = data;
         this.render({noEffect: true});
@@ -197,7 +197,7 @@ export default Base.extend({
       _.each(bindings, function (v) {
         var element = this.$(v.selector),
           has     = element.closest('.icheckbox_square-green');
-        if (element.is(':checkbox') && has && has.size()) {
+        if (element.is(':checkbox') && has && has.length) {
           v.converter = function (dir, val) {
             has.toggleClass('checked', !!val);
             return val;

@@ -1,9 +1,11 @@
 import StateItemView from './stateItemView';
+import {render as template} from 'templates/brander-eav/Widgets/attribute.item.twig';
 
 
 export default StateItemView.extend({
+  template,
+
   'tagName':           'li',
-  'templateName':      '@BranderEAV/Widgets/attribute.item.twig',
   'changeStateEvents': [
     'processing',
     'error',

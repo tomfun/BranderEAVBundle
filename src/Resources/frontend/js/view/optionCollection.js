@@ -1,12 +1,14 @@
 import Base from './baseCollection';
 import Collection from 'brander-eav/eav/optionCollection';
+import {render as template} from 'templates/brander-eav/Widgets/option.collection.twig';
 import 'backbone.radio';
 
 
 var BaseProto = Base.prototype;
 
 export default Base.extend({
-  templateName:       '@BranderEAV/Widgets/option.collection.twig',
+  template,
+
   options:            {
     childViewOptions: {},
   },

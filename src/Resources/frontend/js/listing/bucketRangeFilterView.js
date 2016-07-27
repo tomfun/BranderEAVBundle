@@ -53,7 +53,7 @@ export default BaseView.extend({
         lt  = it.data('lt'),
         gte = it.data('gte')/* ,
            /*less = _.findWhere(that.aggregations, {'key_value': lt}),
-           great = _.findWhere(that.aggregations, {'key_value': gte})*;
+           great = _.findWhere(that.aggregations, {'key_value': gte})*/;
       if (!lt) {
         lt = undefined;
       }

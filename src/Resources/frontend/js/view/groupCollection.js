@@ -1,12 +1,14 @@
 import Base from './baseCollection';
 import _ from 'underscore';
+import {render as template} from 'templates/brander-eav/Widgets/group.collection.twig';
 import 'backbone.radio';
 
 
 var BaseProto = Base.prototype;
 
 export default Base.extend({
-  templateName:       '@BranderEAV/Widgets/group.collection.twig',
+  template,
+
   childViewContainer: 'ul',
   initialize(options) {
     BaseProto.initialize.call(this, _.extend(options, {channel: 'attribute-group'}));

@@ -10,14 +10,8 @@ export default Backbone.View.extend({
 
   initialize(options) {
     BaseProto.initialize.apply(this, arguments);
-    this.template = Templating.get((options && options.templateName) // todo
-      || (_.isObject(this.templateName) ? this.templateName.template : this.templateName));
-    if (_.isObject(this.templateName)) {
-      _.each(this.templateName, function (templateName, name) {
-        if (name !== 'template') {
-          this[name] = Templating.get(templateName);
-        }
-      }, this);
+    if (this.templateName) {
+      throw new Error('TODO templateName'); // todo
     }
   },
 

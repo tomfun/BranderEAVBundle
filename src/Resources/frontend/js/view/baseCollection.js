@@ -8,8 +8,6 @@ import $ from 'jquery';
 var BaseProto = Marionette.CompositeView.prototype;
 
 export default Marionette.CompositeView.extend({
-  templateName: undefined, // '@BranderEAV/Widgets/layout.twig',
-  template:     undefined,
   // childViewContainer: '.collection',
 
   softRemove: false, // change remove behavior
@@ -17,7 +15,10 @@ export default Marionette.CompositeView.extend({
   initialize(options) {
     BaseProto.initialize.apply(this, arguments);
     if (options && options.templateName) {
-      this.templateName = options.templateName;
+      throw new Error('TODO 2') // TODO
+    }
+    if (options && options.template) {
+      this.template = options.template;
     }
     if (options.softRemove !== undefined) {
       this.softRemove = options.softRemove;
