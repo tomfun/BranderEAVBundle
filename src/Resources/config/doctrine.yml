@@ -13,21 +13,25 @@ services:
   # Repo
   brander_eav.repo.value:
     class:            %brander_eav.repo.value.class%
-    factory_service:  doctrine.orm.entity_manager
-    factory_method:   getRepository
+    factory:
+      - "@doctrine.orm.entity_manager"
+      - getRepository
     arguments: [BranderEAVBundle:Value]
   brander_eav.repo.attribute:
     class:            %brander_eav.repo.attribute.class%
-    factory_service:  doctrine.orm.entity_manager
-    factory_method:   getRepository
+    factory:
+      - "@doctrine.orm.entity_manager"
+      - getRepository
     arguments: [BranderEAVBundle:Attribute]
   brander_eav.repo.group:
     class:            %brander_eav.repo.group.class%
-    factory_service:  doctrine.orm.entity_manager
-    factory_method:   getRepository
+    factory:
+      - "@doctrine.orm.entity_manager"
+      - getRepository
     arguments: [BranderEAVBundle:AttributeGroup]
   brander_eav.repo.set:
     class:            %brander_eav.repo.set.class%
-    factory_service:  doctrine.orm.entity_manager
-    factory_method:   getRepository
+    factory:
+      - "@doctrine.orm.entity_manager"
+      - getRepository
     arguments: [BranderEAVBundle:AttributeSet]
