@@ -48,6 +48,7 @@ var ManageView = Backbone.View.extend({
 
     this.viewAttribute.on('locale:changing', function (locale) {
       this.viewGroup.changeLocale(locale);
+      this.viewAttrCollection.changeLocale(locale);
     }, this);
   },
 

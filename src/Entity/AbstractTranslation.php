@@ -13,7 +13,6 @@ abstract class AbstractTranslation extends AbstractTranslationBase
     /**
      * Will be mapped to translatable entity
      * by TranslatableSubscriber
-     * @Serializer\Groups("=false")
      * @Serializer\Exclude()
      */
     protected $translatable;
@@ -27,11 +26,12 @@ abstract class AbstractTranslation extends AbstractTranslationBase
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Type("integer")
      */
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=false)
      * @Assert\NotBlank(message="brander.eav.locale")
      * @Serializer\Type("string")
      * @Serializer\Expose()
@@ -40,7 +40,7 @@ abstract class AbstractTranslation extends AbstractTranslationBase
     protected $locale;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=false)
      * @Assert\NotBlank(message="brander.eav.title")
      * @Serializer\Type("string")
      * @Serializer\Expose()

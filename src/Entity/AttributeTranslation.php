@@ -14,8 +14,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AttributeTranslation extends AbstractTranslation
 {
     /**
-     * todo
      * @ORM\ManyToOne(targetEntity="Attribute", inversedBy="translations", fetch="EAGER")
+     * @ORM\JoinColumn(name="translatable", referencedColumnName="id", nullable=false)
+     * @Serializer\Groups("attribute_translation_translatable")
      * @var
      */
     protected $translatable;

@@ -3,7 +3,7 @@ import Backbone from 'backbone';
 import BaseModel from 'brander-eav/basemodel';
 import Routing from 'router';
 import OptionCollection from './optionCollection';
-import TranslationCollection from './translationCollection';
+import {AttributeTranslationCollection, AttributeTranslation} from './translationCollection';
 
 
 var Model = BaseModel.extend({
@@ -19,16 +19,21 @@ var Model = BaseModel.extend({
     }
     var url = Routing.generate('brander_eav_attribute_check', {'attribute': this.id});
     return $.ajax({
+      url,
+
       'method':      'patch',
       'dataType':    'json',
       'processData': false,
-      url,
       'data':        JSON.stringify(this.toJSON()),
     });
   },
 
   'hasOptions'() {
     return this.get('discr') === 'select';
+  },
+
+  getTitle() {
+    return this.get('translations').at(0).get('title');
   },
 
   'relations': [
@@ -41,13 +46,12 @@ var Model = BaseModel.extend({
     {
       'type':           Backbone.HasMany,
       'key':            'translations',
-      'relatedModel':   TranslationCollection.Model,
-      'collectionType': TranslationCollection,
+      'relatedModel':   AttributeTranslation,
+      'collectionType': AttributeTranslationCollection,
     },
   ],
 
   'defaults': {
-    'title':        'New attribute',
     'isRequired':   false,
     'isFilterable': false,
     'isSortable':   false,

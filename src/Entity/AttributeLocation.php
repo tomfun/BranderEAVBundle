@@ -9,8 +9,6 @@ use JMS\Serializer\Annotation as Serializer;
  * @author tomfun
  *
  * @ORM\Entity()
- * @Serializer\ExclusionPolicy("all")
- * @Serializer\ReadOnly()
  */
 class AttributeLocation extends Attribute
 {

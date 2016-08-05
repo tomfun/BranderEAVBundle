@@ -10,8 +10,6 @@ use JMS\Serializer\Annotation as Serializer;
  * @author Bogdan Yurov <bogdan@yurov.me>
  *
  * @ORM\Entity()
- * @Serializer\ExclusionPolicy("all")
- * @Serializer\ReadOnly()
  */
 class AttributeBoolean extends Attribute
 {

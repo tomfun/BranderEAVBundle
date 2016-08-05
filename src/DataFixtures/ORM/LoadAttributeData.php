@@ -6,6 +6,8 @@ use Brander\Bundle\EAVBundle\Entity\Attribute;
 use Brander\Bundle\EAVBundle\Entity\AttributeGroup;
 use Brander\Bundle\EAVBundle\Entity\AttributeSelect;
 use Brander\Bundle\EAVBundle\Entity\AttributeSelectOption;
+use Brander\Bundle\EAVBundle\Entity\AttributeTranslation;
+use Brander\Bundle\EAVBundle\Entity\OptionTranslation;
 use Brander\Bundle\EAVBundle\Service\Holder;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -92,12 +94,16 @@ class LoadAttributeData extends AbstractFixture
     private function createAttribute(array $attribute, ObjectManager $manager)
     {
         $attr = $this->attribute->createFromShortName($attribute['type']);
-        $attr->translate($this->getLocale());
         if ($attr instanceof AttributeSelect) {
             foreach (range(0, mt_rand(2, 5)) as $i) {
                 $option = new AttributeSelectOption();
-                $option->translate('ru')->setTitle($this->faker->name);
-                $option->mergeNewTranslations();
+
+                $optionTranslation = new OptionTranslation();
+                $optionTranslation->setLocale($this->getLocale())
+                    ->setTranslatable($option)
+                    ->setTitle($this->faker->name);
+                $option->getTranslations()->add($optionTranslation);
+
                 $attr->getOptions()->add($option);
                 $option->setAttribute($attr);
                 $manager->persist($option);
@@ -110,21 +116,24 @@ class LoadAttributeData extends AbstractFixture
             $attr->setFilterOrder((int)$attribute['filterOrder']);
         }
 
-        $localized = $attr->translate($this->getLocale());
-        $localized->setTitle($attribute['title']);
+        $attrTrans = new AttributeTranslation();
+        $attrTrans
+            ->setTranslatable($attr)
+            ->setLocale($this->getLocale())
+            ->setTitle($attribute['title']);
+        $attr->getTranslations()->add($attrTrans);
 
         if (isset($attribute['hint'])) {
-            $localized->setHint($attribute['hint']);
+            $attrTrans->setHint($attribute['hint']);
         }
 
         if (isset($attribute['placeholder'])) {
-            $localized->setPlaceholder($attribute['placeholder']);
+            $attrTrans->setPlaceholder($attribute['placeholder']);
         }
 
         if (isset($attribute['postfix'])) {
-            $localized->setPostfix($attribute['postfix']);
+            $attrTrans->setPostfix($attribute['postfix']);
         }
-        $attr->mergeNewTranslations();
 
         $attr->setIsRequired(
             isset($attribute['required']) ? $attribute['required'] : $this->faker->boolean(40)

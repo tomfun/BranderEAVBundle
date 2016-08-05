@@ -1,6 +1,7 @@
 <?php
 namespace Brander\Bundle\EAVBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -12,13 +13,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ORM\Entity()
  * @ORM\Table(name="brander_eav_attribute_select_option")
- * @method string getTitle()
- * @method OptionTranslation translate(string $lang)
  * @Serializer\ExclusionPolicy("all")
+ * @method OptionTranslation[]|Collection getTranslations()
  */
 class AttributeSelectOption
 {
-    protected $defaultLocale = 'ru';
+    use Translatable;
 
     // -- Entity ---------------------------------------
 
@@ -50,23 +50,21 @@ class AttributeSelectOption
 
     // -- Translations ------------------------------------
 
-    use Translatable;
-
     /**
+     * @ORM\OneToMany(targetEntity="Brander\Bundle\EAVBundle\Entity\OptionTranslation", cascade={"all"}, mappedBy="translatable", orphanRemoval=true, fetch="EAGER")
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\OptionTranslation>")
-     * @Serializer\Accessor(getter="getATranslations", setter="setATranslations")
-     * @Serializer\Groups({"translations", "admin"})
+     * @Serializer\Groups(groups={"translations", "admin"})
      * @Serializer\Expose()
      * @Assert\Valid
      */
     protected $translations;
-    /**
-     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
-     * @Serializer\Type("string")
-     * @Serializer\Groups({"=read && !g('minimal')"})
-     * @Serializer\Expose()
-     */
-    protected $title;
+//    /**
+//     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
+//     * @Serializer\Type("string")
+//     * @Serializer\Groups({"=read && !g('minimal')"})
+//     * @Serializer\Expose()
+//     */
+//    protected $title;
 
     /**
      * Returns translation entity class name.
@@ -125,4 +123,14 @@ class AttributeSelectOption
 //        $this->title = $title;
 //        return $this;
 //    }
+    /**
+     * @Serializer\PostDeserialize()
+     */
+    public function updateTranslations()
+    {
+        $translatable = $this;
+        $this->getTranslations()->map(function (OptionTranslation $trans) use (&$translatable) {
+            $trans->setTranslatable($translatable);
+        });
+    }
 }

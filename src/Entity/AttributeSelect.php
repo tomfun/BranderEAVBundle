@@ -12,12 +12,11 @@ use JMS\Serializer\Annotation as Serializer;
  * @author Bogdan Yurov <bogdan@yurov.me>
  *
  * @ORM\Entity()
- * @Serializer\ExclusionPolicy("all")
  */
 class AttributeSelect extends Attribute
 {
     /**
-     * @ORM\OneToMany(targetEntity="AttributeSelectOption", mappedBy="attribute", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="AttributeSelectOption", mappedBy="attribute", cascade={"remove", "persist", "refresh"}, orphanRemoval=true)
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeSelectOption>")
      * @Serializer\Expose()
      * @var AttributeSelectOption[]|Collection

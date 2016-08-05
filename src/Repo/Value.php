@@ -2,6 +2,8 @@
 namespace Brander\Bundle\EAVBundle\Repo;
 
 use Brander\Bundle\EAVBundle\Entity\Attribute;
+use Brander\Bundle\EAVBundle\Entity\AttributeSelect;
+use Brander\Bundle\EAVBundle\Entity\AttributeSelectOption;
 use Brander\Bundle\EAVBundle\Entity\ValueDate;
 use Brander\Bundle\EAVBundle\Entity\ValueNumeric;
 use Brander\Bundle\EAVBundle\Entity\ValueSelect;
@@ -13,18 +15,26 @@ use Doctrine\ORM\EntityRepository;
 class Value extends EntityRepository
 {
     /**
-     * @param Attribute $attribute
-     * @return ValueSelect[]
+     * @param AttributeSelect $attribute
+     * @return AttributeSelectOption[]
      */
-    public function getUsed(Attribute $attribute)
+    public function getUsedSelectOptions(AttributeSelect $attribute)
     {
         $qb = $this->createQueryBuilder('v');
-        $qb->leftJoin('v.attribute', 'a')
+        $qb->select('v.value')
+           ->leftJoin('v.attribute', 'a')
            ->where('a = :attribute')
+           ->andWhere('v instance of BranderEAVBundle:ValueSelect')
+           ->andWhere('a instance of BranderEAVBundle:AttributeSelect')
            ->setParameter('attribute', $attribute)
            ->groupBy('v.value');
-        return $qb->getQuery()
-                  ->getResult();
+        $optionIds = array_map(function ($v) {
+            return $v['value'];
+        }, $qb->getQuery()
+            ->getArrayResult());
+        $optionRepo = $this->_em->getRepository(AttributeSelectOption::class);
+        $options = $optionRepo->findBy(['id' => $optionIds]);
+        return $options;
     }
 
     /**

@@ -7,7 +7,7 @@
           New Attribute
         {% else %}
           Edit Attribute #{{ model.id }}
-          <small>{{ model.title }}</small>
+          <small>{{ model.translations.models[lcl].title }}</small>
         {% endif %}
       </h5>
       <div class="ibox-tools">

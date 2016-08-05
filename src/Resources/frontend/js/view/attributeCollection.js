@@ -9,9 +9,15 @@ var BaseProto = Base.prototype;
 
 export default Base.extend({
   template,
+
   childViewContainer: 'ul',
   draggable:          true,
+  childViewOptions:   {currentLocale: 'ru'},
   initialize(options) {
     BaseProto.initialize.call(this, _.extend({channel: 'attribute', draggable: true}, options));
+  },
+  changeLocale(newLocale) {
+    this.childViewOptions.currentLocale = newLocale;
+    this.render();
   },
 });

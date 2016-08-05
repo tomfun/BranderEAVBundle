@@ -10,8 +10,6 @@ use JMS\Serializer\Annotation as Serializer;
  * @author Vladimir Odesskij <odesskij1992@gmail.com>
  *
  * @ORM\Entity()
- * @Serializer\ExclusionPolicy("all")
- * @Serializer\ReadOnly()
  */
 class AttributeTextarea extends Attribute
 {

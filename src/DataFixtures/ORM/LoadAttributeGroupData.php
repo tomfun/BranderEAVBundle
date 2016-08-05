@@ -3,6 +3,7 @@ namespace Brander\Bundle\EAVBundle\DataFixtures\ORM;
 
 use Brander\Bundle\EAVBundle\DataFixtures\AbstractFixture;
 use Brander\Bundle\EAVBundle\Entity\AttributeGroup;
+use Brander\Bundle\EAVBundle\Entity\AttributeGroupTranslation;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Yaml\Yaml;
 
@@ -20,12 +21,14 @@ class LoadAttributeGroupData extends AbstractFixture
     {
         foreach ($this->getData() as $row) {
             $group = new AttributeGroup();
-            $group
-                ->setClass($row['class'])
-                ->translate($this->getLocale())
-                ->setTitle($row['title']);
-            $group->mergeNewTranslations();
+            $group->setClass($row['class']);
+            $groupTrans = new AttributeGroupTranslation();
+            $groupTrans
+                ->setTitle($row['title'])
+                ->setLocale($this->getLocale())
+                ->setTranslatable($group);
             $manager->persist($group);
+            $manager->persist($groupTrans);
 
             $this->setReference('brander-eav-attribute-group-' . $group->getClass(), $group);
         }

@@ -22,4 +22,13 @@ export default StateItemView.extend({
     'click @ui.remove': 'remove',
   },
 
+  serializeData() {
+    const first = this.model.get('translations').find({locale: this.options.currentLocale});
+    return {
+      currentLocale: this.options.currentLocale,
+      // lcl:           this.model.get('translations').indexOfLocale(this.currentLocale),
+      title:         first ? first.get('title') : '',
+      model:         this.model,
+    };
+  },
 });

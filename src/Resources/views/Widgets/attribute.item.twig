@@ -1,26 +1,27 @@
-<a href="#attribute-{{ id }}" class="edit">
-  {% if discr == 'textarea' %}
+<a href="#attribute-{{ model.id }}" class="edit">
+  {% if model.discr == 'textarea' %}
     <i class="fa fa-book"></i>
   {% endif %}
-  {% if discr == 'select' %}
+  {% if model.discr == 'select' %}
     <i class="fa fa-level-down"></i>
   {% endif %}
-  {% if discr == 'numeric' %}
+  {% if model.discr == 'numeric' %}
     <i class="fa fa-plus"></i>
   {% endif %}
-  {% if discr == 'input' %}
+  {% if model.discr == 'input' %}
     <i class="fa fa-pencil-square-o"></i>
   {% endif %}
-  {% if discr == 'boolean' %}
+  {% if model.discr == 'boolean' %}
     <i class="fa fa-check"></i>
   {% endif %}
-  {% if discr == 'date' %}
+  {% if model.discr == 'date' %}
     <i class="fa fa-clock-o"></i>
   {% endif %}
-  {% if discr == 'location' %}
+  {% if model.discr == 'location' %}
     <i class="fa fa-map-marker"></i>
   {% endif %}
   {{ title }}
-  <small>#{{ id }}</small>
+
+  <small>#{{ model.id }}</small>
 </a>
 <a href="#attribute-remove-{{ id }}" class="remove"><i class="fa fa-times"></i></a>

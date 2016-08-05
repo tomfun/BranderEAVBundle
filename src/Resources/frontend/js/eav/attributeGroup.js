@@ -4,7 +4,7 @@ import BaseModel from 'brander-eav/basemodel';
 import AttributeModel from './attribute';
 import AttributeCollection from './attributeCollection';
 import Routing from 'router';
-import TranslationCollection from './translationCollection';
+import {AttributeGroupTranslationCollection, AttributeGroupTranslation} from './translationCollection';
 import 'backbone-chaining';
 
 
@@ -25,13 +25,13 @@ var Model = BaseModel.extend({
     {
       'type':           Backbone.HasMany,
       'key':            'translations',
-      'relatedModel':   TranslationCollection.Model,
-      'collectionType': TranslationCollection,
+      'relatedModel':   AttributeGroupTranslation,
+      'collectionType': AttributeGroupTranslationCollection,
     },
   ],
 
   getIds() {
-    var hash = {};
+    const hash = {};
     _.each(this.get('attributes[*].id'), function (val) {
       hash[String(val)] = true;
     });

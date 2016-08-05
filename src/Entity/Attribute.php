@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *   "textarea" = "\Brander\Bundle\EAVBundle\Entity\AttributeTextarea",
  *   "location" = "\Brander\Bundle\EAVBundle\Entity\AttributeLocation"
  * })
- * @Serializer\Discriminator(field="discr", map={
+ * @Serializer\Discriminator(field="discr", disabled=false, map={
  *   "input"    = "Brander\Bundle\EAVBundle\Entity\AttributeInput",
  *   "select"   = "Brander\Bundle\EAVBundle\Entity\AttributeSelect",
  *   "boolean"  = "Brander\Bundle\EAVBundle\Entity\AttributeBoolean",
@@ -34,22 +34,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  *   "textarea" = "Brander\Bundle\EAVBundle\Entity\AttributeTextarea",
  *   "location" = "Brander\Bundle\EAVBundle\Entity\AttributeLocation"
  * })
- * @Serializer\ExclusionPolicy("all")
- *
- * Переводные методы:
- * @method AttributeTranslation translate(string $lang)
- * @method AttributeTranslation[]|ArrayCollection getTranslations()
- * @method AttributeTranslation[] getATranslations()
- * @method AttributeTranslation mergeNewTranslations()
- * @method string getTitle()
- * @method string getHint()
- * @method string getPlaceholder()
- * @method string getPostfix()
- * *method AttributeTranslation setTitle(string $title)
+ * @method AttributeTranslation[]|Collection getTranslations()
  */
 abstract class Attribute
 {
-    protected $defaultLocale = 'ru';
+    use Translatable;
     /**
      * @var int
      *
@@ -113,67 +102,61 @@ abstract class Attribute
      */
     protected $showType;
     /**
-     * @ORM\OneToMany(targetEntity="Value", cascade={"all"}, mappedBy="attribute")
+     * @ORM\OneToMany(targetEntity="Value", cascade={"remove"}, mappedBy="attribute")
+     * @Serializer\Groups(groups={"eav_attribute_values"})
      * @var Value[]
      */
     protected $values;
     /**
      * @ORM\ManyToMany(targetEntity="Brander\Bundle\EAVBundle\Entity\AttributeSet", cascade={"persist"}, mappedBy="attributes")
+     * @Serializer\Groups(groups={"eav_attribute_sets"})
      * @var AttributeSet[]|Collection
      */
     protected $sets;
     /**
      * @ORM\ManyToMany(targetEntity="\Brander\Bundle\EAVBundle\Entity\AttributeGroup", cascade={"persist"}, mappedBy="attributes")
+     * @Serializer\Groups(groups={"eav_attribute_groups"})
      * @var AttributeGroup[]|Collection
      */
     protected $groups;
     /**
      * @var string
+     * @Serializer\Groups(groups={"eav_attribute_value_class"})
      */
     protected $valueClass;
 
     // -- Value ---------------------------------------
     /**
-     * @ORM\OneToMany(targetEntity="AttributeTranslation", cascade={"all"}, mappedBy="translatable", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="AttributeTranslation", cascade={"all"}, mappedBy="translatable", orphanRemoval=true, fetch="EAGER")
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeTranslation>")
-     * @Serializer\Accessor(getter="getATranslations", setter="setATranslations")
-     * @Serializer\Groups({"translations", "admin"})
+     * @Serializer\Groups(groups={"translations", "admin"})
      * @Serializer\Expose()
      * @Assert\Valid
      */
     protected $translations;
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
-     * @Serializer\Type("string")
-     * @Serializer\Expose()
-     */
-    protected $title;
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getHint")
-     * @Serializer\Type("string")
-     * @Serializer\Expose()
-     */
-    protected $hint;
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getPlaceholder")
-     * @Serializer\Type("string")
-     * @Serializer\Expose()
-     */
-    protected $placeholder;
+//    /**
+//     * *virtual
+//     * @Serializer\Accessor(getter="getTitle", setter="setTitle")
+//     * @Serializer\Type("string")
+//     * @Serializer\Expose()
+//     */
+//    protected $title;
+//    /**
+//     * *virtual
+//     * @Serializer\Accessor(getter="getHint")
+//     * @Serializer\Type("string")
+//     * @Serializer\Expose()
+//     */
+//    protected $hint;
+//    /**
+//     * *virtual
+//     * @Serializer\Accessor(getter="getPlaceholder")
+//     * @Serializer\Type("string")
+//     * @Serializer\Expose()
+//     */
+//    protected $placeholder;
 
     // -- Translations ------------------------------------
-
-    use Translatable;
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getPostfix")
-     * @Serializer\Type("string")
-     * @Serializer\Expose()
-     */
-    protected $postfix;
 
     /**
      * Constructor
@@ -223,17 +206,6 @@ abstract class Attribute
         $value->setAttribute($this);
 
         return $value;
-    }
-
-    /**
-     * @Serializer\VirtualProperty()
-     * @Serializer\SerializedName("title")
-     * @Serializer\Type("string")
-     * @return string
-     */
-    public function _title()
-    {
-        return $this->getTitle();
     }
 
     // -- Accessors ---------------------------------------

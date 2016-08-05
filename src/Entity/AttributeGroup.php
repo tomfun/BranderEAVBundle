@@ -2,6 +2,7 @@
 namespace Brander\Bundle\EAVBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -15,17 +16,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ORM\Entity()
  * @ORM\Table(name="brander_eav_attribute_group")
- * Переводные методы:
- * @method AttributeGroupTranslation translate(string $lang)
- * @method AttributeGroupTranslation[]|ArrayCollection getTranslations()
- * @method AttributeGroupTranslation[] getATranslations()
- * @method AttributeGroupTranslation mergeNewTranslations()
- * @method string getTitle()
- * *method AttributeGroupTranslation setTitle(string $title)
+ * @method AttributeGroupTranslation[]|Collection getTranslations()
  */
 class AttributeGroup
 {
-    protected $defaultLocale = 'ru';
+    use Translatable;
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -53,8 +48,8 @@ class AttributeGroup
      */
     protected $attributes;
     /**
+     * @ORM\OneToMany(targetEntity="AttributeGroupTranslation", cascade={"all"}, mappedBy="translatable", orphanRemoval=true, fetch="EAGER")
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeGroupTranslation>")
-     * @Serializer\Accessor(getter="getATranslations", setter="setATranslations")
      * @Serializer\Groups({"translations", "admin"})
      * @Serializer\Expose()
      * @Assert\Valid
@@ -62,15 +57,6 @@ class AttributeGroup
     protected $translations;
 
     // -- Translations ------------------------------------
-
-    use Translatable;
-    /**
-     * *virtual
-     * @Serializer\Accessor(getter="getTitle")
-     * @Serializer\Type("string")
-     * @Serializer\Expose()
-     */
-    protected $title;
 
     /**
      * @inheritdoc

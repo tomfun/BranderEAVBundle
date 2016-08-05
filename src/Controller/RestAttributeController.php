@@ -13,6 +13,7 @@ use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializerInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -63,12 +64,18 @@ class RestAttributeController
         if (!$this->securityChecker->isGranted(UniversalManageVoter::CREATE, $attribute)) {
             throw new AccessDeniedException();
         }
-        $this->em->persist($attribute);
+        foreach ($attribute->getTranslations() as $attrTrans) {
+            $attrTrans->setTranslatable($attribute);
+        }
         if ($attribute instanceof AttributeSelect) {
             foreach ($attribute->getOptions() as $option) {
-                $this->em->persist($option->setAttribute($attribute));
+                $option->setAttribute($attribute);
+                foreach ($option->getTranslations() as $optTrans) {
+                    $optTrans->setTranslatable($option);
+                }
             }
         }
+        $this->em->persist($attribute);
 
         return $this->flush($attribute);
     }
@@ -93,47 +100,33 @@ class RestAttributeController
         $attributeNew = $this->deserialize($request->getContent());
         $checkResult = $this->check($attribute, $attributeNew);
         if ($checkResult['recreate']) {
+            /** @var AttributeTranslation[] $allTranslations */
+            $allTranslations = $attribute->getTranslations()->toArray();
+            $allTranslations +=$attributeNew->getTranslations()->toArray();
+            foreach ($allTranslations as $attrTrans) {
+                $attrTrans->setTranslatable($attributeNew);
+            }
             $this->em->remove($attribute);
             $this->em->persist($attributeNew);
-            foreach ($attribute->getTranslations() as $trans) {
-                $this->em->detach($trans);
-                $trans->setTranslatable($attributeNew);
-                $trans->setId(null);
-                $this->em->persist($trans);
-            }
-            $attributeNew->mergeNewTranslations();
         } else {
             $attributeNew->setId($attribute->getId());
 
-            $ret = $attribute->getTranslations()->toArray();
-            if ($attributeNew->getTranslations()) {
-                /** @var AttributeTranslation $trans */
-                foreach ($attributeNew->getTranslations() as $trans) {
-                    if ($trans->isEmpty()) {
-                        continue;
-                    }
-                    $trans->setTranslatable($attribute);
-                    if (isset($ret[$trans->getLocale()])) {
-                        $trans->setId($ret[$trans->getLocale()]->getId());
-                    }
-                    $ret[$trans->getLocale()] = $this->em->merge($trans);
-                }
-                foreach ($attributeNew->getNewTranslations() as $trans) {
-                    if ($trans->isEmpty()) {
-                        continue;
-                    }
-                    $trans->setTranslatable($attribute);
-                    if (isset($ret[$trans->getLocale()])) {
-                        $trans->setId($ret[$trans->getLocale()]->getId());
-                    }
-                    $ret[$trans->getLocale()] = $this->em->merge($trans);
+            /** @var AttributeTranslation[] $allTranslations */
+            $oldTranslations = $attribute->getTranslationsById();
+            /** @var AttributeTranslation[] $ret */
+            $ret = $attributeNew->getTranslationsByLocale();
+            foreach ($ret as $attrTrans) {
+                $attrTrans->setTranslatable($attributeNew);
+                if ($attrTrans->getId()) {
+                    unset($oldTranslations[$attrTrans->getId()]);
                 }
             }
-            $attributeNew->getTranslations()->clear();
+
+            foreach ($oldTranslations as $forDelete) {
+                $this->em->remove($forDelete);
+            }
 
             $attribute = $this->em->merge($attributeNew);
-            $attribute->setATranslations(new ArrayCollection($ret));
-            $attributeNew->setATranslations($attribute->getTranslations());
 
             if ($attributeNew instanceof AttributeSelect) {
                 foreach ($attributeNew->getOptions() as $option) {
@@ -185,7 +178,7 @@ class RestAttributeController
      * @Rest\Delete("/{attribute}", name="brander_eav_attribute_delete", defaults={"_format": "json"})
      * @Rest\View()
      * @param Attribute $attribute
-     * @return array
+     * @return Response
      * @throws AccessDeniedException
      */
     public function deleteAction(Attribute $attribute)
@@ -196,7 +189,7 @@ class RestAttributeController
         $this->em->remove($attribute);
         $this->em->flush();
 
-        return ['ok' => true];
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -205,7 +198,7 @@ class RestAttributeController
      * )
      *
      * @Rest\Get("/{attribute}", name="brander_eav_attribute_get", defaults={"_format": "json"})
-     * @Rest\View(serializerGroups={"Default"})
+     * @Rest\View(serializerGroups={"Default", "translations"})
      * @param Attribute $attribute
      * @return Attribute
      * @throws AccessDeniedException
@@ -230,14 +223,13 @@ class RestAttributeController
         $usedOptions = [];
         $newOptions = [];
 
-        $used = $this->repoValue->getUsed($attribute);
-
         if ($attribute instanceof AttributeSelect) {
+            $used = $this->repoValue->getUsedSelectOptions($attribute);
             foreach ($attribute->getOptions() as $option) {
                 $oldOptions[$option->getId()] = $option;
             }
-            foreach ($used as $value) {
-                $usedOptions[$value->getOption()->getId()] = $value->getOption();
+            foreach ($used as $option) {
+                $usedOptions[$option->getId()] = $option;
             }
         }
         if (($attributeNew instanceof AttributeSelect)) {
@@ -279,8 +271,6 @@ class RestAttributeController
             unset($contentJson['id']);
             $content = json_encode($contentJson);
         }
-
-        /** @var Attribute $attributeNew */
 
         return $this->serializer->deserialize($content, Attribute::class, 'json', $context);
     }
