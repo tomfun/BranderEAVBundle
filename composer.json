@@ -31,18 +31,18 @@
     }
   ],
   "require": {
-    "tomfun/brander-elastica-skeleton": "0.0.6",
-    "werkint/stats-bundle": "*",
-    "werkint/templating-bundle": "^0.1.0",
-    "friendsofsymfony/rest-bundle": "*",
-    "jms/di-extra-bundle": "*",
-    "doctrine/orm": "*"
+    "symfony/symfony": "^3.1",
+    "friendsofsymfony/rest-bundle": "^2",
+    "jms/di-extra-bundle": "^1",
+    "doctrine/orm": "^2",
+    "friendsofsymfony/jsrouting-bundle": "^1.5.4",
+    "doctrine/doctrine-cache-bundle": "^1",
+    "tomfun/brander-elastica-skeleton": "*"
   },
   "require-dev":{
-    "doctrine/doctrine-fixtures-bundle": "*",
-    "nelmio/api-doc-bundle": "*",
-    "werkint/framework-extra-bundle": "dev-master",
-    "fzaninotto/faker": "*"
+    "doctrine/doctrine-fixtures-bundle": "^2",
+    "nelmio/api-doc-bundle": "^2",
+    "fzaninotto/faker": "^1"
   },
   "autoload": {
     "psr-4": {

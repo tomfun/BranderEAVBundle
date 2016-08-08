@@ -1,9 +1,54 @@
-###show auto-generated lists (inner elastica index name / type name):###
-```
-app/console de:cont | grep "brander_eav.elastica.list"
+### How it work, what is it
+[read in russian](/how_it_work.ru.md)
+
+### Install bundle
+
+```bash
+composer require tomfun/brander-eav
 ```
 
-###config example:###
+```php
+// app/AppKernel.php
+    public function registerBundles()
+    // ...
+        new \Brander\Bundle\EAVBundle\BranderEAVBundle(),
+        new FOS\ElasticaBundle\FOSElasticaBundle(),
+        new JMS\AopBundle\JMSAopBundle(),
+        new JMS\SerializerBundle\JMSSerializerBundle(), // optional
+        new JMS\DiExtraBundle\JMSDiExtraBundle($this),
+
+    // ...
+```
+
+```yml
+# app/config/parameters.yml
+# same add to app/config/parameters.yml.dist
+parameters:
+# .........
+    locale: ru
+```
+
+[just **enable** elastica bundle](https://github.com/FriendsOfSymfony/FOSElasticaBundle/blob/master/Resources/doc/setup.md)
+[and add **base configuration**](https://github.com/FriendsOfSymfony/FOSElasticaBundle/blob/master/Resources/doc/setup.md#c-basic-bundle-configuration)
+
+```yml
+#app/config/config.yml
+fos_elastica:
+    clients:
+        default: { host: localhost, port: 9200 }
+    indexes:
+        app: ~
+```
+
+### Configuration
+
+#### First at all
+ - you must have entity you want to search
+ - query php class
+ - search result class
+
+#### Config example
+
 ```yml
 brander_eav:
   fixturesDirectory: /home/tomfun/fixtures-data
@@ -34,13 +79,46 @@ brander_eav:
     - Sdelka\Bundle\AdvertBundle\Entity\Advert #orm entity
 ```
 
+#### show auto-generated lists (inner elastica index name / type name): ###
+```
+app/console de:cont | grep "brander_eav.elastica.list"
+```
+
+#### Routing ###
+
+in app/config/routing.yml add this lines:
+
+```yml
+# app/config/routing.yml
+eav:
+  resource: "@BranderEAVBundle/Resources/config/routing.yml"
+  options:
+    i18n: false
+    expose: true
+```
+
+default admin url is **/admin/eav/manage/**
+
+### Security ###
+
 if you want *grant access for admin part for non admin* (example: manager)
 ```yml
 brander_eav:
   useJmsSerializer: false #turn off standard elastica serializer for known entity
-  manageRole ROLE_MANAGER
+  manageRole: ROLE_MANAGER
 ```
-or rewrite voter.
+or for *anonymous*: ```manageRole: "anon."```
+or rewrite voter service: *brander_eav.security.universal_voter*.
 
 also look into
 [ElasticaSkeletonBundle](https://github.com/tomfun/BranderElasticaSkeletonBundle/blob/master/README.md)
+
+todo:
+* vendor/werkint/stats-bundle/src/Service/Security/Voter/StatsVoter.php supportsAttribute
+* backbone.modelbinder -> stickit
+
+wtf:
+cache.app
+voter
+Twig\BranderEAVExtension
+\Brander\Bundle\EAVBundle\DependencyInjection\BranderEAVExtension::getConfiguration
