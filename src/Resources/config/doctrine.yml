@@ -12,25 +12,25 @@ parameters:
 services:
   # Repo
   brander_eav.repo.value:
-    class:            %brander_eav.repo.value.class%
+    class:            "%brander_eav.repo.value.class%"
     factory:
       - "@doctrine.orm.entity_manager"
       - getRepository
     arguments: [BranderEAVBundle:Value]
   brander_eav.repo.attribute:
-    class:            %brander_eav.repo.attribute.class%
+    class:            "%brander_eav.repo.attribute.class%"
     factory:
       - "@doctrine.orm.entity_manager"
       - getRepository
     arguments: [BranderEAVBundle:Attribute]
   brander_eav.repo.group:
-    class:            %brander_eav.repo.group.class%
+    class:            "%brander_eav.repo.group.class%"
     factory:
       - "@doctrine.orm.entity_manager"
       - getRepository
     arguments: [BranderEAVBundle:AttributeGroup]
   brander_eav.repo.set:
-    class:            %brander_eav.repo.set.class%
+    class:            "%brander_eav.repo.set.class%"
     factory:
       - "@doctrine.orm.entity_manager"
       - getRepository

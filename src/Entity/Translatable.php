@@ -7,16 +7,11 @@ use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Для переводов. Нельзя создать базовый класс, иначе будут проблемы с сериалайзером.
- *
+ * @property $translations Collection
  * @author Bogdan Yurov <bogdan@yurov.me>
  */
 trait Translatable
 {
-    /**
-     * @var Collection
-     */
-    protected $translations;
-
     /**
      * Returns collection of translations.
      *
