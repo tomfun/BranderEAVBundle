@@ -12,10 +12,10 @@ export default BaseView.extend({
   'autoApply':     false,
   'slowClose':     1200,
 
-  "initialize"(options) {
+  'initialize'(options) {
     BaseView.prototype.initialize.apply(this, arguments);
     if (options.model && options.model.get('attribute')) {
-      var descr = options.model.get('attribute').get('discr');
+      let descr = options.model.get('attribute').get('discr');
       this.discriminator = descr;
       if (descr === 'date') {
         this.unit = '';// formatViewDate
@@ -27,7 +27,7 @@ export default BaseView.extend({
     this.slowClose = this.slowClose === false ? false : parseInt(this.slowClose);
 
     this.on('render', function () {
-      var data,
+      let data,
         field = this.model.get('field').join('.'),
         tmp   = this.filter.get(field);
       switch (this.discriminator) {
@@ -46,14 +46,14 @@ export default BaseView.extend({
     }, this);
   },
 
-  "updateElements"() {
-    var that = this;
+  'updateElements'() {
+    let that = this;
     this.$('.bucket-range').each(function (i, el) {
-      var it  = $(el),
+      let it  = $(el),
         lt  = it.data('lt'),
         gte = it.data('gte')/* ,
            /*less = _.findWhere(that.aggregations, {'key_value': lt}),
-           great = _.findWhere(that.aggregations, {'key_value': gte})*/;
+           great = _.findWhere(that.aggregations, {'key_value': gte};
       if (!lt) {
         lt = undefined;
       }
@@ -76,19 +76,19 @@ export default BaseView.extend({
     'click a.apply':       'applyClick',
   },
 
-  "setRangeClick"(e) {
-    var it = $(e.currentTarget);
+  'setRangeClick'(e) {
+    let it = $(e.currentTarget);
     this.lt = it.data('lt');
     this.gte = it.data('gte');
     this.applyClick(e);
     it.addClass('active').css('opacity', '0.7');
   },
 
-  "applyClick"(e) {
+  'applyClick'(e) {
     if (e) {
       e.preventDefault();
     }
-    var field = this.model.get('field').join('.');
+    let field = this.model.get('field').join('.');
     try {
       this.filter.set(field, this.getRangeQuery(this.lt, this.gt, this.lte, this.gte));
       this.drawError('');
@@ -102,18 +102,18 @@ export default BaseView.extend({
     this.$('.slide-holder').slideUp(this.slowClose);
   },
 
-  "toggleOpener"(e) {
+  'toggleOpener'(e) {
     e.preventDefault();
     $(e.currentTarget).toggleClass('active');
     this.$('.slide-holder').slideToggle();
   },
 
-  "dataConverter"(event) {
-    var target = $(event.currentTarget);
+  'dataConverter'(event) {
+    let target = $(event.currentTarget);
     if (['lt', 'lte', 'gt', 'gte', 'aggregations'].indexOf(target.prop('name')) === -1) {
       return;
     }
-    var val   = target.val(),
+    let val   = target.val(),
       type  = target.prop('name'),
       field = this.model.get('field').join('.');
     switch (this.discriminator) {
@@ -149,10 +149,10 @@ export default BaseView.extend({
     }
     this.drawError('');
   },
-  "drawError"(e) {
+  'drawError'(e) {
     this.$('.error').text(e);
   },
-  "serializeData"() {
+  'serializeData'() {
     return _.merge(this.model.toJSON(), {
       discriminator: this.discriminator,
       unit:          this.unitFormat.bind(this),
@@ -161,24 +161,24 @@ export default BaseView.extend({
     });
   },
 
-  'unitFormat' (key, view_key) {
+  'unitFormat'(key, view_key) {
     return this.unit;
   },
 
-  "formatViewNumber"(number) {
+  'formatViewNumber'(number) {
     return __.numberFormat(number, Math.abs(number) > 1 ? 0 : 3, '.', ' ');
   },
 
-  "formatViewDate"(momentObj) {
+  'formatViewDate'(momentObj) {
     return momentObj.format('L');
   },
 
-  "onChangeAggregations"(aggregations) {
-    var aggName = this.model.get('field').join('.');
-    var success = function () {
+  'onChangeAggregations'(aggregations) {
+    let aggName = this.model.get('field').join('.');
+    let success = function () {
       if (this.discriminator === 'date') {
         _.each(this.aggregations, function (v, i) {
-          var moment = Moment.unix(v.key / 1000);
+          let moment = Moment.unix(v.key / 1000);
           v.key_value = moment.format();
           v.key_view = this.formatViewDate(moment);
         }, this);

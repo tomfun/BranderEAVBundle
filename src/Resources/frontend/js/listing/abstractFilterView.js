@@ -28,7 +28,7 @@ export default Marionette.ItemView.extend({
     return '' + latitude + ',' + longitude + 'distance:' + distance + unit;
   },
   'getRangeQuery'(lt, gt, lte, gte) {
-    var tmp = '';
+    let tmp = '';
     if (lt !== undefined) {
       tmp += 'lt:' + lt + ';';
     } else {
@@ -46,7 +46,7 @@ export default Marionette.ItemView.extend({
     return tmp;
   },
   'getRangeData'(string, formatter) {
-    var keywords = [
+    let keywords = [
         'gt',
         'gte',
         'lt',
@@ -55,7 +55,7 @@ export default Marionette.ItemView.extend({
       result   = {},
       res;
     _.each(keywords, function (keyword) {
-      var format = keyword + ':\\s*(.+?)\\s*;';
+      let format = keyword + ':\\s*(.+?)\\s*;';
       format = new RegExp(format, 'i');
       res = string.match(format);// , $value, $res
       if (res && res.length > 1) {
@@ -69,21 +69,21 @@ export default Marionette.ItemView.extend({
     return result;
   },
   'getPointFromString'() {
-    var tmp = string.split(',');
+    const tmp = string.split(',');
     return {
       lat: parseFloat(tmp[0]),
       lon: parseFloat(tmp[1]),
     };
   },
   'getGeoFilterData'(string) {
-    var value = string.trim();
+    let value = string.trim();
     if (value) {
       if (value.indexOf('distance:') !== -1) {
         value = value.split('distance:');
-        var distance = value[1];
+        let distance = value[1];
         value = value[0];
         value = this.getPointFromString(value);
-        var units = [
+        const units = [
           'km',
           'm',
           'mi',
@@ -91,10 +91,10 @@ export default Marionette.ItemView.extend({
           'ft',
           'nm',
         ];
-        var matches = distance.match('/\\s*([\\d\\.,]+)(.*)$/');
+        const matches = distance.match('/\\s*([\\d\\.,]+)(.*)$/');
         if (matches[1] && matches[1] !== '') {
           distance = parseFloat(matches[1]);
-          var unit;
+          let unit;
           if (distance && (unit = matches[2].trim().toLowerCase()) !== '') {
             if (units.indexOf(unit) === -1) {
               unit = 'km';

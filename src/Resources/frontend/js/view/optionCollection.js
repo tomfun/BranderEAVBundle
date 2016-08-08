@@ -4,7 +4,7 @@ import {render as template} from 'templates/brander-eav/Widgets/option.collectio
 import 'backbone.radio';
 
 
-var BaseProto = Base.prototype;
+const BaseProto = Base.prototype;
 
 export default Base.extend({
   template,
@@ -18,7 +18,7 @@ export default Base.extend({
     this.currentLocale = options.currentLocale;
     this.options.childViewOptions.currentLocale = this.currentLocale;
     this.on('childview:remove', function (childView, hash) {
-      var model = hash.model;
+      const model = hash.model;
       this.removeModel(model);
     }, this);
   },
@@ -37,9 +37,9 @@ export default Base.extend({
   events: {
     'click .add-option'(e) {
       e.preventDefault();
-      var model = new Collection.Model();
+      const model = new Collection.Model();
       this.collection.add(model);
-      var itemView = this.children.findByModel(model);
+      const itemView = this.children.findByModel(model);
       itemView.trigger('processing');
     },
   },

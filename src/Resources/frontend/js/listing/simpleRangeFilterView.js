@@ -14,11 +14,11 @@ export default BaseView.extend({
     ));
 
     if (options.model && options.model.get('attribute')) {
-      var descr = options.model.get('attribute').get('discr');
+      const descr = options.model.get('attribute').get('discr');
       this.discriminator = descr;
     }
     this.on('render', function () {
-      var data,
+      let data,
         field = this.model.get('field').join('.'),
         tmp   = this.filter.get(field);
       switch (this.discriminator) {
@@ -47,11 +47,11 @@ export default BaseView.extend({
   },
 
   'dataConverter'(event) {
-    var target = $(event.currentTarget);
+    const target = $(event.currentTarget);
     if (['lt', 'lte', 'gt', 'gte', 'lat', 'lon', 'distance'].indexOf(target.prop('name')) === -1) {
       return;
     }
-    var val   = target.val(),
+    let val   = target.val(),
       type  = target.prop('name'),
       field = this.model.get('field').join('.');
     switch (this.discriminator) {

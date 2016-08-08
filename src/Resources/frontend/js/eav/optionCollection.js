@@ -3,7 +3,7 @@ import BaseModel from 'brander-eav/basemodel';
 import TranslationCollection from './translationCollection';
 
 
-var Model      = BaseModel.extend({
+let Model      = BaseModel.extend({
     'defaults':  {
       title: 'new option',
     },

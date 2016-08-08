@@ -2,7 +2,7 @@ import BaseModel from 'brander-eav/basemodel';
 import Backbone from 'backbone';
 import AttributeModel from 'brander-eav/eav/attribute';
 
-var Model = BaseModel.extend({
+const Model = BaseModel.extend({
   'defaults':  {
     'field':        [],
     'isFilterable': false,

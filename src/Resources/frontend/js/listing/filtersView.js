@@ -25,7 +25,7 @@ export default Marionette.CompositeView.extend({
 
 
   'setAggregations'(aggregations) {
-    var need;
+    let need;
     _.each(this.children._views, function (view, id) {
       if (view.onChangeAggregations(aggregations)) {
         need = true;

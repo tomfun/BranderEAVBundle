@@ -4,7 +4,7 @@ import Model from './attributeGroup';
 import Routing from 'router';
 
 
-var Collection = Backbone.Collection.extend({
+const Collection = Backbone.Collection.extend({
   'fetchOptions': {},
 
   'initialize'(options) {
@@ -26,10 +26,10 @@ var Collection = Backbone.Collection.extend({
     if (excludeEmpty === undefined) {
       excludeEmpty = true;
     }
-    var overall = [],
+    let overall = [],
       result  = {};
     this.each(function (group, i) {
-      var outValues = group.filterValues(values);
+      const outValues = group.filterValues(values);
       if (excludeEmpty && !outValues.length) {
         return;
       }
@@ -40,7 +40,7 @@ var Collection = Backbone.Collection.extend({
       overall = _.union(overall, outValues);
     });
     if (returnNotInGroups) {
-      var tmpVals   = _.isArray(values) ? values : values.toArray(),
+      let tmpVals   = _.isArray(values) ? values : values.toArray(),
         outValues = _.difference(_.uniq(tmpVals), overall);
       if (outValues.length) {
         result.rest = {

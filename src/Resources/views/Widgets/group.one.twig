@@ -7,13 +7,12 @@
         Edit Attribute Group #{{ model.id }}
         <small>{{ model.title }}</small>
       {% endif %}
-      &nbsp;
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false"
+         style="color: #c4c4c4; font-size: .6em;">
+        {{ currentLocale }}
+        <i class="fa fa-flag"></i>
+      </a>
     </h5>
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false"
-       style="color: #c4c4c4; font-size: .6em;">
-      {{ currentLocale }}
-      <i class="fa fa-flag"></i>
-    </a>
   </div>
   <div class="ibox-content">
     <form class="form-horizontal">

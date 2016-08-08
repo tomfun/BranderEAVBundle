@@ -1,33 +1,17 @@
 <?php
-namespace Brander\Bundle\EAVBundle\Service\Elastica;
+namespace Brander\Bundle\EAVBundle\Service\Stats;
 
-use Brander\Bundle\EAVBundle\Repo\Value;
-use Brander\Bundle\EAVBundle\Service\Filter\ValueMinMax;
-use Brander\Bundle\EAVBundle\Service\Stats\ProviderInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException as InvalidArgumentExceptionInterface;
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
- * @author tomfun
+ * Simple version of Psr\Cache\CacheItemPoolInterface
+ * Used for data caching
+ *
+ * @author Tomfun <tomfun1990@gmail.com>
  */
-class ValueStatsProvider implements ProviderInterface
+interface ProviderInterface
 {
-    /**
-     * @var Value
-     */
-    private $repoValue;
-
-    /**
-     * @param Value $value
-     */
-    public function __construct(
-        Value $value
-    ) {
-        $this->repoValue = $value;
-    }
-
-
     /**
      * Returns a Cache Item representing the specified key.
      *
@@ -44,13 +28,7 @@ class ValueStatsProvider implements ProviderInterface
      * @return CacheItemInterface
      *   The corresponding Cache Item.
      */
-    public function getItem($key)
-    {
-        if (strpos($key, ValueMinMax::VALUE_STAT) !== 0) {
-            throw new InvalidArgumentException('Wrong attribute');
-        }
-        return new ValueMinMax($this->repoValue, ValueMinMax::parseAttributeId($key));
-    }
+    public function getItem($key);
 
     /**
      * Confirms if the cache contains specified cache item.
@@ -69,8 +47,5 @@ class ValueStatsProvider implements ProviderInterface
      * @return bool
      *  True if item exists in the cache, false otherwise.
      */
-    public function hasItem($key)
-    {
-        return ValueMinMax::isMyKey($key);
-    }
+    public function hasItem($key);
 }

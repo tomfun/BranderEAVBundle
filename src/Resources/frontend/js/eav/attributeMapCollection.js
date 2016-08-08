@@ -3,7 +3,7 @@ import Backbone from 'backbone';
 import Routing from 'router';
 
 
-var Collection = Backbone.Collection.extend({
+const Collection = Backbone.Collection.extend({
   'model': Backbone.Model,
   'parse'(v) {
     return _.map(v, function (v, i) {

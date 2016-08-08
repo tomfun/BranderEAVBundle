@@ -4,7 +4,7 @@ import {render as template} from 'templates/brander-eav/Widgets/set.collection.t
 import 'backbone.radio';
 
 
-var BaseProto = Base.prototype;
+const BaseProto = Base.prototype;
 
 export default Base.extend({
   template,

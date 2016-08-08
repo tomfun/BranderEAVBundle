@@ -113,4 +113,15 @@ class AttributeGroup
 
         return $this;
     }
+
+    /**
+     * @Serializer\PostDeserialize()
+     */
+    public function updatePostDeserialize()
+    {
+        $translatable = $this;
+        $this->getTranslations()->map(function (AttributeGroupTranslation $trans) use (&$translatable) {
+            $trans->setTranslatable($translatable);
+        });
+    }
 }

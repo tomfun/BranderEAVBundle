@@ -16,7 +16,7 @@ export default BaseView.extend({
     this.templateInput = this.template;
     this.filter = options.filter;
     if (options.model && options.model.get('attribute')) {
-      var descr = options.model.get('attribute').get('discr');
+      const descr = options.model.get('attribute').get('discr');
       this.descriminator = descr;
       switch (descr) {
         case 'select':
@@ -42,7 +42,7 @@ export default BaseView.extend({
     }
     this.modelBinder = new Backbone.ModelBinder();
     this.on('render', function () {
-      var bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
+      const bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
       _.each(bindings, function (v) {
         v.converter = this.dataConverter;
       }, this);

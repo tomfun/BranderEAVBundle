@@ -8,6 +8,7 @@ parameters:
   brander_eav.filter.holder.class: Brander\Bundle\EAVBundle\Service\Filter\FilterHolder
   brander_eav.filter.standard_models.class: Brander\Bundle\EAVBundle\Service\Filter\FilterProvider
   brander_eav.elastica.value_stats_provider.class: Brander\Bundle\EAVBundle\Service\Elastica\ValueStatsProvider
+  brander_eav.stats.stats_holder.class: Brander\Bundle\EAVBundle\Service\Filter\StatsHolder
 
 services:
   brander_eav.eventlistener.valueselectlistener:
@@ -36,7 +37,7 @@ services:
     class: "%brander_eav.attribute.serialize.query_holder.class%"
     arguments:
       - "@brander_eav.repo.attribute"
-      - "@cache.app"
+      - "@cache.app" # TODO
     tags:
       - { name: jms_serializer.event_subscriber }
 
@@ -65,8 +66,13 @@ services:
       - { name: brander_eav.filter.provider }
 
   brander_eav.elastica.value_stats_provider:
-      class: "%brander_eav.elastica.value_stats_provider.class%"
-      arguments:
-        - "@brander_eav.repo.value"
-      tags:
-        - { name: werkint_stats.provider }
+    class: "%brander_eav.elastica.value_stats_provider.class%"
+    arguments:
+      - "@brander_eav.repo.value"
+    tags:
+      - { name: werkint_stats.provider }
+
+  brander_eav.stats.stats_holder:
+    class: "%brander_eav.stats.stats_holder.class%"
+    arguments:
+      - "@cache.app"

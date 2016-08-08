@@ -1,6 +1,7 @@
-require(['brander-eav/manage'], function(ManageViewes6) {
+require(['brander-eav/manage'], function (ManageViewes6) {
   const ManageView = ManageViewes6.default;
-  /*{
+
+  /* {
    el:            '#page_content',
    currentLocale: '{{ brander_eav_global.localeDefault }}',
    currentLocales: '{{ brander_eav_global.localesSupported|json_encode|raw }}'

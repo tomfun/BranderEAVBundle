@@ -15,14 +15,14 @@ import 'backbone.modelbinder';
 import 'jquery-ui';
 
 
-var BaseProto = Base.prototype;
+const BaseProto = Base.prototype;
 
 export default Base.extend({
   template,
   templateChanges,
 
   initialize(options) {
-    BaseProto.initialize.apply(this, arguments);
+    BaseProto.initialize.call(this, options);
     this.currentLocale = options.currentLocale;
     this.currentLocales = options.currentLocales;
     this.hide = true;
@@ -62,7 +62,7 @@ export default Base.extend({
   optionView: {},
 
   renderOptionView(element) {
-    var viewId     = this.model.cid,
+    let viewId     = this.model.cid,
       collection = this.model.get('options');
     if (!this.model.hasOptions()) {
       return this;
@@ -81,7 +81,7 @@ export default Base.extend({
   },
 
   onModelChange() {
-    var lastModel = this.model;
+    const lastModel = this.model;
     this.model.check().done(function (data) {
       if (this.model === lastModel) {
         this.renderChanges(data);
@@ -100,9 +100,9 @@ export default Base.extend({
   events: {
     'click .save'(e) {
       e.preventDefault();
-      var model = this.model;
+      const model = this.model;
       this.channel.trigger('saving', model);
-      model.save(undefined, {
+      model.save(null, {
         success: function () {
           this.channel.trigger('saved', model);
           this.render({noEffect: true});
@@ -139,9 +139,13 @@ export default Base.extend({
       this.hide = !this.hide;
       this.showHide();
     },
+    'click .dropdown-toggle'(e) {
+      e.preventDefault();
+      this.$(e.currentTarget).next('.dropdown-menu').show();
+    },
     'click .language-item'(e) {
       e.preventDefault();
-      var newLocale = this.$(e.currentTarget).data('language');
+      const newLocale = this.$(e.currentTarget).data('language');
       if (!newLocale) {
         console.warn('locale don\'t found');
         return;
@@ -193,9 +197,9 @@ export default Base.extend({
       } else {
         this.$el.slideDown();
       }
-      var bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
+      const bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
       _.each(bindings, function (v) {
-        var element = this.$(v.selector),
+        let element = this.$(v.selector),
           has     = element.closest('.icheckbox_square-green');
         if (element.is(':checkbox') && has && has.length) {
           v.converter = function (dir, val) {

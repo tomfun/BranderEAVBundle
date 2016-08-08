@@ -9,11 +9,11 @@ import AttributesModel from './attributeModel';
  * @param showMore - if true, you must implement getCurrentType method which return string - field in listing model
  * @returns {*}
  */
-var factory = function (routes, showMore) {
+const factory = function (routes, showMore) {
   showMore = !!showMore;
-  var Base = filterFactory(routes);// pure filter model
+  const Base = filterFactory(routes);// pure filter model
 
-  var extendHash = {
+  const extendHash = {
     'updateFilterAttributes': [], // example: ['category', 'direction'] - when this field changed -> call update filters
     'relations':              [
       {
@@ -29,15 +29,15 @@ var factory = function (routes, showMore) {
         'attributes': new AttributesModel(),
       });
       this.get('attributes').on('change', function () {
-        var lst = this.get('attributes').changedAttributes();
+        const lst = this.get('attributes').changedAttributes();
         if (lst) { // process eav filters
           // like resetPageHandler
-          var changed = _.keys(lst),
+          let changed = _.keys(lst),
             list    = _.intersection(this.ignorePageAttributes, changed);
           if (list.length <= 0 && changed.length > 0) {
             this.set({page: this.defaults.page}, {silent: true});
           }
-          var attrs = this.get('attributes').attributes;
+          const attrs = this.get('attributes').attributes;
           _.each(attrs, function (v, i) {
             if (v === '') {
               delete attrs[i];
@@ -46,7 +46,7 @@ var factory = function (routes, showMore) {
         }
         this.trigger('change', this);
       }, this);
-      var that          = this,
+      let that          = this,
         updateFilters = this.updateFilters = function () {
           that.trigger('update-filters');
         };
@@ -57,7 +57,7 @@ var factory = function (routes, showMore) {
 
     // clean up
     'toJSON'(category) {
-      var ret = Base.prototype.toJSON.apply(this, arguments);
+      const ret = Base.prototype.toJSON.apply(this, arguments);
 
       if (ret.attributes && !Object.keys(ret.attributes).length) {
         delete ret.attributes;
@@ -68,7 +68,7 @@ var factory = function (routes, showMore) {
 
     // is this filter equal to 'val'
     'attrSelected'(attr, val) {
-      var a = this.get('attributes') ? this.get('attributes')[attr.id] : null;
+      const a = this.get('attributes') ? this.get('attributes')[attr.id] : null;
       if (!a) {
         return false;
       }

@@ -9,7 +9,7 @@ export default {
       url: Routing.router.generate('brander_eav_filter_list'), // !!
       success(data) {
         requirejs(data, function (view) {
-          var resHash = {};
+          const resHash = {};
           _.each(arguments, function (module, i) {
             resHash[data[i]] = module;
           });

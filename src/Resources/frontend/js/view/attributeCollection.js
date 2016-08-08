@@ -5,7 +5,7 @@ import 'backbone.radio';
 import 'jquery-ui';
 
 
-var BaseProto = Base.prototype;
+const BaseProto = Base.prototype;
 
 export default Base.extend({
   template,

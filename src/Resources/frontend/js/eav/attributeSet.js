@@ -5,7 +5,7 @@ import AttributeModel from './attribute';
 import AttributeCollection from './attributeCollection';
 
 
-var Model = BaseModel.extend({
+const Model = BaseModel.extend({
   'relations': [
     {
       'type':           Backbone.HasMany,

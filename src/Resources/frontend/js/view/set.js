@@ -9,7 +9,7 @@ import {render as templateCollection} from 'templates/brander-eav/Widgets/set.at
 import 'backbone.modelbinder';
 import 'jquery-ui';
 
-var BaseProto = Base.prototype;
+const BaseProto = Base.prototype;
 
 export default Base.extend({
   templateCollection,
@@ -36,7 +36,7 @@ export default Base.extend({
   events: {
     'click .save'(e) {
       e.preventDefault();
-      var model = this.model;
+      const model = this.model;
       this.channel.trigger('saving', model);
       model.save(undefined, {
         success: function () {
@@ -79,7 +79,7 @@ export default Base.extend({
   },
 
   dropAttribute(event, ui) {
-    var model      = $(ui.draggable).data('model'),
+    let model      = $(ui.draggable).data('model'),
       collection = this.model.get('attributes'),
       dragZone   = $(event.target);
     if (!(model instanceof collection.model)) {
@@ -95,7 +95,7 @@ export default Base.extend({
   },
 
   buildCollectionView(model) {
-    var remove = function () {
+    const remove = function () {
       if (this.collectionView) {
         this.collectionView.remove();
         this.collectionView = false;

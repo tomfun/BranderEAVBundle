@@ -3,13 +3,13 @@ import BaseModel from 'brander-eav/basemodel';
 import AttributeModel from './attribute';
 
 
-var Model = BaseModel.extend({
+const Model = BaseModel.extend({
   'defaults':  {
     'value': null,
     'discr': null,
   },
   'initialize'() {
-    var attribute = this.get('attribute');
+    const attribute = this.get('attribute');
     if (attribute) {
       this.set('discr', attribute.get('discr'));
 

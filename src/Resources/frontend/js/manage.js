@@ -14,10 +14,10 @@ import AttributeGroupCollection from './eav/attributeGroupCollection';
 import AttributeSetCollection from './eav/attributeSetCollection';
 
 
-var ManageView = Backbone.View.extend({
+const ManageView = Backbone.View.extend({
   template: mainTemplate,
   initialize(options) {
-    var attrCollection  = new AttributeCollection({manage: true}),
+    let attrCollection  = new AttributeCollection({manage: true}),
       groupCollection = new AttributeGroupCollection({manage: true}),
       setCollection   = new AttributeSetCollection({manage: true});
     attrCollection.fetch();
@@ -49,6 +49,7 @@ var ManageView = Backbone.View.extend({
     this.viewAttribute.on('locale:changing', function (locale) {
       this.viewGroup.changeLocale(locale);
       this.viewAttrCollection.changeLocale(locale);
+      this.viewGroupCollection.changeLocale(locale);
     }, this);
   },
 

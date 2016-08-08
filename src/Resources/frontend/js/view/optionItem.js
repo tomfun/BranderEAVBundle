@@ -10,7 +10,7 @@ export default Marionette.ItemView.extend({
 
   'initialize'(options) {
     this.currentLocale = options.currentLocale;
-      this.optionBinder = new Backbone.ModelBinder();
+    this.optionBinder = new Backbone.ModelBinder();
     this.on('processing', function () {
       this.state = 'edit';
       this.render();
@@ -40,7 +40,7 @@ export default Marionette.ItemView.extend({
     },
   },
   'serializeData'() {
-    var data = Marionette.ItemView.prototype.serializeData.apply(this, arguments);
+    const data = Marionette.ItemView.prototype.serializeData.apply(this, arguments);
     data.state = this.state;
     data.lcl = this.model.get('translations').indexOfLocale(this.currentLocale);
 

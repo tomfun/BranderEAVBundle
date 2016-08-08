@@ -1,6 +1,6 @@
 import BaseModel from 'brander-eav/basemodel';
 
 
-var Attributes = BaseModel.extend({});
+const Attributes = BaseModel.extend({});
 
 export default Attributes;

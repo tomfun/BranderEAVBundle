@@ -3,7 +3,7 @@ import Model from './attribute';
 import Routing from 'router';
 
 
-var BaseProto  = Backbone.Collection.prototype,
+let BaseProto  = Backbone.Collection.prototype,
   Collection = Backbone.Collection.extend({
     'fetchOptions': {},
     'initialize'(options) {

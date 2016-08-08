@@ -6,7 +6,7 @@ import OptionCollection from './optionCollection';
 import {AttributeTranslationCollection, AttributeTranslation} from './translationCollection';
 
 
-var Model = BaseModel.extend({
+const Model = BaseModel.extend({
   'url'() {
     return this.isNew()
       ? Routing.generate('brander_eav_attribute_post')
@@ -17,7 +17,7 @@ var Model = BaseModel.extend({
     if (this.isNew()) {
       return $.Deferred().resolve();
     }
-    var url = Routing.generate('brander_eav_attribute_check', {'attribute': this.id});
+    const url = Routing.generate('brander_eav_attribute_check', {'attribute': this.id});
     return $.ajax({
       url,
 

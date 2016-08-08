@@ -8,7 +8,7 @@ import {AttributeGroupTranslationCollection, AttributeGroupTranslation} from './
 import 'backbone-chaining';
 
 
-var Model = BaseModel.extend({
+const Model = BaseModel.extend({
   'url'() {
     return this.isNew()
       ? Routing.generate('brander_eav_attribute_group_post')
@@ -39,12 +39,12 @@ var Model = BaseModel.extend({
   },
 
   filterValues(values) {
-    var ids = {},
+    let ids = {},
       res = [];
     if (values instanceof Backbone.Collection) {
       ids = this.getIds();
       values.each(function (val, i) {
-        var attribute;
+        let attribute;
         if (val && (attribute = val.get('attribute'))) {
           if (attribute instanceof AttributeModel && ids[String(attribute.id)]) {
             res.push(val);

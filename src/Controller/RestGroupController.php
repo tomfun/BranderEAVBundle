@@ -50,7 +50,6 @@ class RestGroupController
         if (!$this->securityChecker->isGranted(UniversalManageVoter::CREATE, $attributeGroup)) {
             throw new AccessDeniedException();
         }
-        $attributeGroup->mergeNewTranslations();
         $this->em->persist($attributeGroup);
 
         return $this->flush($attributeGroup);
@@ -93,7 +92,6 @@ class RestGroupController
         if (!$this->securityChecker->isGranted(UniversalManageVoter::UPDATE, $attributeGroupNew)) {
             throw new AccessDeniedException();
         }
-        $attributeGroupNew->mergeNewTranslations();
 
         return $this->flush($attributeGroupNew);
     }

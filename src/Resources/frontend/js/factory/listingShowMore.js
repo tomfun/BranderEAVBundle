@@ -14,7 +14,7 @@ import BaseModel from 'brander-eav/basemodel';
  * @param disableCategoryFilters
  * @returns {*}
  */
-var factory = function (Filter, types, RowModel, RowCollection, ResultModel, disableCategoryFilters) {
+const factory = function (Filter, types, RowModel, RowCollection, ResultModel, disableCategoryFilters) {
   if (!ResultModel) {
     ResultModel = BaseModel;
   }
@@ -24,15 +24,15 @@ var factory = function (Filter, types, RowModel, RowCollection, ResultModel, dis
   RowCollection = RowCollection.extend({
     'comparator': 'explicitOrder',
   });
-  var FilterModel = Filter.extend({
+  const FilterModel = Filter.extend({
     'ignorePageAttributes': _.without(Filter.prototype.ignorePageAttributes, 'order'), //! showMore когда меняется сортировка, то тоже должна сбрасыватьс страница
   });
 
-  var ResultModelExtended = ResultModel.extend({
+  let ResultModelExtended = ResultModel.extend({
       'pageSize': 10,
         // Data from server can be parsed in wrong sort order. Происходят проблемы сортировки из-за шоу мор
       'parse'(data) {
-        var order = this.pageSize * (data.page - 1);
+        let order = this.pageSize * (data.page - 1);
         _.each(data.rows, function (v) {
           v.explicitOrder = order++;
         });
@@ -41,7 +41,7 @@ var factory = function (Filter, types, RowModel, RowCollection, ResultModel, dis
 
         // How much items left
       'calculateShowMore'() {
-        var moreNumber = this.get('countTotal') - this.get('page') * this.pageSize;
+        let moreNumber = this.get('countTotal') - this.get('page') * this.pageSize;
         moreNumber = moreNumber > this.pageSize ? this.pageSize : moreNumber;
         moreNumber = moreNumber >= 0 ? moreNumber : 0;
         return moreNumber;
@@ -55,7 +55,7 @@ var factory = function (Filter, types, RowModel, RowCollection, ResultModel, dis
 
   return Model.extend({
     fetchOnChange(filterModel) {
-      var changed = filterModel.changedAttributes();
+      const changed = filterModel.changedAttributes();
       if (changed && changed.hasOwnProperty('page') && _.keys(changed).length === 1 && changed.page > 1) {
         this.fetchDelayed({fetchOnChange: true, remove: false});
       } else {
@@ -63,18 +63,18 @@ var factory = function (Filter, types, RowModel, RowCollection, ResultModel, dis
       }
     },
     showMore(currentResultType) {
-      var filter = this.get('filter');
+      const filter = this.get('filter');
       if (currentResultType === undefined) {
         currentResultType = filter.getCurrentType();
       }
-      var result = this.get(currentResultType),
+      let result = this.get(currentResultType),
         pageR  = result.get('page'),
         pageF  = filter.get('page');
       filter.set('page', (pageR > pageF ? pageF : pageR) + 1);
       this.fetchDelayed({remove: false, showMore: true});
     },
     overallCount() {
-      var count = 0;
+      let count = 0;
       _.each(this.getAvailableResultTypes(), function (key) {
         count += this.get(key).get('countTotal');
       }, this);

@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 import _ from 'underscore';
 
 
-var BaseProto = Backbone.View.prototype;
+const BaseProto = Backbone.View.prototype;
 
 export default Backbone.View.extend({
   templateName: undefined, // '@BranderEAV/Widgets/one.model.twig',{'template': '@BranderEAV/Widgets/one.model.twig'}

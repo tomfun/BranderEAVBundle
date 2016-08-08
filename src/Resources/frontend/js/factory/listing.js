@@ -17,7 +17,7 @@ import FrontFilterCollection from 'brander-eav/listing/filterCollection';
  * @param disableCategoryFilters
  * @returns {*}
  */
-var factory = function (Filter, types, RowModel, RowCollection, ResultModel, disableCategoryFilters) {
+const factory = function (Filter, types, RowModel, RowCollection, ResultModel, disableCategoryFilters) {
   if (!ResultModel) {
     ResultModel = BaseModel;
   }
@@ -25,7 +25,7 @@ var factory = function (Filter, types, RowModel, RowCollection, ResultModel, dis
     throw 'wrong model';
   }
 
-  var relationsExtend = ResultModel.prototype.relations ? ResultModel.prototype.relations : [],
+  let relationsExtend = ResultModel.prototype.relations ? ResultModel.prototype.relations : [],
     relations       = [
       {
         'type':           Backbone.HasMany,
@@ -47,7 +47,7 @@ var factory = function (Filter, types, RowModel, RowCollection, ResultModel, dis
       });
     },
     convertToArray  = function (hash) {
-      var array = [];
+      const array = [];
       _.each(hash, function (hash) {
         array.push(hash);
       });
@@ -56,7 +56,7 @@ var factory = function (Filter, types, RowModel, RowCollection, ResultModel, dis
   convertToHash(relations);
   convertToHash(relationsExtend);
 
-  var ResultModelExtended = ResultModel.extend({
+  let ResultModelExtended = ResultModel.extend({
       'relations': convertToArray(relationHash), // process old and new relations. new can override old.
     }),
 

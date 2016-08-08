@@ -4,19 +4,19 @@ import {render as attributeTemplate} from 'templates/brander-eav/Widgets/attribu
 
 
 export default Marionette.ItemView.extend({
-  template: attributeTemplate,
+  template:            attributeTemplate,
 //        "tagName":           'li',
-  'changeStateEvents':   [
+  changeStateEvents:   [
     // 'processing',
     // 'error',
     // 'saved',
   ], // or: {"eventName": "css-class-name"}
-  'cssClassStatePrefix': 'item-',
+  cssClassStatePrefix: 'item-',
 
-  'initialize'() {
+  initialize() {
     this.template = attributeTemplate;
     _.each(this.changeStateEvents, function (value, index) {
-      var eventName;
+      let eventName;
       if (_.isArray(this.changeStateEvents)) {
         eventName = value;
       } else {
@@ -26,10 +26,10 @@ export default Marionette.ItemView.extend({
     }, this);
   },
 
-  'getChangeStateHandler'(eventName) {
+  getChangeStateHandler(eventName) {
     return function () {
       this.state = eventName;
-      var cssClass;
+      let cssClass;
       if (_.isArray(this.changeStateEvents)) {
         cssClass = this.cssClassStatePrefix + eventName;
       } else {
@@ -39,12 +39,12 @@ export default Marionette.ItemView.extend({
     };
   },
 
-  'ui': {
-    'edit':   '.edit',
-    'remove': '.remove',
+  ui: {
+    edit:   '.edit',
+    remove: '.remove',
   },
 
-  'triggers': {
+  triggers: {
     'click @ui.edit':   'select',
     'click @ui.remove': 'remove',
   },

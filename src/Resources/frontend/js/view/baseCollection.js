@@ -5,7 +5,7 @@ import $ from 'jquery';
 
 
 /* globals console*/
-var BaseProto = Marionette.CompositeView.prototype;
+const BaseProto = Marionette.CompositeView.prototype;
 
 export default Marionette.CompositeView.extend({
   // childViewContainer: '.collection',
@@ -13,10 +13,7 @@ export default Marionette.CompositeView.extend({
   softRemove: false, // change remove behavior
 
   initialize(options) {
-    BaseProto.initialize.apply(this, arguments);
-    if (options && options.templateName) {
-      throw new Error('TODO 2') // TODO
-    }
+    BaseProto.initialize.call(this, options);
     if (options && options.template) {
       this.template = options.template;
     }
@@ -67,7 +64,7 @@ export default Marionette.CompositeView.extend({
 
   applyChildViewHandlers() {
     this.on('childview:remove', function (childView, hash) {
-      var model = hash.model;
+      const model = hash.model;
       this.removeModel(model);
     }, this);
   },
@@ -85,14 +82,14 @@ export default Marionette.CompositeView.extend({
     if (model.isNew()) {
       this.collection.add(model);
     }
-    var itemView = this.children.findByModel(model);
+    const itemView = this.children.findByModel(model);
     if (itemView) {
       itemView.trigger('processing');
     }
   },
 
   savedHandler(model) {
-    var itemView = this.children.findByModel(model);
+    const itemView = this.children.findByModel(model);
     itemView.trigger('saved');
   },
 
@@ -100,19 +97,19 @@ export default Marionette.CompositeView.extend({
     if (model.isNew()) {
       this.collection.remove(model);
     }
-    var itemView = this.children.findByModel(model);
+    const itemView = this.children.findByModel(model);
     if (itemView) {
       itemView.trigger('error');
     }
   },
 
   removeModelSoft(model) {
-    var res;
+    let res;
     try {
       this.collection.remove(model);
     } catch (e) {
       this.collection.add(model);
-      var itemView = this.children.findByModel(model);
+      const itemView = this.children.findByModel(model);
       itemView.trigger('error', e);
       if (this.channel) {
         res = this.channel.trigger('error', model, e);
@@ -135,7 +132,7 @@ export default Marionette.CompositeView.extend({
     model.destroy({
       success: function () {
         if (this.channel) {
-          var res = this.channel.trigger('removed', model);
+          const res = this.channel.trigger('removed', model);
           if (window.$verbosity > 1) {
             console.log('removed', model, res);
           }
@@ -143,10 +140,10 @@ export default Marionette.CompositeView.extend({
       }.bind(this),
       error:   function (e) {
         this.collection.add(model);
-        var itemView = this.children.findByModel(model);
+        const itemView = this.children.findByModel(model);
         itemView.trigger('error', e);
         if (this.channel) {
-          var res = this.channel.trigger('error', model, e);
+          const res = this.channel.trigger('error', model, e);
           if (window.$verbosity > 0) {
             console.log('error removing', model, res);
           }
@@ -157,12 +154,12 @@ export default Marionette.CompositeView.extend({
 
   removeModel(model) {
     if (this.channel) {
-      var res = this.channel.trigger('removing', model);
+      const res = this.channel.trigger('removing', model);
       if (window.$verbosity > 2) {
         console.log(res);
       }
     }
-    var itemView = this.children.findByModel(model);
+    const itemView = this.children.findByModel(model);
     itemView.trigger('processing');
     if (this.softRemove) {
       return this.removeModelSoft(model);

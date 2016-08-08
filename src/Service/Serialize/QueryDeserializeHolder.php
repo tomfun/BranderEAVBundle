@@ -6,7 +6,7 @@ use Brander\Bundle\EAVBundle\Model\Elastica\EavElasticaQuery;
 use Doctrine\ORM\EntityRepository;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
-use Werkint\Bundle\StatsBundle\Service\StatsDirectorInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Just add repository to query
@@ -30,7 +30,7 @@ class QueryDeserializeHolder implements EventSubscriberInterface
      * @param EntityRepository $repoAttribute
      * @param StatsDirectorInterface $stats
      */
-    public function __construct(EntityRepository $repoAttribute, StatsDirectorInterface $stats)
+    public function __construct(EntityRepository $repoAttribute, CacheItemPoolInterface $stats)
     {
         $this->repoAttribute = $repoAttribute;
         $this->stats = $stats;
