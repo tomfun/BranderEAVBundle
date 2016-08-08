@@ -51,9 +51,11 @@ export default BaseView.extend({
     this.$('.bucket-range').each(function (i, el) {
       let it  = $(el),
         lt  = it.data('lt'),
-        gte = it.data('gte')/* ,
-           /*less = _.findWhere(that.aggregations, {'key_value': lt}),
-           great = _.findWhere(that.aggregations, {'key_value': gte};
+        gte = it.data('gte');
+      /*
+        less = _.findWhere(that.aggregations, {'key_value': lt}),
+        great = _.findWhere(that.aggregations, {'key_value': gte})
+      */
       if (!lt) {
         lt = undefined;
       }
