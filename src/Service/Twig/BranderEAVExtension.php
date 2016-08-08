@@ -14,7 +14,7 @@ use Werkint\Bundle\FrameworkExtraBundle\Twig\AbstractExtension;
  *
  * @author Kate Shcherbak <katescherbak@gmail.com>
  */
-class BranderEAVExtension extends \Twig_Extension
+class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_GlobalsInterface
 {
     const EXT_NAME = 'brander_eav';
 
