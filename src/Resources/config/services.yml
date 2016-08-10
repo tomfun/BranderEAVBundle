@@ -44,7 +44,7 @@ services:
   brander_eav.extensible_entity.handler:
     arguments:
      - {}
-     - "@service_container"
+     - "@request_stack"
      - "%locale%"
     class: "%brander_eav.extensible_entity.handler.class%"
 

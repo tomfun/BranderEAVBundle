@@ -10,6 +10,7 @@ use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\SerializationContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Can serialize EAV models to JSON
@@ -23,16 +24,15 @@ class SerializeHandler
     private $locale;
 
     /**
-     * @param array $classes elastica serialization classes
-     * @param ContainerInterface $container
-     * @param string $defaultLocale
+     * @param array        $classes elastica serialization classes
+     * @param RequestStack $requestStack
+     * @param string       $defaultLocale
      */
-    public function __construct(array $classes, ContainerInterface $container, $defaultLocale = 'en')
+    public function __construct(array $classes, RequestStack $requestStack, $defaultLocale = 'en')
     {
         $this->supportedElasticaClasses = $classes;
         $this->locale = $defaultLocale;
-        if ($container->isScopeActive('request')) {
-            $request = $container->get('request');
+        if ($request = $requestStack->getCurrentRequest()) {
             $this->locale = $request->getLocale();
         }
     }

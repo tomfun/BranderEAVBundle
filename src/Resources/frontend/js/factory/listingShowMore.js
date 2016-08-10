@@ -22,36 +22,36 @@ const factory = function (Filter, types, RowModel, RowCollection, ResultModel, d
     throw 'wrong model';
   }
   RowCollection = RowCollection.extend({
-    'comparator': 'explicitOrder',
+    comparator: 'explicitOrder',
   });
   const FilterModel = Filter.extend({
-    'ignorePageAttributes': _.without(Filter.prototype.ignorePageAttributes, 'order'), //! showMore когда меняется сортировка, то тоже должна сбрасыватьс страница
+    ignorePageAttributes: _.without(Filter.prototype.ignorePageAttributes, 'order'), //! showMore когда меняется сортировка, то тоже должна сбрасыватьс страница
   });
 
-  let ResultModelExtended = ResultModel.extend({
-      'pageSize': 10,
-        // Data from server can be parsed in wrong sort order. Происходят проблемы сортировки из-за шоу мор
-      'parse'(data) {
-        let order = this.pageSize * (data.page - 1);
-        _.each(data.rows, function (v) {
-          v.explicitOrder = order++;
-        });
-        return data;
-      },
+  const ResultModelExtended = ResultModel.extend({
+    pageSize: 10,
+    // Data from server can be parsed in wrong sort order. Происходят проблемы сортировки из-за шоу мор
+    parse(data) {
+      let order = this.pageSize * (data.page - 1);
+      _.each(data.rows, function (v) {
+        v.explicitOrder = order++;
+      });
+      return data;
+    },
 
-        // How much items left
-      'calculateShowMore'() {
-        let moreNumber = this.get('countTotal') - this.get('page') * this.pageSize;
-        moreNumber = moreNumber > this.pageSize ? this.pageSize : moreNumber;
-        moreNumber = moreNumber >= 0 ? moreNumber : 0;
-        return moreNumber;
-      },
-    }),
+    // How much items left
+    calculateShowMore() {
+      let moreNumber = this.get('countTotal') - this.get('page') * this.pageSize;
+      moreNumber = moreNumber > this.pageSize ? this.pageSize : moreNumber;
+      moreNumber = moreNumber >= 0 ? moreNumber : 0;
+      return moreNumber;
+    },
+  });
 
-      /**
-       * Listing model with filter model and filteredResult model within
-       */
-    Model               = abstractListing(FilterModel, types, RowModel, RowCollection, ResultModelExtended, disableCategoryFilters);
+  /**
+   * Listing model with filter model and filteredResult model within
+   */
+  const Model = abstractListing(FilterModel, types, RowModel, RowCollection, ResultModelExtended, disableCategoryFilters);
 
   return Model.extend({
     fetchOnChange(filterModel) {
@@ -68,8 +68,8 @@ const factory = function (Filter, types, RowModel, RowCollection, ResultModel, d
         currentResultType = filter.getCurrentType();
       }
       let result = this.get(currentResultType),
-        pageR  = result.get('page'),
-        pageF  = filter.get('page');
+          pageR  = result.get('page'),
+          pageF  = filter.get('page');
       filter.set('page', (pageR > pageF ? pageF : pageR) + 1);
       this.fetchDelayed({remove: false, showMore: true});
     },

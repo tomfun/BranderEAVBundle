@@ -158,7 +158,8 @@ abstract class AbstractFixture extends BaseAbstractFixture implements
             $values = new ArrayCollection(is_array($values) ? $values : []);
             $entity->setValues($values);
         }
-        foreach ($entity->getAttributeSet()->getAttributes() as $attribute) {
+        $set = $entity->getAttributeSet();
+        foreach ($set->getAttributes() as $attribute) {
             $values->add($this->createValue($attribute));
         }
     }
