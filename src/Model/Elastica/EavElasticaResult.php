@@ -23,7 +23,7 @@ class EavElasticaResult extends ElasticaResult
 
     /**
      * @Serializer\VirtualProperty
-     * @Serializer\Groups({"=read"})
+     * @Serializer\Groups({"eav_result"})
      * @Serializer\SerializedName("filterableAttributes")
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Model\Elastica\FilterableAttribute>")
      * @return FilterableAttribute[]|null
@@ -71,7 +71,7 @@ class EavElasticaResult extends ElasticaResult
 
     /**
      * @Serializer\VirtualProperty
-     * @Serializer\Groups({"=read"})
+     * @Serializer\Groups({"eav_result"})
      * @Serializer\SerializedName("aggregations")
      * @Serializer\Type("array")
      * @return array|null

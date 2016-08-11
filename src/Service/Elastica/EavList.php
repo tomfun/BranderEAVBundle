@@ -35,6 +35,7 @@ class EavList extends ElasticaList
     public function setQueryClass($queryClass)
     {
         $this->queryClass = $queryClass;
+
         return $this;
     }
 
@@ -54,6 +55,7 @@ class EavList extends ElasticaList
     public function setResultClass($resultClass)
     {
         $this->resultClass = $resultClass;
+
         return $this;
     }
 
@@ -73,7 +75,24 @@ class EavList extends ElasticaList
     public function setQueryHolder(QueryDeserializeHolder $queryHolder)
     {
         $this->queryHolder = $queryHolder;
+
         return $this;
+    }
+
+    /**
+     * @param EavElasticaQuery $query
+     * @param array|null       $orderMap
+     * @return EavElasticaResult
+     * @throws \Exception
+     */
+    public function result($query, array $orderMap = null)
+    {
+        if (is_subclass_of($query, $this->getQueryClass()) || get_class($query) === $this->getQueryClass()) {
+            $this->getQueryHolder()->initializeQuery($query);
+
+            return parent::result($query, $orderMap);
+        }
+        throw new \Exception('Wrong query');
     }
 
     /**
@@ -88,21 +107,7 @@ class EavList extends ElasticaList
     protected function createResult(Pagerfanta $data, $rows, $page, $countPage, $countTotal)
     {
         $class = $this->getResultClass();
-        return new $class($rows, $page, $countPage, $countTotal);
-    }
 
-    /**
-     * @param EavElasticaQuery $query
-     * @param array|null       $orderMap
-     * @return EavElasticaResult
-     * @throws \Exception
-     */
-    public function result($query, array $orderMap = null)
-    {
-        if (is_subclass_of($query, $this->getQueryClass()) || get_class($query) === $this->getQueryClass()) {
-            $this->getQueryHolder()->initializeQuery($query);
-            return parent::result($query, $orderMap);
-        }
-        throw new \Exception('Wrong query');
+        return new $class($rows, $page, $countPage, $countTotal);
     }
 }

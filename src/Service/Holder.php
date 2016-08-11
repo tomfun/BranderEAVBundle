@@ -63,6 +63,7 @@ class Holder implements EventSubscriberInterface
         if (!isset($map[$discriminator])) {
             throw new \InvalidArgumentException("Can't find class by this discriminator value: '$discriminator'");
         }
+
         return $this->createAttribute($map[$discriminator]);
     }
 
@@ -83,6 +84,7 @@ class Holder implements EventSubscriberInterface
             throw new \RuntimeException("This class is not inherited from Attribute: $class");
         }
         $this->setValueClass($entity);
+
         return $entity;
     }
 
@@ -98,6 +100,7 @@ class Holder implements EventSubscriberInterface
         /** @var ClassMetadata $metaDataEntity */
         $metaDataEntity = $metadataFactory->getMetadataFor(static::VALUE_NAME);
         $entity->setValueClass($metaDataEntity->discriminatorMap[$metaDataAttribute->discriminatorValue]);
+
         return $this;
     }
 
@@ -110,6 +113,7 @@ class Holder implements EventSubscriberInterface
         $metaDataValue = $metadataFactory->getMetadataFor(Attribute::class);
         /** @var ClassMetadata $metaDataValue */
         $list = $metaDataValue->discriminatorMap;
+
         return $list;
     }
 }

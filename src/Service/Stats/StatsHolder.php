@@ -1,5 +1,5 @@
 <?php
-namespace Brander\Bundle\EAVBundle\Service\Filter;
+namespace Brander\Bundle\EAVBundle\Service\Stats;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -21,20 +21,26 @@ class StatsHolder
      * @var CacheItemPoolInterface[]
      */
     private $providers = [];
+    /**
+     * @var int
+     */
+    private $cacheTime = 0;
 
     /**
      * StatsHolder constructor.
      * @param CacheItemPoolInterface $cache
+     * @param int                    $cacheTime - seconds
      */
-    public function __construct(CacheItemPoolInterface $cache)
+    public function __construct(CacheItemPoolInterface $cache, $cacheTime)
     {
         $this->cache = $cache;
+        $this->cacheTime = $cacheTime;
     }
 
     /**
-     * @param CacheItemPoolInterface $provider
+     * @param ProviderInterface $provider
      */
-    public function addProvider(CacheItemPoolInterface $provider)
+    public function addProvider(ProviderInterface $provider)
     {
         $this->providers[] = $provider;
     }
@@ -58,16 +64,20 @@ class StatsHolder
     public function getItem($key)
     {
         if ($this->cache->hasItem($key)) {
-            $this->cache->getItem($key);
+            return $this->cache->getItem($key);
         }
         foreach ($this->providers as $provider) {
             if ($provider->hasItem($key)) {
-                $item = $provider->getItem($key);
-                $this->cache->saveDeferred($item);
+                $itemValue = $provider->getItem($key);
+                $item = $this->cache->getItem($key)
+                    ->set($itemValue->get())
+                    ->expiresAfter($this->cacheTime);
+                $this->cache->save($item);
+
                 return $item;
             }
         }
-        throw new InvalidArgumentException();
+        throw new InvalidArgumentException("There is no any provider that has this key: $key");
     }
 
     /**
@@ -99,6 +109,7 @@ class StatsHolder
         foreach ($keys as $key) {
             $items[] = $this->getItem($key);
         }
+
         return $items;
     }
 }

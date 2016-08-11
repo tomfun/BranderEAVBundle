@@ -20,6 +20,11 @@ class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_Glo
 
     /** @var ObjectManager */
     protected $manager;
+    /** @var \Twig_SimpleFilter[] */
+    protected $filters = [];
+    /** @var \Twig_SimpleFunction[] */
+    protected $functions = [];
+    protected $globals = [];
     /**
      * @var array
      */
@@ -29,21 +34,18 @@ class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_Glo
      */
     private $locale;
 
-    /** @var \Twig_SimpleFilter[] */
-    protected $filters = [];
-
     /**
-     * @param string   $name
-     * @param bool     $isSafe
-     * @param callable $callable
+     * @param ObjectManager $manager
+     * @param array         $locales
+     * @param string        $locale
+     * @throws \Exception
      */
-    protected function addFilter(
-        $name,
-        $isSafe,
-        callable $callable
-    ) {
-        $safe = ['is_safe' => ['all']];
-        $this->filters[$name] = new \Twig_SimpleFilter($name, $callable, $isSafe ? $safe : []);
+    public function __construct(ObjectManager $manager, array $locales, $locale)
+    {
+        $this->manager = $manager;
+        $this->locales = $locales;
+        $this->locale = $locale;
+        $this->init();
     }
 
     /**
@@ -54,24 +56,13 @@ class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_Glo
     public function getFilter($name)
     {
         if (!isset($this->filters[$name])) {
-            throw new \InvalidArgumentException('Filter not found: ' . $name);
+            throw new \InvalidArgumentException('Filter not found: '.$name);
         }
+
         return $this->filters[$name]->getCallable();
     }
 
-    /**
-     * @param string   $name
-     * @param bool     $isSafe
-     * @param callable $callable
-     */
-    protected function addFunction(
-        $name,
-        $isSafe,
-        callable $callable
-    ) {
-        $safe = ['is_safe' => ['all']];
-        $this->functions[$name] = new \Twig_SimpleFunction($name, $callable, $isSafe ? $safe : []);
-    }
+    // -- Stuff ---------------------------------------
 
     /**
      * @param string $name
@@ -81,12 +72,11 @@ class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_Glo
     public function getFunction($name)
     {
         if (!isset($this->functions[$name])) {
-            throw new \InvalidArgumentException('Function not found: ' . $name);
+            throw new \InvalidArgumentException('Function not found: '.$name);
         }
+
         return $this->functions[$name]->getCallable();
     }
-
-    // -- Stuff ---------------------------------------
 
     /**
      * @return string
@@ -104,9 +94,6 @@ class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_Glo
         return $this->filters;
     }
 
-    /** @var \Twig_SimpleFunction[] */
-    protected $functions = [];
-
     /**
      * {@inheritdoc}
      */
@@ -115,8 +102,6 @@ class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_Glo
         return $this->functions;
     }
 
-    protected $globals = [];
-
     /**
      * {@inheritdoc}
      */
@@ -124,19 +109,35 @@ class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_Glo
     {
         return $this->globals;
     }
-    
+
     /**
-     * @param ObjectManager       $manager
-     * @param array  $locales
-     * @param string $locale
-     * @throws \Exception
+     * @param string   $name
+     * @param bool     $isSafe
+     * @param callable $callable
      */
-    public function __construct(ObjectManager $manager, array $locales, $locale)
+    protected function addFilter(
+        $name,
+        $isSafe,
+        callable $callable
+    )
     {
-        $this->manager = $manager;
-        $this->locales = $locales;
-        $this->locale = $locale;
-        $this->init();
+        $safe = ['is_safe' => ['all']];
+        $this->filters[$name] = new \Twig_SimpleFilter($name, $callable, $isSafe ? $safe : []);
+    }
+
+    /**
+     * @param string   $name
+     * @param bool     $isSafe
+     * @param callable $callable
+     */
+    protected function addFunction(
+        $name,
+        $isSafe,
+        callable $callable
+    )
+    {
+        $safe = ['is_safe' => ['all']];
+        $this->functions[$name] = new \Twig_SimpleFunction($name, $callable, $isSafe ? $safe : []);
     }
 
     /**
@@ -152,7 +153,7 @@ class BranderEAVExtension extends \Twig_Extension implements \Twig_Extension_Glo
 
         $this->globals = [
             'brander_eav_global' => [
-                'localeDefault' => $this->locale,
+                'localeDefault'    => $this->locale,
                 'localesSupported' => $this->locales,
             ],
         ];

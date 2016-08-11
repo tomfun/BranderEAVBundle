@@ -10,14 +10,15 @@ use Brander\Bundle\EAVBundle\Entity\AttributeNumeric;
 use Brander\Bundle\EAVBundle\Entity\AttributeTextarea;
 use Brander\Bundle\EAVBundle\Entity\ValueLocation;
 use Brander\Bundle\EAVBundle\Model\GeoLocation;
-use Brander\Bundle\EAVBundle\Service\Elastica\ValueStatsProvider;
 use Brander\Bundle\EAVBundle\Service\Filter\FilterProvider;
+use Brander\Bundle\EAVBundle\Service\Stats\StatsHolder;
+use Brander\Bundle\EAVBundle\Service\Stats\ValueStatsProvider;
 use Brander\Bundle\ElasticaSkeletonBundle\Entity\Aggregation;
 use Brander\Bundle\ElasticaSkeletonBundle\Service\Elastica\ElasticaQuery;
 use Doctrine\ORM\EntityRepository;
 use Elastica\Query\BoolQuery;
 use JMS\Serializer\Annotation as Serializer;
-use Werkint\Bundle\StatsBundle\Service\StatsDirectorInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @author Tomfun <tomfun1990@gmail.com>
@@ -36,7 +37,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
     const RANGE_LTE = 'lte';
     const RANGE_LT = 'lt';
 
-    /** @var  EntityRepository */
+    /** @var  \Brander\Bundle\EAVBundle\Repo\Attribute */
     protected $attributeRepository;
     /**
      * 'attribute' field comes from frontend can be some like:
@@ -71,12 +72,12 @@ abstract class EavElasticaQuery extends ElasticaQuery
      */
     protected $attributes;
     /**
-     * @var StatsDirectorInterface
+     * @var StatsHolder
      */
     private $stats;
 
     /**
-     * @return EntityRepository
+     * @return \Brander\Bundle\EAVBundle\Repo\Attribute
      */
     public function getAttributeRepository()
     {
@@ -95,7 +96,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
     }
 
     /**
-     * @return StatsDirectorInterface
+     * @return StatsHolder
      */
     public function getStats()
     {
@@ -103,11 +104,11 @@ abstract class EavElasticaQuery extends ElasticaQuery
     }
 
     /**
-     * @param StatsDirectorInterface $stats
+     * @param StatsHolder $stats
      *
      * @return $this
      */
-    public function setStats(StatsDirectorInterface $stats)
+    public function setStats(StatsHolder $stats)
     {
         $this->stats = $stats;
         return $this;
@@ -457,6 +458,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
      */
     protected function getAutoAggregationRange(array $fieldName, $indexName)
     {
+        $fieldName = implode('.', $fieldName);
         return [
             new Aggregation(
                 $fieldName.'_max',
@@ -528,7 +530,8 @@ abstract class EavElasticaQuery extends ElasticaQuery
 
             /** @var Attribute $attr */
             $attr = $this->getAttributeRepository()->findOneBy(['id' => $options['attribute_id']]);
-            $arr = $this->stats->getStat(ValueStatsProvider::VALUE_STAT, $options);
+            $item = $this->getStats()->getItem(ValueStatsProvider::constructValueMinMaxKey($options['attribute_id']));
+            $arr = $item->get() ? $item->get() : ['min' => 0, 'max' => 100];
             $rounding = isset($options['rounding']) ? (float) $options['rounding'] : false;
             $this->calculateIntervalByStats($arr, $interval, $size, $rounding);
             if ($attr instanceof AttributeDate) {
@@ -601,14 +604,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
      */
     protected function getAvailableAttributes(array $usedIds = [])
     {
-        $qb = $this->getAttributeRepository()->createQueryBuilder('a');
-        $qb->where('a.isSortable = 1 or a.isFilterable = 1');
-        if (count($usedIds)) {
-            $qb->andWhere('a.id in (:ids)')
-                ->setParameter('ids', $usedIds);
-        }
-        /** @var Attribute[] $attributes */
-        return $qb->getQuery()->getResult();
+        return $this->getAttributeRepository()->getAvailableAttributes($usedIds);
     }
 
     protected function convertEavOrder()

@@ -15,14 +15,6 @@ class SimpleSerializer extends Callback implements ContainerAwareInterface
     protected $eavSerializer;
 
     /**
-     * @param SerializeHandler $converter
-     */
-    protected function setEavSerializer(SerializeHandler $converter)
-    {
-        $this->eavSerializer = $converter;
-    }
-
-    /**
      * for EAV models use our serializer, or parent realization for others
      * @param $object
      * @return string
@@ -32,6 +24,7 @@ class SimpleSerializer extends Callback implements ContainerAwareInterface
         if ($this->eavSerializer->supportClass(get_class($object))) {
             return $this->eavSerializer->serialize($object);
         }
+
         return parent::serialize($object);
     }
 
@@ -45,5 +38,13 @@ class SimpleSerializer extends Callback implements ContainerAwareInterface
     public function setContainer(ContainerInterface $container = null)
     {
         $this->setEavSerializer($container->get('brander_eav.extensible_entity.handler'));
+    }
+
+    /**
+     * @param SerializeHandler $converter
+     */
+    protected function setEavSerializer(SerializeHandler $converter)
+    {
+        $this->eavSerializer = $converter;
     }
 }

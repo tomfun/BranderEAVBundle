@@ -103,6 +103,10 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
             $this->getAlias().'.locales_supported',
             $config['locales_supported']
         );
+        $container->setParameter(
+            'brander_eav.elastica.value_stats.default_life_time',
+            $config['statsLifeTime']
+        );
 
         // fixtures config
         if ($config['fixturesDirectory']) {

@@ -1,11 +1,10 @@
 <?php
-namespace Brander\Bundle\EAVBundle\Service\Elastica;
+namespace Brander\Bundle\EAVBundle\Service\Stats;
 
 use Brander\Bundle\EAVBundle\Repo\Value;
-use Brander\Bundle\EAVBundle\Service\Filter\ValueMinMax;
-use Brander\Bundle\EAVBundle\Service\Stats\ProviderInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException as InvalidArgumentExceptionInterface;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -13,6 +12,11 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 class ValueStatsProvider implements ProviderInterface
 {
+    const VALUE_STAT = 'Brander_Bundle_EAVBundle_Repo_ValueMinMax_';
+    /**
+     * @var \Closure
+     */
+    protected $createCacheItem;
     /**
      * @var Value
      */
@@ -21,12 +25,58 @@ class ValueStatsProvider implements ProviderInterface
     /**
      * @param Value $value
      */
-    public function __construct(
-        Value $value
-    ) {
+    public function __construct(Value $value)
+    {
         $this->repoValue = $value;
     }
 
+    /**
+     * @param int $attributeId
+     * @return string
+     */
+    static public function constructValueMinMaxKey($attributeId)
+    {
+        return self::VALUE_STAT.$attributeId;
+    }
+
+    /**
+     * @param string $key
+     * @return int
+     */
+    static public function parseValueMinMaxAttributeId($key)
+    {
+        $attributeId = str_replace(self::VALUE_STAT, '', $key);
+        $int = (int) $attributeId;
+        if ($attributeId != $int) {
+            throw new InvalidArgumentException('Wrong attribute');
+        }
+
+        return $int;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    static public function isValueMinMaxKey($key)
+    {
+        $attributeId = str_replace(self::VALUE_STAT, '', $key);
+        $int = (string) (int) $attributeId;
+
+        return $attributeId === $int;
+    }
+
+    /**
+     * @param string $key
+     * @return \float[]
+     * @throws \Exception
+     */
+    public function getAttributeMinMax($key)
+    {
+        $attributeId = self::parseValueMinMaxAttributeId($key);
+
+        return $this->repoValue->minMaxByAttributeId((int) $attributeId);
+    }
 
     /**
      * Returns a Cache Item representing the specified key.
@@ -46,10 +96,14 @@ class ValueStatsProvider implements ProviderInterface
      */
     public function getItem($key)
     {
-        if (strpos($key, ValueMinMax::VALUE_STAT) !== 0) {
+        if (strpos($key, self::VALUE_STAT) !== 0) {
             throw new InvalidArgumentException('Wrong attribute');
         }
-        return new ValueMinMax($this->repoValue, ValueMinMax::parseAttributeId($key));
+
+        $item = new CacheItem();
+        $item->set($this->getAttributeMinMax($key));
+
+        return $item;
     }
 
     /**
@@ -71,6 +125,6 @@ class ValueStatsProvider implements ProviderInterface
      */
     public function hasItem($key)
     {
-        return ValueMinMax::isMyKey($key);
+        return self::isValueMinMaxKey($key);
     }
 }

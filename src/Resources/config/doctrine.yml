@@ -7,7 +7,7 @@ parameters:
   brander_eav.repo.set.class:
     Doctrine\ORM\EntityRepository
   brander_eav.repo.attribute.class:
-    Doctrine\ORM\EntityRepository
+    Brander\Bundle\EAVBundle\Repo\Attribute
 
 services:
   # Repo
@@ -17,18 +17,21 @@ services:
       - "@doctrine.orm.entity_manager"
       - getRepository
     arguments: [BranderEAVBundle:Value]
+
   brander_eav.repo.attribute:
     class:            "%brander_eav.repo.attribute.class%"
     factory:
       - "@doctrine.orm.entity_manager"
       - getRepository
     arguments: [BranderEAVBundle:Attribute]
+
   brander_eav.repo.group:
     class:            "%brander_eav.repo.group.class%"
     factory:
       - "@doctrine.orm.entity_manager"
       - getRepository
     arguments: [BranderEAVBundle:AttributeGroup]
+
   brander_eav.repo.set:
     class:            "%brander_eav.repo.set.class%"
     factory:

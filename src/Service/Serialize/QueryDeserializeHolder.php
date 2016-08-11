@@ -3,10 +3,10 @@ namespace Brander\Bundle\EAVBundle\Service\Serialize;
 
 use Brander\Bundle\EAVBundle\Entity as EAV;
 use Brander\Bundle\EAVBundle\Model\Elastica\EavElasticaQuery;
+use Brander\Bundle\EAVBundle\Service\Stats\StatsHolder;
 use Doctrine\ORM\EntityRepository;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
-use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Just add repository to query
@@ -28,9 +28,9 @@ class QueryDeserializeHolder implements EventSubscriberInterface
 
     /**
      * @param EntityRepository $repoAttribute
-     * @param StatsDirectorInterface $stats
+     * @param StatsHolder      $stats
      */
-    public function __construct(EntityRepository $repoAttribute, CacheItemPoolInterface $stats)
+    public function __construct(EntityRepository $repoAttribute, StatsHolder $stats)
     {
         $this->repoAttribute = $repoAttribute;
         $this->stats = $stats;
@@ -68,6 +68,7 @@ class QueryDeserializeHolder implements EventSubscriberInterface
             $query->setAttributeRepository($this->repoAttribute);
             $query->setStats($this->stats);
         }
+
         return $query;
     }
 
@@ -81,6 +82,7 @@ class QueryDeserializeHolder implements EventSubscriberInterface
             throw new \InvalidArgumentException("wrong class");
         }
         $query = new $class();
+
         return $this->initializeQuery($query);
     }
 }

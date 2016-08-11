@@ -7,8 +7,9 @@ parameters:
   brander_eav.attribute.serialize.query_holder.class: Brander\Bundle\EAVBundle\Service\Serialize\QueryDeserializeHolder
   brander_eav.filter.holder.class: Brander\Bundle\EAVBundle\Service\Filter\FilterHolder
   brander_eav.filter.standard_models.class: Brander\Bundle\EAVBundle\Service\Filter\FilterProvider
-  brander_eav.elastica.value_stats_provider.class: Brander\Bundle\EAVBundle\Service\Elastica\ValueStatsProvider
-  brander_eav.stats.stats_holder.class: Brander\Bundle\EAVBundle\Service\Filter\StatsHolder
+  brander_eav.elastica.value_stats_provider.class: Brander\Bundle\EAVBundle\Service\Stats\ValueStatsProvider
+  brander_eav.stats.stats_holder.class: Brander\Bundle\EAVBundle\Service\Stats\StatsHolder
+  brander_eav.elastica.value_stats.default_life_time: 3600
 
 services:
   brander_eav.eventlistener.valueselectlistener:
@@ -37,7 +38,7 @@ services:
     class: "%brander_eav.attribute.serialize.query_holder.class%"
     arguments:
       - "@brander_eav.repo.attribute"
-      - "@cache.app" # TODO
+      - "@brander_eav.stats.stats_holder" # "@cache.app" # TODO
     tags:
       - { name: jms_serializer.event_subscriber }
 
@@ -45,6 +46,7 @@ services:
     arguments:
      - {}
      - "@request_stack"
+     - "@jms_serializer.event_dispatcher"
      - "%locale%"
     class: "%brander_eav.extensible_entity.handler.class%"
 
@@ -70,9 +72,10 @@ services:
     arguments:
       - "@brander_eav.repo.value"
     tags:
-      - { name: werkint_stats.provider }
+      - { name: brander_eav.stats.provider }
 
   brander_eav.stats.stats_holder:
     class: "%brander_eav.stats.stats_holder.class%"
     arguments:
       - "@cache.app"
+      - "%brander_eav.elastica.value_stats.default_life_time%"

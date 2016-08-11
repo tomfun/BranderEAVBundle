@@ -13,7 +13,7 @@ class StatsCompilerPass implements
     CompilerPassInterface
 {
     const STATS_HOLDER_SERVICE = 'brander_eav.stats.stats_holder';
-    const STATS_PROVIDER_TAG = 'brander_eav.filter.provider';
+    const STATS_PROVIDER_TAG = 'brander_eav.stats.provider';
 
     /**
      * @param ContainerBuilder $container

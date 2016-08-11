@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Bogdan Yurov <bogdan@yurov.me>
  *
  * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Brander\Bundle\EAVBundle\Repo\Attribute")
  * @ORM\Table(name="brander_eav_attribute")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string")

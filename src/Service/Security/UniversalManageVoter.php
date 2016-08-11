@@ -170,6 +170,7 @@ class UniversalManageVoter implements VoterInterface
                 return in_array($this->role, $user->getRoles());
             }
         }
+
         return false;
     }
 }

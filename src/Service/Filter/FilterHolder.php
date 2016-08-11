@@ -39,6 +39,7 @@ class FilterHolder
             }
             $this->list = array_unique($list);
         }
+
         return $this->list;
     }
 }

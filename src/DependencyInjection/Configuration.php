@@ -44,6 +44,7 @@ class Configuration implements ConfigurationInterface
             ->root($this->alias)
                 ->children()
                     ->booleanNode('useJmsSerializer')->defaultTrue()->end()
+                    ->scalarNode('statsLifeTime')->defaultValue(3600)->end()
                     ->scalarNode('fixturesDirectory')->defaultNull()->end()
                     ->scalarNode('manageRole')->defaultValue("ROLE_ADMIN")->end()
                     ->arrayNode('searchable')

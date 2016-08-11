@@ -1,12 +1,10 @@
 <?php
 namespace Brander\Bundle\EAVBundle\Repo;
 
-use Brander\Bundle\EAVBundle\Entity\Attribute;
 use Brander\Bundle\EAVBundle\Entity\AttributeSelect;
 use Brander\Bundle\EAVBundle\Entity\AttributeSelectOption;
 use Brander\Bundle\EAVBundle\Entity\ValueDate;
 use Brander\Bundle\EAVBundle\Entity\ValueNumeric;
-use Brander\Bundle\EAVBundle\Entity\ValueSelect;
 use Doctrine\ORM\EntityRepository;
 
 /**
@@ -22,18 +20,19 @@ class Value extends EntityRepository
     {
         $qb = $this->createQueryBuilder('v');
         $qb->select('v.value')
-           ->leftJoin('v.attribute', 'a')
-           ->where('a = :attribute')
-           ->andWhere('v instance of BranderEAVBundle:ValueSelect')
-           ->andWhere('a instance of BranderEAVBundle:AttributeSelect')
-           ->setParameter('attribute', $attribute)
-           ->groupBy('v.value');
+            ->leftJoin('v.attribute', 'a')
+            ->where('a = :attribute')
+            ->andWhere('v instance of BranderEAVBundle:ValueSelect')
+            ->andWhere('a instance of BranderEAVBundle:AttributeSelect')
+            ->setParameter('attribute', $attribute)
+            ->groupBy('v.value');
         $optionIds = array_map(function ($v) {
             return $v['value'];
         }, $qb->getQuery()
             ->getArrayResult());
         $optionRepo = $this->_em->getRepository(AttributeSelectOption::class);
         $options = $optionRepo->findBy(['id' => $optionIds]);
+
         return $options;
     }
 
@@ -58,6 +57,7 @@ class Value extends EntityRepository
             if ($data === false) {
                 return false;
             }
+
             return [
                 'max' => floatval($data['max']),
                 'min' => floatval($data['min']),
@@ -65,8 +65,8 @@ class Value extends EntityRepository
         }
         $qb = $this->createQueryBuilder('v');
         $qb->leftJoin('v.attribute', 'a')
-           ->where('a = :attribute')
-           ->setParameter('attribute', $attributeId);
+            ->where('a = :attribute')
+            ->setParameter('attribute', $attributeId);
 
         $arr = [];
         foreach ($qb->getQuery()->getResult() as $value) {
@@ -79,6 +79,7 @@ class Value extends EntityRepository
         if (!count($arr)) {
             return false;
         }
+
         return [
             'max' => max($arr),
             'min' => min($arr),
