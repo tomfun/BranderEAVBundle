@@ -11,8 +11,8 @@ use Brander\Bundle\EAVBundle\Service\Serialize\SimpleSerializer;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
-use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Yaml;
@@ -63,7 +63,7 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
                 $config,
                 $selfConfig['list_class_map'],
                 $container->getParameter('kernel.environment'),
-                $selfConfig['useJmsSerializer']
+                $selfConfig['serializerCallbackClass']
             );
             foreach ($container->getExtensions() as $name => $extension) {
                 switch ($name) {
@@ -120,21 +120,13 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
             $this->getAlias().'.fixtures_directory',
             $fixturesDir
         );
-        //old style
-        $container->setParameter(
-            $this->getAlias().'.jsmodeldir',
-            realpath(__DIR__.'/../Resources/scripts/jsmodel')
-        );
-        //new style
-        $container->setParameter(
-            $this->getAlias().'.'.'frontend_config', //JsmodelProviderPass::PARAMETER_POSTFIX,
-            [
-                [
-                    'path' => realpath(__DIR__.'/../Resources/scripts/jsmodel'),
-                    'name' => 'brander-eav',
-                ],
-            ]
-        );
+
+        /** @var string[] $classes */
+        $classes = $config['searchable'];
+        foreach ($config['list_class_map'] as $classMap) {
+            $classes[] = $classMap['entity'];
+        }
+        $classes = array_unique($classes);
 
         $container->setParameter($this->getAlias().'.manageRole', $config['manageRole']);
 
@@ -144,13 +136,9 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
         );
         $loader->load('services.yml');
         $loader->load('doctrine.yml');
-        $classes = $config['searchable'];
-        foreach ($config['list_class_map'] as $classMap) {
-            $classes[] = $classMap['entity'];
-        }
-        $classes = array_unique($classes);
+
         if (count($classes)) {
-            $this->makeSerializeHandlers($classes, $container, $config['useJmsSerializer']);
+            $this->makeSerializeHandlers($classes, $container);
         }
 
 
@@ -222,58 +210,35 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
     /**
      * Subscribe on serialize event
      *
-     * @param array            $classes An array of searchable classes
+     * @param string[]         $classes An array of searchable classes
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param bool             $useJmsSerializer
      */
-    private function makeSerializeHandlers(array $classes, ContainerBuilder $container, $useJmsSerializer = true)
+    private function makeSerializeHandlers(array $classes, ContainerBuilder $container)
     {
+        /** @var Definition $serializeHandler */
         $serializeHandler = $container->getDefinition(self::ELASTICA_SERIALIZER_HANDLER);
         $serializeHandler->replaceArgument(0, $classes);
-        if (!$useJmsSerializer) {
-            return;
-        }
-        foreach ($classes as $class) {
-            if (!class_exists($class, true)) {
-                throw new \InvalidArgumentException('in brander_eav.searchable class: '.$class.' not found');
-            }
-            if (!is_subclass_of($class, self::MODEL_SEARCHABLE_INTERFACE)) {
-                throw new \InvalidArgumentException(
-                    'in brander_eav.searchable class: '.$class.' not implement '.self::MODEL_SEARCHABLE_INTERFACE
-                );
-            }
-            $serializeHandler->addTag(
-                "jms_serializer.handler",
-                [
-                    'type' => $class,
-                    'format' => "json",
-                    'method' => "serializeToJson",
-                ]
-            );
-        }
     }
 
     /**
      * @param array  $config
      * @param array  $classMap
      * @param string $env
-     * @param bool   $useJmsSerializer
+     * @param string $serializerCallbackClass
      * @return array
      */
-    private function makeElasticaConfig($config, $classMap, $env, $useJmsSerializer = true)
+    private function makeElasticaConfig($config, $classMap, $env, $serializerCallbackClass)
     {
         $newConfig = $config;
-        if ($useJmsSerializer) {//default serialize callback
-            if (!isset($newConfig['serializer']['callback_class'])) {
-                $newConfig['serializer']['callback_class'] = self::JMS_SERIALIZER_CLASS;
+        if (!isset($newConfig['serializer']['callback_class'])) {
+            $invalidSerializer = $serializerCallbackClass !== SimpleSerializer::class;
+            $invalidSerializer = $invalidSerializer && !is_subclass_of($serializerCallbackClass, SimpleSerializer::class);
+            if ($invalidSerializer) {
+                $msg = 'brander_eav.serializerCallbackClass value: '.$serializerCallbackClass
+                    .' not extends from '.SimpleSerializer::class;
+                throw new \InvalidArgumentException($msg);
             }
-            if (!isset($newConfig['serializer']['serializer'])) {
-                $newConfig['serializer']['serializer'] = 'serializer';
-            }
-        } else {
-            if (!isset($newConfig['serializer']['calfllback_class'])) {
-                $newConfig['serializer']['callback_class'] = SimpleSerializer::class;
-            }
+            $newConfig['serializer']['callback_class'] = $serializerCallbackClass;
         }
 
         $template = Yaml::parse(file_get_contents(realpath(__DIR__.self::ELASTICA_TEMPLATE_FILE)));
@@ -302,7 +267,7 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
                 foreach ($mappings as $fieldName => $analyzer) {
                     if ($analyzer === SearchableCustomMappingsInterface::ELASTICA_MAPPING_GEO_POINT) {
                         $index['types']['entity']['mappings'][$fieldName] = [
-                            'type' => 'geo_point',
+                            'type'    => 'geo_point',
                             'lat_lon' => 'true',
                         ];
                         continue;
@@ -314,7 +279,7 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
                         continue;
                     }
                     $index['types']['entity']['mappings'][$fieldName] = [
-                        'type' => 'string',
+                        'type'     => 'string',
                         'analyzer' => $analyzer,
                     ];
                 }
@@ -325,6 +290,7 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
             ];
             $newConfig['indexes'][$name] = $index;
         }
+
         return $newConfig;
     }
 }

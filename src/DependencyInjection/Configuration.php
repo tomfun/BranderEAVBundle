@@ -2,6 +2,7 @@
 
 namespace Brander\Bundle\EAVBundle\DependencyInjection;
 
+use Brander\Bundle\EAVBundle\Service\Serialize\SimpleSerializer;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -43,7 +44,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder
             ->root($this->alias)
                 ->children()
-                    ->booleanNode('useJmsSerializer')->defaultTrue()->end()
+                    ->scalarNode('serializerCallbackClass')->defaultValue(SimpleSerializer::class)->end()
                     ->scalarNode('statsLifeTime')->defaultValue(3600)->end()
                     ->scalarNode('fixturesDirectory')->defaultNull()->end()
                     ->scalarNode('manageRole')->defaultValue("ROLE_ADMIN")->end()

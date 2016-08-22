@@ -43,12 +43,12 @@ services:
       - { name: jms_serializer.event_subscriber }
 
   brander_eav.extensible_entity.handler:
+    class: "%brander_eav.extensible_entity.handler.class%"
     arguments:
      - {}
      - "@request_stack"
      - "@jms_serializer.event_dispatcher"
      - "%locale%"
-    class: "%brander_eav.extensible_entity.handler.class%"
 
   brander_eav.security.universal_voter:
     class: "%brander_eav.security.universal_voter.class%"

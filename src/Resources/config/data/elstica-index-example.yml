@@ -90,7 +90,7 @@ fos_elastica:
             finder: ~
             listener: ~
           serializer:
-            groups: [elastica] #exactly this serialization groups
+            groups: [elastica] #exactly this serialization groups, not used for eav
           dynamic_templates:
             eavfltxt_ru:
               match: "*_eavfltxt_ru"
