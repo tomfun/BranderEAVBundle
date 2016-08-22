@@ -13,7 +13,7 @@ use JMS\Serializer\SerializationContext;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Can serialize EAV models to JSON
+ * Can serialize EAV models to JSON for Elastic
  * @author Tomfun <tomfun1990@gmail.com>
  */
 class SerializeHandler
@@ -60,6 +60,7 @@ class SerializeHandler
     }
 
     /**
+     * Not used
      * @Serializer\HandlerCallback("json", direction="serialization")
      * @param JsonSerializationVisitor  $visitor
      * @param SearchableEntityInterface $data
@@ -89,8 +90,7 @@ class SerializeHandler
             return $visitor->endVisitingObject($metadata, $this, $type, $context);
         }
 
-        return null; // TODO
-        return $this->defaultSerializerBehavior($visitor, $data, $metadata, $type, $context);
+        return null;
     }
 
     /**
@@ -165,73 +165,5 @@ class SerializeHandler
         }
 
         return $result;
-    }
-
-
-    /**
-     * public function accept($data, array $type = null, Context $context)
-     *
-     * @param JsonSerializationVisitor       $visitor
-     * @param SearchableEntityInterface|null $data
-     * @param ClassMetadata                  $metadata
-     * @param array                          $type
-     * @param SerializationContext|null      $context
-     * @return null
-     */
-    protected function defaultSerializerBehavior(JsonSerializationVisitor $visitor, SearchableEntityInterface $data = null, ClassMetadata $metadata, array $type = [], SerializationContext $context = null)
-    {
-
-        $exclusionStrategy = $context->getExclusionStrategy();
-
-        //    /** @var $metadata ClassMetadata */
-        //$metadata = $this->metadataFactory->getMetadataForClass($type['name']);
-
-        if (null !== $exclusionStrategy && $exclusionStrategy->shouldSkipClass($metadata, $context)) {
-//            $this->leaveScope($context, $data);
-
-            return null;
-        }
-
-        $context->pushClassMetadata($metadata);
-
-        foreach ($metadata->preSerializeMethods as $method) {
-            $method->invoke($data);
-        }
-
-        $object = $data;
-//
-//        if (isset($metadata->handlerCallbacks[$context->getDirection()][$context->getFormat()])) {
-//            $rs = $object->{$metadata->handlerCallbacks[$context->getDirection()][$context->getFormat()]}(
-//                $visitor,
-//                $context instanceof SerializationContext ? null : $data,
-//                $context
-//            );
-//            $this->afterVisitingObject($metadata, $object, $type, $context);
-//
-//            return $context instanceof SerializationContext ? $rs : $object;
-//        }
-
-        $visitor->startVisitingObject($metadata, $object, $type, $context);
-        foreach ($metadata->propertyMetadata as $propertyMetadata) {
-            if (null !== $exclusionStrategy && $exclusionStrategy->shouldSkipProperty($propertyMetadata, $context)) {
-                continue;
-            }
-
-            $context->pushPropertyMetadata($propertyMetadata);
-            $visitor->visitProperty($propertyMetadata, $data, $context);
-            $context->popPropertyMetadata();
-        }
-
-//        $context->stopVisiting($data);
-        $context->popClassMetadata();
-
-        foreach ($metadata->postSerializeMethods as $method) {
-            $method->invoke($object);
-        }
-
-        if (null !== $this->dispatcher && $this->dispatcher->hasListeners('serializer.post_serialize', $metadata->name, $context->getFormat())) {
-            $this->dispatcher->dispatch('serializer.post_serialize', $metadata->name, $context->getFormat(), new ObjectEvent($context, $object, $type));
-        }
-
     }
 }
