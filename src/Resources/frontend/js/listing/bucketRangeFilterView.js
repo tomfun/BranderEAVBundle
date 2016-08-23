@@ -14,7 +14,7 @@ export default BaseView.extend({
   'autoApply':     false,
   'slowClose':     1200,
 
-  'initialize'(options) {
+  initialize(options) {
     BaseView.prototype.initialize.apply(this, arguments);
     if (options.model && options.model.get('attribute')) {
       let descr = options.model.get('attribute').get('discr');
@@ -48,7 +48,7 @@ export default BaseView.extend({
     }, this);
   },
 
-  'updateElements'() {
+  updateElements() {
     let that = this;
     this.$('.bucket-range').each(function (i, el) {
       let it  = $(el),
@@ -80,7 +80,7 @@ export default BaseView.extend({
     'click a.apply':       'applyClick',
   },
 
-  'setRangeClick'(e) {
+  setRangeClick(e) {
     let it = $(e.currentTarget);
     this.lt = it.data('lt');
     this.gte = it.data('gte');
@@ -88,7 +88,7 @@ export default BaseView.extend({
     it.addClass('active').css('opacity', '0.7');
   },
 
-  'applyClick'(e) {
+  applyClick(e) {
     if (e) {
       e.preventDefault();
     }
@@ -106,13 +106,13 @@ export default BaseView.extend({
     this.$('.slide-holder').slideUp(this.slowClose);
   },
 
-  'toggleOpener'(e) {
+  toggleOpener(e) {
     e.preventDefault();
     $(e.currentTarget).toggleClass('active');
     this.$('.slide-holder').slideToggle();
   },
 
-  'dataConverter'(event) {
+  dataConverter(event) {
     let target = $(event.currentTarget);
     if (['lt', 'lte', 'gt', 'gte', 'aggregations'].indexOf(target.prop('name')) === -1) {
       return;
@@ -153,10 +153,10 @@ export default BaseView.extend({
     }
     this.drawError('');
   },
-  'drawError'(e) {
+  drawError(e) {
     this.$('.error').text(e);
   },
-  'serializeData'() {
+  serializeData() {
     return _.merge(this.model.toJSON(), {
       discriminator: this.discriminator,
       unit:          this.unitFormat.bind(this),
@@ -165,44 +165,42 @@ export default BaseView.extend({
     });
   },
 
-  'unitFormat'(key, view_key) {
+  unitFormat(key, view_key) {
     return this.unit;
   },
 
-  'formatViewNumber'(number) {
+  formatViewNumber(number) {
     return __.numberFormat(number, Math.abs(number) > 1 ? 0 : 3, '.', ' ');
   },
 
-  'formatViewDate'(momentObj) {
+  formatViewDate(momentObj) {
     return momentObj.format('L');
   },
 
-  'onChangeAggregations'(aggregations) {
-    let aggName = this.model.get('field').join('.');
-    let success = function () {
+  onChangeAggregations(aggregations) {
+    const aggName = this.model.get('field').join('.');
+    const success = () => {
       if (this.discriminator === 'date') {
         _.each(this.aggregations, function (v, i) {
-          let moment = Moment.unix(v.key / 1000);
+          const moment = Moment.unix(v.key / 1000);
           v.key_value = moment.format();
           v.key_view = this.formatViewDate(moment);
         }, this);
       } else {
-        _.each(this.aggregations, function (v, i) {
+        _.each(this.aggregations, (v) => {
           v.key_value = v.key;
           v.key_view = this.formatViewNumber(v.key);
-        }, this);
+        });
       }
       this.render();
-    }.bind(this);
+    };
     if (aggName && aggregations[aggName]) {
       this.aggregations = aggregations[aggName].range_basket;
       success();
-    } else {
-      if (this.aggregations && this.aggregations.length) {
-        this.aggregations = [];
-        success();
-        // return true;
-      }
+    } else if (this.aggregations && this.aggregations.length) {
+      this.aggregations = [];
+      success();
+      // return true;
     }
     return false;
   },

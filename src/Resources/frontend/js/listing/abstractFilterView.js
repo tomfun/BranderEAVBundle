@@ -1,18 +1,18 @@
 import Marionette from 'backbone.marionette';
 import _ from 'underscore';
 import BaseView from 'brander-eav/view/base';
-
+import 'backbone-chaining'; // for special model binder's names
 
 export default Marionette.ItemView.extend({
-  'initialize'() {
+  initialize() {
     BaseView.prototype.initialize.apply(this, arguments);
     Marionette.ItemView.prototype.initialize.apply(this, arguments);
   },
-  'onChangeAggregations'(aggregations) {
+  onChangeAggregations(aggregations) {
     // may be implement
     return false;// doesn't need redraw
   },
-  'getGeoPointFilter'(latitude, longitude, distance, unit) {
+  getGeoPointFilter(latitude, longitude, distance, unit) {
     latitude = parseFloat(latitude);
     longitude = parseFloat(longitude);
     if (!latitude || !longitude || _.isNaN(latitude) || _.isNaN(longitude)) {
@@ -27,7 +27,7 @@ export default Marionette.ItemView.extend({
     }
     return '' + latitude + ',' + longitude + 'distance:' + distance + unit;
   },
-  'getRangeQuery'(lt, gt, lte, gte) {
+  getRangeQuery(lt, gt, lte, gte) {
     let tmp = '';
     if (lt !== undefined) {
       tmp += 'lt:' + lt + ';';
@@ -45,7 +45,7 @@ export default Marionette.ItemView.extend({
     }
     return tmp;
   },
-  'getRangeData'(string, formatter) {
+  getRangeData(string, formatter) {
     let keywords = [
         'gt',
         'gte',
@@ -68,14 +68,14 @@ export default Marionette.ItemView.extend({
     });
     return result;
   },
-  'getPointFromString'() {
+  getPointFromString(string) {
     const tmp = string.split(',');
     return {
       lat: parseFloat(tmp[0]),
       lon: parseFloat(tmp[1]),
     };
   },
-  'getGeoFilterData'(string) {
+  getGeoFilterData(string) {
     let value = string.trim();
     if (value) {
       if (value.indexOf('distance:') !== -1) {

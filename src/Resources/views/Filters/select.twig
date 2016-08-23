@@ -1,11 +1,11 @@
 <label>
   {% if attribute %}
-    {{ attribute.title }}:
+    {{ attribute.translations[0].title }}:
   {% endif %}
   <select name="{{ field|join('.') }}">
     <option value="">{{ attribute.hint }}</option>
     {% for option in attribute.options %}
-      <option value="{{ option.id }}">{{ option.title }}</option>
+      <option value="{{ option.id }}">{{ option.translations[0].title }}</option>
     {% endfor %}
 
   </select>

@@ -10,7 +10,6 @@ import $ from 'jquery';
 import router from 'router';
 import {render as template} from 'templates/brander-eav/Widgets/attribute.one.twig';
 import {render as templateChanges} from 'templates/brander-eav/Widgets/attribute.changes.twig';
-import 'backbone-chaining';
 import 'backbone.modelbinder';
 import 'jquery-ui';
 

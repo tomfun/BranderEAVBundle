@@ -1,6 +1,6 @@
 <label>
   {% if attribute %}
-    {{ attribute.title }}:
+    {{ attribute.translations[0].title }}:
   {% endif %}
   <select name="{{ field|join('.') }}">
     <option value="">{{ attribute.hint }}</option>

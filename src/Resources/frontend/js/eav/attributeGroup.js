@@ -5,17 +5,15 @@ import AttributeModel from './attribute';
 import AttributeCollection from './attributeCollection';
 import Routing from 'router';
 import {AttributeGroupTranslationCollection, AttributeGroupTranslation} from './translationCollection';
-import 'backbone-chaining';
-
 
 const Model = BaseModel.extend({
-  'url'() {
+  url() {
     return this.isNew()
       ? Routing.generate('brander_eav_attribute_group_post')
       : Routing.generate('brander_eav_attribute_group_get', {'attributeGroup': this.id});
   },
 
-  'relations': [
+  relations: [
     {
       'type':           Backbone.HasMany,
       'key':            'attributes',
@@ -32,8 +30,8 @@ const Model = BaseModel.extend({
 
   getIds() {
     const hash = {};
-    _.each(this.get('attributes[*].id'), function (val) {
-      hash[String(val)] = true;
+    this.get('attributes').each((attr) => {
+      hash[attr.id] = true;
     });
     return hash;
   },
@@ -43,7 +41,7 @@ const Model = BaseModel.extend({
       res = [];
     if (values instanceof Backbone.Collection) {
       ids = this.getIds();
-      values.each(function (val, i) {
+      values.each(function (val) {
         let attribute;
         if (val && (attribute = val.get('attribute'))) {
           if (attribute instanceof AttributeModel && ids[String(attribute.id)]) {

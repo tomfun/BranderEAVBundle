@@ -1,6 +1,6 @@
 <label>
   {% if attribute %}
-    {{ attribute.title }}:
+    {{ attribute.translations[0].title }}:
   {% endif %}
   <input name="{{ field|join('.') }}"
          placeholder="{{ attribute.holder }}"

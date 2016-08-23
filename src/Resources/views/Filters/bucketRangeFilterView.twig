@@ -1,6 +1,6 @@
 <div class="slide-drop">
   <a href="#" class="opener">
-    <span>{% if title %}{{ title }}{% else %}{{ attribute.title }}{% endif %}</span>
+    <span>{% if title %}{{ title }}{% else %}{{ attribute.translations[0].title }}{% endif %}</span>
     <i class="icon-arrow-down-small"></i></a>
 {# look at field key_as_string, don't forget to add twigjs transchoice #}
   <div class="slide-holder">

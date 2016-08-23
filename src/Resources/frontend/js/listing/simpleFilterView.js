@@ -18,6 +18,7 @@ export default BaseView.extend({
         case 'select':
           this.template = templateSelect;
           break;
+        case 'numeric':
         case 'input':
         case 'textarea':
           this.template = templateInput;
@@ -25,9 +26,6 @@ export default BaseView.extend({
         case 'boolean':
           this.template = templateBoolean;
           break;
-        // case 'numeric':
-        //    this.template = this.templateNumeric;
-        //    break;
         // case 'date':
         //    this.template = this.templateDate;
         //    break;
