@@ -2,11 +2,13 @@ import _ from 'lodash';
 import $ from 'jquery';
 import BaseView from './abstractFilterView';
 import Moment from 'moment';
+import {render as template} from 'templates/brander-eav/Filters/bucketRangeFilterView.twig';
 import __ from 'underscore.string';
 
 
 export default BaseView.extend({
-  templateName:    '@BranderEAV/Filters/bucketRangeFilterView.twig',
+  template,
+
   'unit':          'грн',
   'discriminator': 'numeric',
   'autoApply':     false,

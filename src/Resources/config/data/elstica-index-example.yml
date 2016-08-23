@@ -6,7 +6,7 @@ fos_elastica:
 #    default: { host: localhost, port: 9200 }
   indexes:
     namespace_entity: #some name. example: sdelka_advert
-      index_name: namespace_entity_%kernel.environment% #add environment. example: sdelka_advert_dev
+      index_name: "namespace_entity_%kernel.environment%" #add environment. example: sdelka_advert_dev
       settings:
         analysis:
           analyzer:

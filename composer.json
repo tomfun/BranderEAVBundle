@@ -37,7 +37,7 @@
     "doctrine/orm": "^2",
     "friendsofsymfony/jsrouting-bundle": "^1.5.4",
     "doctrine/doctrine-cache-bundle": "^1",
-    "tomfun/brander-elastica-skeleton": "*"
+    "tomfun/brander-elastica-skeleton": "^0.1.0"
   },
   "require-dev":{
     "doctrine/doctrine-fixtures-bundle": "^2",

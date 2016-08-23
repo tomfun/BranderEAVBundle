@@ -1,21 +1,24 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import Routing from 'router';
+import router from 'router';
 
-
-export default {
-  load(name, req, onLoad) {
-    $.ajax({
-      url: Routing.router.generate('brander_eav_filter_list'), // !!
-      success(data) {
-        requirejs(data, function (view) {
-          const resHash = {};
-          _.each(arguments, function (module, i) {
-            resHash[data[i]] = module;
-          });
-          onLoad(resHash);
+function load(name, req, onLoad) {
+  $.ajax({
+    url: router.generate('brander_eav_filter_list'), // !! todo: убрать нахуй ПХП часть
+    success(data) {
+      (req || requirejs)(data, function doViewLoad(...views) {
+        const resHash = {};
+        _.each(views, (module, i) => {
+          let view = module;
+          if (module.__esModule === true) {
+            view = module.default;
+          }
+          resHash[data[i]] = view;
         });
-      },
-    });
-  },
-};
+        onLoad(resHash);
+      });
+    },
+  });
+}
+
+export {load};

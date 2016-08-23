@@ -6,25 +6,25 @@ import ChildViews from 'brander-eav/listing/filtersLoader!';
 
 export default Marionette.CompositeView.extend({
   template:             containerTemplate,
-  'childViewContainer': 'fieldset',
+  childViewContainer: 'fieldset',
 
-  'getChildView'(model) {
+  getChildView(model) {
     return ChildViews[model.get('view')];
   },
 
-  'childViewOptions'(model) {
+  childViewOptions(model) {
     return _.merge(model.get('viewOptions'), {
       filter:       this.listing.get('filter'),
       aggregations: this.aggregations,
     });
   },
 
-  'redrawOnChange'() {
+  redrawOnChange() {
     this.listing.get('filters').on('sync', this.render, this);
   },
 
 
-  'setAggregations'(aggregations) {
+  setAggregations(aggregations) {
     let need;
     _.each(this.children._views, function (view, id) {
       if (view.onChangeAggregations(aggregations)) {
@@ -36,11 +36,11 @@ export default Marionette.CompositeView.extend({
     }
   },
 
-  'getCollection'() {
+  getCollection() {
     return this.listing.get('filters').get('filterableAttributes');
   },
 
-  'initialize'(options) {
+  initialize(options) {
     this.listing = options.listing;
     this.aggregations = options.aggregations;
     this.collection = this.getCollection();
@@ -57,7 +57,7 @@ export default Marionette.CompositeView.extend({
     }
   },
 
-  'filter'(model) {
+  filter(model) {
     return model.get('isFilterable');
   },
 });

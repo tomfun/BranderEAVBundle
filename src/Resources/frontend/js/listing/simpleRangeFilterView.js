@@ -1,10 +1,12 @@
 import BaseView from './abstractFilterView';
+import {render as template} from 'templates/brander-eav/Filters/simpleRangeFilterView.twig';
 import _ from 'lodash';
 import $ from 'jquery';
 
 
 export default BaseView.extend({
-  'templateName': '@BranderEAV/Filters/simpleRangeFilterView.twig',
+  template,
+
   'unit':         'km',
   'initialize'(options) {
     BaseView.prototype.initialize.apply(this, arguments);

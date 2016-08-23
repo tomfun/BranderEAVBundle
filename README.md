@@ -40,6 +40,16 @@ fos_elastica:
         app: ~
 ```
 
+### Requirements
+ - FOSElasticaBundle()
+ - JMSAopBundle()
+ - JMSDiExtraBundle($this)
+ - JS router with generate function
+ - Twigjs filters (for listing frontend)
+   - trans
+   - transchoice
+ - Compatible [gulp task](https://www.npmjs.com/package/brander-gulp-tasks) with twigjs compilation
+
 ### Configuration
 
 #### First at all
