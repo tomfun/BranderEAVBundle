@@ -11,6 +11,7 @@ import router from 'router';
 import {render as template} from 'templates/brander-eav/Widgets/attribute.one.twig';
 import {render as templateChanges} from 'templates/brander-eav/Widgets/attribute.changes.twig';
 import 'backbone.modelbinder';
+import 'backbone-chaining'; // for special model binder's names
 import 'jquery-ui';
 
 

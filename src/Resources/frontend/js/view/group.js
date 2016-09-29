@@ -3,6 +3,7 @@ import {render as template} from 'templates/brander-eav/Widgets/group.one.twig';
 import 'backbone';
 import 'brander-eav/view/attributeCollection';
 import 'brander-eav/view/attributeItem';
+import 'backbone-chaining'; // for special model binder's names
 import 'backbone.modelbinder';
 import 'jquery-ui';
 

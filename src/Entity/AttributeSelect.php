@@ -18,7 +18,7 @@ class AttributeSelect extends Attribute
     /**
      * @ORM\OneToMany(targetEntity="AttributeSelectOption", mappedBy="attribute", cascade={"remove", "persist", "refresh"}, orphanRemoval=true)
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeSelectOption>")
-     * @Serializer\Expose()
+     * @Serializer\Groups("attributeselect_with_options")
      * @var AttributeSelectOption[]|Collection
      **/
     protected $options;

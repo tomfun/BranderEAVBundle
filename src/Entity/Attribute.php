@@ -130,7 +130,7 @@ abstract class Attribute
     /**
      * @ORM\OneToMany(targetEntity="AttributeTranslation", cascade={"all"}, mappedBy="translatable", orphanRemoval=true, fetch="EAGER")
      * @Serializer\Type("array<Brander\Bundle\EAVBundle\Entity\AttributeTranslation>")
-     * @Serializer\Groups(groups={"translations", "admin"})
+     * @Serializer\Groups(groups={"translations", "admin", "attribute_with_translations"})
      * @Serializer\Expose()
      * @Assert\Valid
      */
