@@ -55,7 +55,7 @@ abstract class Value
      * @ORM\JoinColumn(name="attribute_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @Serializer\Accessor(getter="getAttribute",setter="setAttribute")
      * @Serializer\Type("Brander\Bundle\EAVBundle\Entity\Attribute")
-     * @Serializer\Groups("=!g('short-view')")
+     * @Serializer\Groups("values_with_attributes")
      * @var Attribute
      */
     protected $attribute;
