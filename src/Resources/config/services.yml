@@ -9,6 +9,7 @@ parameters:
   brander_eav.filter.standard_models.class: Brander\Bundle\EAVBundle\Service\Filter\FilterProvider
   brander_eav.elastica.value_stats_provider.class: Brander\Bundle\EAVBundle\Service\Stats\ValueStatsProvider
   brander_eav.stats.stats_holder.class: Brander\Bundle\EAVBundle\Service\Stats\StatsHolder
+  validator.eav_value.class: Brander\Bundle\EAVBundle\Validator\Constraint\EavConstraintValidation
   brander_eav.elastica.value_stats.default_life_time: 3600
 
 services:
@@ -79,3 +80,16 @@ services:
     arguments:
       - "@cache.app"
       - "%brander_eav.elastica.value_stats.default_life_time%"
+
+  product.filter.custom_filters_provider:
+    class: Shatel\ProductBundle\Service\Filter\CustomFilterProvider
+    tags:
+      - { name: brander_eav.filter.provider }
+
+  validator.eav_value:
+    class: "%validator.eav_value.class%"
+    arguments:
+      - "%locale%"
+      - "@request_stack"
+    tags:
+        - { name: validator.constraint_validator, alias: validator.eav_value}
