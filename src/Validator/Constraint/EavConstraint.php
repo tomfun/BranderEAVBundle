@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  * @Target({"CLASS", "ANNOTATION"})
  *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Tomfun <tomfun1990@gmail.com>
  */
 class EavConstraint extends Constraint
 {

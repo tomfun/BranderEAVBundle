@@ -13,8 +13,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * @author mom <alinyonish@gmail.com>
- *
- * @Annotation
  */
 class EavConstraintValidation extends ConstraintValidator
 {
