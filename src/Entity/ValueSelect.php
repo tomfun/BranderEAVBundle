@@ -68,6 +68,6 @@ class ValueSelect extends Value
         /** @var AttributeSelect $attr */
         $attr = $this->getAttribute();
 
-        return parent::isValid() && $attr->getOptions()->contains($this->getOption());
+        return parent::isValid() && (in_array($this->getValue(), $attr->getOptions()->getKeys()) || $attr->getOptions()->contains($this->getOption()));
     }
 }

@@ -54,9 +54,12 @@ class EavConstraintValidation extends ConstraintValidator
             $entityAttributes = new ArrayCollection($entityAttributes);
         }
         $this->containsLeftInRight($entityAttributes, $attributes, $constraint->messageExcess);
-        $this->containsLeftInRight($attributes->filter(function (Attribute $attribute) {
+
+        $requiredAttributes = $attributes->filter(function (Attribute $attribute) {
             return $attribute->isRequired();
-        }), $entityAttributes, $constraint->messageRequired);
+        });
+        $this->containsLeftInRight($requiredAttributes, $entityAttributes, $constraint->messageRequired);
+        $this->checkRequiredValues($entity, $constraint->messageRequired);
     }
 
     /**
@@ -68,13 +71,7 @@ class EavConstraintValidation extends ConstraintValidator
     {
         foreach ($left as $attr) {
             if (!$right->contains($attr)) {
-                $trans = $attr->getTranslationsByLocale();
-                $trans = isset($trans[$this->locale]) ? $trans[$this->locale] : array_pop($trans);
-                /** @var AbstractTranslation $trans */
-                $title = $trans->getTitle();
-                $this->context->buildViolation($message)
-                    ->setParameter('%title%', $title)
-                    ->addViolation();
+                $this->buildViolation($attr, $message, 'values[]');
             }
         }
     }
@@ -91,5 +88,43 @@ class EavConstraintValidation extends ConstraintValidator
         }
 
         return $result;
+    }
+
+    /**
+     * @param ExtensibleEntityInterface $entity
+     * @param string  $message
+     */
+    protected function checkRequiredValues(ExtensibleEntityInterface $entity, $message)
+    {
+        foreach ($entity->getValues() as $pathCounter => $val) {
+            $attr = $val->getAttribute();
+            if ($attr->isRequired() && !$val->isValid()) {
+                $this->buildViolation($attr, $message, "values[$pathCounter].value");
+            }
+        }
+    }
+
+    /**
+     * @param Attribute $attribute
+     * @param string    $message
+     * @param string    $path
+     */
+    protected function buildViolation(Attribute $attribute, $message, $path = '')
+    {
+        $trans = $attribute->getTranslationsByLocale();
+        $trans = isset($trans[$this->locale]) ? $trans[$this->locale] : array_pop($trans);
+        if (!$trans) {
+            $trans = '#'.$attribute->getId();
+        }
+        /** @var AbstractTranslation $trans */
+        $title = $trans->getTitle();
+        $violation = $this->context->buildViolation($message);
+        if ($path) {
+            $violation
+                ->atPath($path);
+        }
+        $violation
+            ->setParameter('%title%', $title)
+            ->addViolation();
     }
 }
