@@ -63,11 +63,13 @@ abstract class Value
     /**
      * @Serializer\VirtualProperty
      * @Serializer\SerializedName("attributeTranslations")
-     * @Serializer\Groups("translations_value_view")
+     * @Serializer\Groups("eav_value_view_title_translations")
      */
     public function getAttributeTranslations()
     {
-        return $this->getAttribute()->getTranslations();
+        return array_map(function (AbstractTranslation $translation) {
+            return $translation->getTitle();
+        }, $this->getAttribute()->getTranslationsByLocale());
     }
 
     /**

@@ -22,11 +22,13 @@ class ValueSelect extends Value
     /**
      * @Serializer\VirtualProperty
      * @Serializer\SerializedName("selectedOption")
-     * @Serializer\Groups("translations_value_view")
+     * @Serializer\Groups("eav_value_view_title_translations")
      */
     public function getSelectedOption()
     {
-        return $this->getOption()->getTranslations();
+        return array_map(function (AbstractTranslation $translation) {
+            return $translation->getTitle();
+        }, $this->getOption()->getTranslationsByLocale());
     }
 
     /**
