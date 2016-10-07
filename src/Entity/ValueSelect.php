@@ -20,6 +20,18 @@ class ValueSelect extends Value
     protected $option = null;
 
     /**
+     * @Serializer\VirtualProperty
+     * @Serializer\SerializedName("selectedOption")
+     * @Serializer\Groups("eav_value_view_title_translations")
+     */
+    public function getSelectedOption()
+    {
+        return array_map(function (AbstractTranslation $translation) {
+            return $translation->getTitle();
+        }, $this->getOption()->getTranslationsByLocale());
+    }
+
+    /**
      * @return AttributeSelectOption
      */
     public function getOption()
