@@ -128,7 +128,6 @@ class RestAttributeController
 
             $attribute = $this->em->merge($attributeNew);
 
-
             if ($attributeNew instanceof AttributeSelect) {
                 foreach ($attributeNew->getOptions() as $option) {
                     $option->setAttribute($attribute);
