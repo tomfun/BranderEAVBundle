@@ -60,6 +60,15 @@ abstract class Value
      */
     protected $attribute;
 
+    /**
+     * @Serializer\VirtualProperty
+     * @Serializer\SerializedName("attributeTranslations")
+     * @Serializer\Groups("translations_value_view")
+     */
+    public function getAttributeTranslations()
+    {
+        return $this->getAttribute()->getTranslations();
+    }
 
     /**
      * @return string|null

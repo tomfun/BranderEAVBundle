@@ -20,6 +20,16 @@ class ValueSelect extends Value
     protected $option = null;
 
     /**
+     * @Serializer\VirtualProperty
+     * @Serializer\SerializedName("selectedOption")
+     * @Serializer\Groups("translations_value_view")
+     */
+    public function getSelectedOption()
+    {
+        return $this->getOption()->getTranslations();
+    }
+
+    /**
      * @return AttributeSelectOption
      */
     public function getOption()
