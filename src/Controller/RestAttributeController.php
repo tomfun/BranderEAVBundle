@@ -264,7 +264,7 @@ class RestAttributeController
     protected function deserialize($content)
     {
         $context = DeserializationContext::create();
-        $context->setGroups(["admin", "Default"]);
+        $context->setGroups(["admin", "Default", "attributeselect_with_options"]);
 
         $contentJson = json_decode($content, true);
         if (isset($contentJson['id'])) {
