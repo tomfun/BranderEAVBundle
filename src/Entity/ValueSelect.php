@@ -23,6 +23,7 @@ class ValueSelect extends Value
      * @Serializer\VirtualProperty
      * @Serializer\SerializedName("selectedOption")
      * @Serializer\Groups("eav_value_view_title_translations")
+     * @return array
      */
     public function getSelectedOption()
     {
@@ -79,7 +80,14 @@ class ValueSelect extends Value
     {
         /** @var AttributeSelect $attr */
         $attr = $this->getAttribute();
+        $baseValid = parent::isValid();
+        $containOption = $attr->getOptions()->contains($this->getOption());
+        $containOption = $containOption || $attr->getOptions()
+                ->map(function (AttributeSelectOption $opt) {
+                    return $opt->getId();
+                })
+                ->contains((int) $this->getValue());
 
-        return parent::isValid() && (in_array($this->getValue(), $attr->getOptions()->getKeys()) || $attr->getOptions()->contains($this->getOption()));
+        return $baseValid && $containOption;
     }
 }
