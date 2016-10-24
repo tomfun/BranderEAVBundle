@@ -26,7 +26,7 @@ class AttributeSelectOption
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Serializer\Type("string")
+     * @Serializer\Type("integer")
      * @Serializer\Expose()
      * @Serializer\ReadOnly()
      * @var int
