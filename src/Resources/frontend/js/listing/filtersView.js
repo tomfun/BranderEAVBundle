@@ -20,7 +20,9 @@ export default Marionette.CompositeView.extend({
   },
 
   redrawOnChange() {
-    this.listing.get('filters').on('sync', this.render, this);
+    this.listenTo(this.listing.get('filters'), 'sync', () => {
+      this.render();
+    });
   },
 
 
