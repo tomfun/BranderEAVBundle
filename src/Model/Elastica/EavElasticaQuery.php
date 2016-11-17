@@ -13,12 +13,12 @@ use Brander\Bundle\EAVBundle\Model\GeoLocation;
 use Brander\Bundle\EAVBundle\Service\Filter\FilterProvider;
 use Brander\Bundle\EAVBundle\Service\Stats\StatsHolder;
 use Brander\Bundle\EAVBundle\Service\Stats\ValueStatsProvider;
-use Brander\Bundle\ElasticaSkeletonBundle\Entity\Aggregation;
+use Brander\Bundle\ElasticaSkeletonBundle\Entity\AutoAggregation;
+use Brander\Bundle\ElasticaSkeletonBundle\Service\AggregationHelper;
 use Brander\Bundle\ElasticaSkeletonBundle\Service\Elastica\ElasticaQuery;
 use Doctrine\ORM\EntityRepository;
 use Elastica\Query\BoolQuery;
 use JMS\Serializer\Annotation as Serializer;
-use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @author Tomfun <tomfun1990@gmail.com>
@@ -31,11 +31,6 @@ abstract class EavElasticaQuery extends ElasticaQuery
     const GEO_UNITS_YD = 'yd';
     const GEO_UNITS_FT = 'ft';
     const GEO_UNITS_NM = 'NM';
-
-    const RANGE_GT = 'gt';
-    const RANGE_GTE = 'gte';
-    const RANGE_LTE = 'lte';
-    const RANGE_LT = 'lt';
 
     /** @var  \Brander\Bundle\EAVBundle\Repo\Attribute */
     protected $attributeRepository;
@@ -92,6 +87,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
     public function setAttributeRepository(EntityRepository $attributeRepository)
     {
         $this->attributeRepository = $attributeRepository;
+
         return $this;
     }
 
@@ -111,6 +107,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
     public function setStats(StatsHolder $stats)
     {
         $this->stats = $stats;
+
         return $this;
     }
 
@@ -129,6 +126,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
     public function setAttributesRaw(array $attributesRaw)
     {
         $this->attributesRaw = $attributesRaw;
+
         return $this;
     }
 
@@ -151,19 +149,20 @@ abstract class EavElasticaQuery extends ElasticaQuery
                         $res[] = $filter;
                     }
                 } elseif ($attr instanceof AttributeNumeric) {
-                    if ($range = $this->parseRange($value, 'floatval')) {
+                    if ($range = AggregationHelper::decodeRange($value, 'floatval')) {
                         $filter = new \Elastica\Filter\NumericRange($fieldName, $range);
                         $res[] = $filter;
                     }
                 } elseif ($attr instanceof AttributeDate) {
                     $value = trim($value);
-                    if ($range = $this->parseRange($value, [$this, 'dateFormatter'])) {
+                    if ($range = AggregationHelper::decodeRange($value, [$this, 'dateFormatter'])) {
                         $filter = new \Elastica\Filter\Range($fieldName, $range);
                         $res[] = $filter;
                     }
                 }
             }
         }
+
         return $res;
     }
 
@@ -180,7 +179,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
                 $fieldName = 'eav_values.'.$attrId;
                 if ($attr instanceof AttributeDate) {
                     $value = trim($value);
-                    if ($range = $this->parseRange($value, [$this, 'dateFormatter'])) {
+                    if ($range = AggregationHelper::decodeRange($value, [$this, 'dateFormatter'])) {
                         $query->addMust(
                             new \Elastica\Query\Range($fieldName, $range)
                         );
@@ -208,7 +207,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
                     continue;
                 } elseif ($attr instanceof AttributeNumeric) {
                     $value = trim($value);
-                    if ($range = $this->parseRange($value)) {
+                    if ($range = AggregationHelper::decodeRange($value)) {
                         $query->addMust(
                             new \Elastica\Query\Range($fieldName, $range)
                         );
@@ -245,6 +244,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
             }
             $res = array_merge($res, $this->getAutoAggregation($filterable->getField(), $fieldName, $aggregationType));
         }
+
         return $res;
     }
 
@@ -265,6 +265,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
             $item->setAttribute($attribute);
             $res[] = $item;
         }
+
         return $res;
     }
 
@@ -318,49 +319,17 @@ abstract class EavElasticaQuery extends ElasticaQuery
                     $distance .= $unit;
                     $fieldName = $attr->getId().ValueLocation::ELASTICA_POSTFIX;
                     $geoQuery = new \Elastica\Filter\GeoDistance($fieldName, (string) $value, $distance);
+
                     return $geoQuery;
                 } else {
                     throw new \InvalidArgumentException("wrong geo format");
                 }
             }
         }
-        return null;
-    }
-
-    /**
-     * @example "gt:0;lt:101;" - number range
-     * @example "gte:5;lte:15;" - number range
-     * @param string        $value
-     * @param callable|null $formatter
-     * @return array|null
-     */
-    protected function parseRange($value, $formatter = null)
-    {
-        $keywords = [
-            self::RANGE_GT,
-            self::RANGE_GTE,
-            self::RANGE_LT,
-            self::RANGE_LTE,
-        ];
-        $result = [];
-        $res = [];
-        foreach ($keywords as $keyword) {
-            $format = $keyword.':\s*(.+?)\s*;';
-            preg_match('/'.$format.'/i', $value, $res);
-            if ($res && count($res) > 1) {
-                if ($formatter) {
-                    $result[$keyword] = call_user_func($formatter, $res[1]);
-                } else {
-                    $result[$keyword] = $res[1];
-                }
-            }
-        }
-        if (count($result)) {
-            return $result;
-        }
 
         return null;
     }
+
 
     /**
      * @param $attrId
@@ -417,6 +386,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
             if (isset($this->attributesRaw[$attrId])) {
                 unset($this->attributesRaw[$attrId]);
             }
+
             return false;
         }
         if ($attr instanceof AttributeLocation) {
@@ -428,6 +398,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
         ) {
             return false;
         }
+
         return $attr;
     }
 
@@ -448,33 +419,54 @@ abstract class EavElasticaQuery extends ElasticaQuery
                 return 'range';
             }
         }
+
         return false;
     }
 
     /**
      * @param string[] $fieldName
      * @param string   $indexName
-     * @return Aggregation[]
+     * @return AutoAggregation[]
      */
     protected function getAutoAggregationRange(array $fieldName, $indexName)
     {
         $fieldName = implode('.', $fieldName);
+
         return [
-            new Aggregation(
+            new AutoAggregation(
                 $fieldName.'_max',
                 'max',
                 $indexName,
                 'setAutoAggregation',
-                ['type' => 'range', 'serializeName' => $fieldName,]
+                null,
+                null,
+                $fieldName,
+                'range'
             ),
-            new Aggregation(
+            new AutoAggregation(
                 $fieldName.'_min',
                 'min',
                 $indexName,
                 'setAutoAggregation',
-                ['type' => 'range', 'serializeName' => $fieldName,]
+                null,
+                null,
+                $fieldName,
+                'range'
             ),
         ];
+    }
+
+
+    /**
+     * @param string[] $fieldName
+     * @param string   $indexName
+     * @return AutoAggregation[]
+     */
+    protected function getAutoAggregationTerm(array $fieldName, $indexName)
+    {
+        $fieldName = implode('.', $fieldName);
+
+        return [AggregationHelper::terms($fieldName, $indexName)];
     }
 
     /**
@@ -506,7 +498,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
      * @param string[] $fieldName
      * @param string   $indexName
      * @param array    $options
-     * @return Aggregation[]
+     * @return AutoAggregation[]
      */
     protected function getAutoAggregationHistogram(array $fieldName, $indexName, array $options = [])
     {
@@ -539,22 +531,21 @@ abstract class EavElasticaQuery extends ElasticaQuery
             }
             $type = $attr instanceof AttributeDate ? 'dateHistogram' : 'histogram';
         }
+
         return [
-            new Aggregation(
+            new AutoAggregation(
                 $fieldName.'_histogram',
                 $type,
                 $indexName,
                 'setAutoAggregation',
                 [
-                    'type' => 'range_basket',
-                    'constructArguments' => [
-                        $fieldName.'_histogram',//name
-                        $indexName,//elastica field name
-                        $interval,
-                    ],
-                    'extractValueField' => 'buckets',
-                    'serializeName' => $fieldName,
-                ]
+                    $fieldName.'_histogram', // name
+                    $indexName, // elastic field name
+                    $interval,
+                ],
+                'buckets',
+                $fieldName,
+                'range_basket'
             ),
         ];
     }
@@ -563,12 +554,15 @@ abstract class EavElasticaQuery extends ElasticaQuery
      * @param string[] $fieldName
      * @param string   $indexName
      * @param string   $aggregationType
-     * @return Aggregation[]
+     * @return AutoAggregation[]
      */
     protected function getAutoAggregation(array $fieldName, $indexName, $aggregationType)
     {
         $attrId = $fieldName[1];
         switch ($aggregationType) {
+            case 'terms':
+                return $this->getAutoAggregationTerm($fieldName, $indexName);
+                break;
             case 'range':
                 return $this->getAutoAggregationRange($fieldName, $indexName);
                 break;
@@ -576,6 +570,7 @@ abstract class EavElasticaQuery extends ElasticaQuery
                 return $this->getAutoAggregationHistogram($fieldName, $indexName, ['attribute_id' => $attrId]);
                 break;
         }
+
         return [];
     }
 
