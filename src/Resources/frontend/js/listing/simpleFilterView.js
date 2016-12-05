@@ -16,6 +16,7 @@ export default BaseView.extend({
       this.descriminator = descr;
       switch (descr) {
         case 'select':
+        case 'multiselect':
           this.template = templateSelect;
           break;
         case 'numeric':

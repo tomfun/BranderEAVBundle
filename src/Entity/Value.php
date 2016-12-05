@@ -14,22 +14,24 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({
- *   "input"     = "\Brander\Bundle\EAVBundle\Entity\ValueInput",
- *   "boolean"   = "\Brander\Bundle\EAVBundle\Entity\ValueBoolean",
- *   "select"    = "\Brander\Bundle\EAVBundle\Entity\ValueSelect",
- *   "numeric"   = "\Brander\Bundle\EAVBundle\Entity\ValueNumeric",
- *   "date"      = "\Brander\Bundle\EAVBundle\Entity\ValueDate",
- *   "textarea"  = "\Brander\Bundle\EAVBundle\Entity\ValueTextarea",
- *   "location"  = "\Brander\Bundle\EAVBundle\Entity\ValueLocation"
+ *   "input"       = "\Brander\Bundle\EAVBundle\Entity\ValueInput",
+ *   "boolean"     = "\Brander\Bundle\EAVBundle\Entity\ValueBoolean",
+ *   "multiselect" = "\Brander\Bundle\EAVBundle\Entity\ValueMultiSelect",
+ *   "select"      = "\Brander\Bundle\EAVBundle\Entity\ValueSelect",
+ *   "numeric"     = "\Brander\Bundle\EAVBundle\Entity\ValueNumeric",
+ *   "date"        = "\Brander\Bundle\EAVBundle\Entity\ValueDate",
+ *   "textarea"    = "\Brander\Bundle\EAVBundle\Entity\ValueTextarea",
+ *   "location"    = "\Brander\Bundle\EAVBundle\Entity\ValueLocation"
  * })
  * @Serializer\Discriminator(field="discr", map={
- *   "input"     = "Brander\Bundle\EAVBundle\Entity\ValueInput",
- *   "boolean"   = "Brander\Bundle\EAVBundle\Entity\ValueBoolean",
- *   "select"    = "Brander\Bundle\EAVBundle\Entity\ValueSelect",
- *   "numeric"   = "Brander\Bundle\EAVBundle\Entity\ValueNumeric",
- *   "date"      = "Brander\Bundle\EAVBundle\Entity\ValueDate",
- *   "textarea"  = "Brander\Bundle\EAVBundle\Entity\ValueTextarea",
- *   "location"  = "Brander\Bundle\EAVBundle\Entity\ValueLocation"
+ *   "input"       = "Brander\Bundle\EAVBundle\Entity\ValueInput",
+ *   "boolean"     = "Brander\Bundle\EAVBundle\Entity\ValueBoolean",
+ *   "multiselect" = "Brander\Bundle\EAVBundle\Entity\ValueMultiSelect",
+ *   "select"      = "Brander\Bundle\EAVBundle\Entity\ValueSelect",
+ *   "numeric"     = "Brander\Bundle\EAVBundle\Entity\ValueNumeric",
+ *   "date"        = "Brander\Bundle\EAVBundle\Entity\ValueDate",
+ *   "textarea"    = "Brander\Bundle\EAVBundle\Entity\ValueTextarea",
+ *   "location"    = "Brander\Bundle\EAVBundle\Entity\ValueLocation"
  * })
  */
 abstract class Value
@@ -64,6 +66,7 @@ abstract class Value
      * @Serializer\VirtualProperty
      * @Serializer\SerializedName("attributeTranslations")
      * @Serializer\Groups("eav_value_view_title_translations")
+     * @return array
      */
     public function getAttributeTranslations()
     {

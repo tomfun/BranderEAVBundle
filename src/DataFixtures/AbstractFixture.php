@@ -122,6 +122,13 @@ abstract class AbstractFixture extends BaseAbstractFixture implements
             $value = new EAV\ValueTextarea();
             $value->setValue($this->getFaker()->realText(mt_rand(20, 200)));
 
+        } elseif ($attribute instanceof EAV\AttributeMultiSelect) {
+            $value = new EAV\ValueMultiSelect();
+            $values = [];
+            foreach (range(1, mt_rand(1, $attribute->getOptions()->count() - 1)) as $i) {
+                $values[] = $attribute->getOptions()[mt_rand(0, $attribute->getOptions()->count() - 1)];
+            }
+            $value->setValue($values);
         } elseif ($attribute instanceof EAV\AttributeSelect) {
             $value = new EAV\ValueSelect();
             $index = mt_rand(0, $attribute->getOptions()->count() - 1);

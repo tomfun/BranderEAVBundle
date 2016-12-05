@@ -18,22 +18,24 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({
- *   "input"    = "\Brander\Bundle\EAVBundle\Entity\AttributeInput",
- *   "select"   = "\Brander\Bundle\EAVBundle\Entity\AttributeSelect",
- *   "boolean"  = "\Brander\Bundle\EAVBundle\Entity\AttributeBoolean",
- *   "numeric"  = "\Brander\Bundle\EAVBundle\Entity\AttributeNumeric",
- *   "date"     = "\Brander\Bundle\EAVBundle\Entity\AttributeDate",
- *   "textarea" = "\Brander\Bundle\EAVBundle\Entity\AttributeTextarea",
- *   "location" = "\Brander\Bundle\EAVBundle\Entity\AttributeLocation"
+ *   "input"       = "\Brander\Bundle\EAVBundle\Entity\AttributeInput",
+ *   "select"      = "\Brander\Bundle\EAVBundle\Entity\AttributeSelect",
+ *   "multiselect" = "\Brander\Bundle\EAVBundle\Entity\AttributeMultiSelect",
+ *   "boolean"     = "\Brander\Bundle\EAVBundle\Entity\AttributeBoolean",
+ *   "numeric"     = "\Brander\Bundle\EAVBundle\Entity\AttributeNumeric",
+ *   "date"        = "\Brander\Bundle\EAVBundle\Entity\AttributeDate",
+ *   "textarea"    = "\Brander\Bundle\EAVBundle\Entity\AttributeTextarea",
+ *   "location"    = "\Brander\Bundle\EAVBundle\Entity\AttributeLocation"
  * })
  * @Serializer\Discriminator(field="discr", disabled=false, map={
- *   "input"    = "Brander\Bundle\EAVBundle\Entity\AttributeInput",
- *   "select"   = "Brander\Bundle\EAVBundle\Entity\AttributeSelect",
- *   "boolean"  = "Brander\Bundle\EAVBundle\Entity\AttributeBoolean",
- *   "numeric"  = "Brander\Bundle\EAVBundle\Entity\AttributeNumeric",
- *   "date"     = "Brander\Bundle\EAVBundle\Entity\AttributeDate",
- *   "textarea" = "Brander\Bundle\EAVBundle\Entity\AttributeTextarea",
- *   "location" = "Brander\Bundle\EAVBundle\Entity\AttributeLocation"
+ *   "input"       = "Brander\Bundle\EAVBundle\Entity\AttributeInput",
+ *   "select"      = "Brander\Bundle\EAVBundle\Entity\AttributeSelect",
+ *   "multiselect" = "Brander\Bundle\EAVBundle\Entity\AttributeMultiSelect",
+ *   "boolean"     = "Brander\Bundle\EAVBundle\Entity\AttributeBoolean",
+ *   "numeric"     = "Brander\Bundle\EAVBundle\Entity\AttributeNumeric",
+ *   "date"        = "Brander\Bundle\EAVBundle\Entity\AttributeDate",
+ *   "textarea"    = "Brander\Bundle\EAVBundle\Entity\AttributeTextarea",
+ *   "location"    = "Brander\Bundle\EAVBundle\Entity\AttributeLocation"
  * })
  * @method AttributeTranslation[]|Collection getTranslations()
  */

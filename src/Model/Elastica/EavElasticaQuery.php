@@ -6,6 +6,7 @@ use Brander\Bundle\EAVBundle\Entity\AttributeBoolean;
 use Brander\Bundle\EAVBundle\Entity\AttributeDate;
 use Brander\Bundle\EAVBundle\Entity\AttributeInput;
 use Brander\Bundle\EAVBundle\Entity\AttributeLocation;
+use Brander\Bundle\EAVBundle\Entity\AttributeMultiSelect;
 use Brander\Bundle\EAVBundle\Entity\AttributeNumeric;
 use Brander\Bundle\EAVBundle\Entity\AttributeTextarea;
 use Brander\Bundle\EAVBundle\Entity\ValueLocation;
@@ -214,6 +215,13 @@ abstract class EavElasticaQuery extends ElasticaQuery
                         continue;
                     }
                     $value = (float) $value;
+                } elseif ($attr instanceof AttributeMultiSelect) {
+                    $and = new BoolQuery();
+                    foreach (explode(',', $value) as $v) {
+                        $and->addMust((new \Elastica\Query\Term())->setTerm($fieldName, $v));
+                    }
+                    $query->addMust($and);
+                    continue;
                 } elseif ($attr instanceof AttributeLocation) {
                     continue;//Filter
                 }

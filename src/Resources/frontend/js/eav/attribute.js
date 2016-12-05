@@ -29,7 +29,7 @@ const Model = BaseModel.extend({
   },
 
   'hasOptions'() {
-    return this.get('discr') === 'select';
+    return this.get('discr') === 'select' || this.get('discr') === 'multiselect';
   },
 
   getTitle() {
