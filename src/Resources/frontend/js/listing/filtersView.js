@@ -47,9 +47,9 @@ export default Marionette.CompositeView.extend({
     this.aggregations = options.aggregations;
     this.collection = this.getCollection();
     this.redrawOnChange();
-    if (!this.collection.length) {
-      this.listing.get('filter').updateFilters();
-    }
+    //if (!this.collection.length) {
+    //  this.listing.get('filter').updateFilters();
+    //}
     Marionette.CompositeView.prototype.initialize.apply(this, arguments);
     if (options && options.templateName) {
       this.templateName = options.templateName;

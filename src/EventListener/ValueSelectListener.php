@@ -2,6 +2,7 @@
 namespace Brander\Bundle\EAVBundle\EventListener;
 
 use Brander\Bundle\EAVBundle\Entity\Attribute;
+use Brander\Bundle\EAVBundle\Entity\ValueMultiSelect;
 use Brander\Bundle\EAVBundle\Entity\ValueSelect;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM;
@@ -39,11 +40,18 @@ class ValueSelectListener implements
         $entity = $args->getEntity();
 
         if ($entity instanceof ValueSelect) {
-
             $repo = $args->getEntityManager()->getRepository(static::OPTION_NAME);
             if ($entity->getValue()) {
                 $option = $repo->find($entity->getValue());
                 $entity->setOption($option);
+            }
+        }
+
+        if ($entity instanceof ValueMultiSelect) {
+            $repo = $args->getEntityManager()->getRepository(static::OPTION_NAME);
+            if ($entity->getValue()) {
+                $options = $repo->findBy(['id' => explode(',', $entity->getValue())]);
+                $entity->setOptions($options);
             }
         }
 

@@ -136,6 +136,8 @@ class SerializeHandler
                 $attrs[$attrId] = floatval($value->getValue());
             } elseif ($value instanceof EAV\ValueBoolean) {
                 $attrs[$attrId] = !!$value->getValue();
+            } elseif ($value instanceof EAV\ValueMultiSelect) {
+                $attrs[$attrId] = explode(',', $value->getValue());
             } elseif ($value instanceof EAV\ValueLocation) {
                 $attrs[$attrId.EAV\ValueLocation::ELASTICA_POSTFIX] = [
                     'lat' => $value->getValue()->getLat(),

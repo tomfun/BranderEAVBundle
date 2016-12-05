@@ -4,6 +4,7 @@ namespace Brander\Bundle\EAVBundle\DataFixtures\ORM;
 use Brander\Bundle\EAVBundle\DataFixtures\AbstractFixture;
 use Brander\Bundle\EAVBundle\Entity\Attribute;
 use Brander\Bundle\EAVBundle\Entity\AttributeGroup;
+use Brander\Bundle\EAVBundle\Entity\AttributeMultiSelect;
 use Brander\Bundle\EAVBundle\Entity\AttributeSelect;
 use Brander\Bundle\EAVBundle\Entity\AttributeSelectOption;
 use Brander\Bundle\EAVBundle\Entity\AttributeTranslation;
@@ -85,7 +86,34 @@ class LoadAttributeData extends AbstractFixture
         $manager->flush();
     }
 
+    /**
+     * @param array                                $iterates
+     * @param AttributeSelect|AttributeMultiSelect $attr
+     * @param ObjectManager                        $manager
+     * @param bool                                 $isFake
+     * @return AttributeSelect|AttributeMultiSelect mixed
+     */
+    private function createOptions($iterates, $attr, $manager, $isFake)
+    {
+        foreach ($iterates as $i) {
+            $option = new AttributeSelectOption();
 
+            $optionTranslation = new OptionTranslation();
+            $optionTranslation->setLocale($this->getLocale())
+                ->setTranslatable($option)
+                ->setTitle($i);
+            if ($isFake) {
+                $optionTranslation->setTitle($this->faker->name);
+            }
+            $option->getTranslations()->add($optionTranslation);
+
+            $attr->getOptions()->add($option);
+            $option->setAttribute($attr);
+            $manager->persist($option);
+        }
+
+        return $attr;
+    }
     /**
      * @param array         $attribute
      * @param ObjectManager $manager
@@ -94,26 +122,18 @@ class LoadAttributeData extends AbstractFixture
     private function createAttribute(array $attribute, ObjectManager $manager)
     {
         $attr = $this->attribute->createFromShortName($attribute['type']);
-        if ($attr instanceof AttributeSelect) {
-            foreach (range(0, mt_rand(2, 5)) as $i) {
-                $option = new AttributeSelectOption();
-
-                $optionTranslation = new OptionTranslation();
-                $optionTranslation->setLocale($this->getLocale())
-                    ->setTranslatable($option)
-                    ->setTitle($this->faker->name);
-                $option->getTranslations()->add($optionTranslation);
-
-                $attr->getOptions()->add($option);
-                $option->setAttribute($attr);
-                $manager->persist($option);
+        if ($attr instanceof AttributeSelect || $attr instanceof AttributeMultiSelect) {
+            if ($attribute['options']) {
+                $attr = $this->createOptions($attribute['options'], $attr, $manager, false);
+            } else {
+                $attr = $this->createOptions(range(0, mt_rand(2, 5)), $attr, $manager, true);
             }
         }
         if (isset($attribute['filterType'])) {
             $attr->setFilterType($attribute['filterType']);
         }
         if (isset($attribute['filterOrder'])) {
-            $attr->setFilterOrder((int)$attribute['filterOrder']);
+            $attr->setFilterOrder((int) $attribute['filterOrder']);
         }
 
         $attrTrans = new AttributeTranslation();

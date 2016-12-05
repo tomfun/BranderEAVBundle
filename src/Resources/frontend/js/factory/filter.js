@@ -1,3 +1,4 @@
+import 'backbone-chaining'; // for special model binder's names
 import _ from 'lodash';
 import filterFactory from 'brander-elastica-skeleton/listing/abstractFilter';
 import Backbone from 'backbone';
@@ -64,6 +65,20 @@ const factory = function (routes, showMore) {
       }
 
       return ret;
+    },
+
+    set(path, value, ...args) {
+      const splitPath = _.split(path, '.');
+      if (splitPath[0] === 'attributes') {
+        let attrs = this.get('attributes');
+        if (attrs === null) {
+          attrs = new AttributesModel();
+        }
+        attrs.set(splitPath[1], value);
+        AttributesModel.prototype.set.call(this, splitPath[0], attrs);
+      } else {
+        AttributesModel.prototype.set.call(this, path, value, ...args);
+      }
     },
 
     // is this filter equal to 'val'
