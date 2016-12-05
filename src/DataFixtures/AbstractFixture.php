@@ -125,8 +125,9 @@ abstract class AbstractFixture extends BaseAbstractFixture implements
         } elseif ($attribute instanceof EAV\AttributeMultiSelect) {
             $value = new EAV\ValueMultiSelect();
             $values = [];
-            $values[] = $attribute->getOptions()[mt_rand(0, $attribute->getOptions()->count() - 1)];
-            $values[] = $attribute->getOptions()[mt_rand(0, $attribute->getOptions()->count() - 1)];
+            foreach (range(1, mt_rand(1, $attribute->getOptions()->count() - 1)) as $i) {
+                $values[] = $attribute->getOptions()[mt_rand(0, $attribute->getOptions()->count() - 1)];
+            }
             $value->setValue($values);
         } elseif ($attribute instanceof EAV\AttributeSelect) {
             $value = new EAV\ValueSelect();

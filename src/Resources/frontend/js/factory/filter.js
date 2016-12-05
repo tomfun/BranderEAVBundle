@@ -68,16 +68,16 @@ const factory = function (routes, showMore) {
     },
 
     set(path, value, ...args) {
-      const splitPath = _.split(path, '.');
-      if (splitPath[0] === 'attributes') {
+      const splitPath = _.split(path, '.', 2);
+      if (splitPath[0] === 'attributes' && splitPath.length === 2) {
         let attrs = this.get('attributes');
         if (attrs === null) {
           attrs = new AttributesModel();
+          this.set('attributes', attrs);
         }
         attrs.set(splitPath[1], value);
-        AttributesModel.prototype.set.call(this, splitPath[0], attrs);
       } else {
-        AttributesModel.prototype.set.call(this, path, value, ...args);
+        Base.prototype.set.call(this, path, value, ...args);
       }
     },
 
