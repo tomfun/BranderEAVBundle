@@ -75,7 +75,7 @@ class ValueMultiSelect extends Value
                 $this->options->add($value);
                 $valIds[] = $value->getId();
             }
-            array_unique($valIds);
+            $valIds = array_unique($valIds);
             $successSort = asort($valIds);
             if (!$successSort) {
                 throw new \InvalidArgumentException("sort error");
@@ -84,7 +84,7 @@ class ValueMultiSelect extends Value
             return parent::setValue(implode(',', $valIds));
         } else {
             $sortedValues = explode(',', $values);
-            array_unique($sortedValues);
+            $sortedValues = array_unique($sortedValues);
             $successSort = asort($sortedValues);
             if (!$successSort) {
                 throw new \InvalidArgumentException("sort error");
