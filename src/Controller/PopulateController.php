@@ -26,7 +26,7 @@ class PopulateController
      *         204="Returned when successful"
      *     }
      * )
-     * @Rest\Patch("/reindex", name="shatel_product_reindex",
+     * @Rest\Patch("/reindex", name="brander_eav_reindex",
      *      defaults={"_format": "json"}
      * )
      * @return Response
