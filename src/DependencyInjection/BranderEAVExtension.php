@@ -100,6 +100,10 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
             $configDir
         );
         $container->setParameter(
+            $this->getAlias().'.list_class_map',
+            $config['list_class_map']
+        );
+        $container->setParameter(
             $this->getAlias().'.locales_supported',
             $config['locales_supported']
         );

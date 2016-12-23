@@ -93,3 +93,12 @@ services:
       - "@request_stack"
     tags:
         - { name: validator.constraint_validator, alias: validator.eav_value}
+
+  brander_eav.reindex_elastica:
+      class: Brander\Bundle\EAVBundle\Service\PopulateService
+      arguments:
+         - "@event_dispatcher"
+         - "@fos_elastica.provider_registry"
+         - "@fos_elastica.index_manager"
+         - "@fos_elastica.resetter"
+         - "%brander_eav.list_class_map%"
