@@ -9,38 +9,14 @@ import ViewSet from './view/set';
 import ViewGroupCollection from './view/groupCollection';
 import ViewGroupItem from './view/groupItem';
 import ViewGroup from './view/group';
+import {PopulateView} from './populateBtn';
 import AttributeCollection from './eav/attributeCollection';
 import AttributeGroupCollection from './eav/attributeGroupCollection';
 import AttributeSetCollection from './eav/attributeSetCollection';
-import $ from 'jquery';
-import router from 'router';
 
 const ManageView = Backbone.View.extend({
   template: mainTemplate,
-  events:             {
-    'click .dt-populate-indexes': 'populate',
-  },
-  populate() {
-    $.ajax({
-      url:         router.generate('brander_eav_reindex'),
-      type:        'PATCH',
-      contentType: 'application/json',
-      success:     this.showSuccessMessage,
-      error:       this.showErrorMessage,
-    });
-  },
-  showErrorMessage() {
-    $('.dt-error-message')
-      .fadeIn('slow')
-      .delay('slow')
-      .fadeOut('slow');
-  },
-  showSuccessMessage() {
-    $('.dt-success-message')
-      .fadeIn('slow')
-      .delay('slow')
-      .fadeOut('slow');
-  },
+
   initialize(options) {
     let attrCollection  = new AttributeCollection({manage: true}),
       groupCollection = new AttributeGroupCollection({manage: true}),
@@ -48,6 +24,7 @@ const ManageView = Backbone.View.extend({
     attrCollection.fetch();
     groupCollection.fetch();
     setCollection.fetch();
+    this.populateView = new PopulateView();
     this.viewAttrCollection = new ViewAttrCollection({
       collection: attrCollection,
       childView:  ViewAttrItem,
@@ -80,6 +57,8 @@ const ManageView = Backbone.View.extend({
 
   render() {
     this.$el.html(this.template());
+    this.populateView.setElement('.dt-populate-container');
+    this.populateView.render();
     this.viewAttrCollection.setElement('#attributes');
     this.viewAttrCollection.render();
     this.viewAttribute.setElement('#attribute');
