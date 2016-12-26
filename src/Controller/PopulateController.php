@@ -1,11 +1,16 @@
 <?php
 namespace Brander\Bundle\EAVBundle\Controller;
 
+use Brander\Bundle\EAVBundle\Service\Security\FakeCollection;
+use Brander\Bundle\EAVBundle\Service\Security\UniversalManageVoter;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\DiExtraBundle\Annotation as DI;
 use Symfony\Component\HttpFoundation\Response;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Brander\Bundle\EAVBundle\Service\PopulateService;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Brander\Bundle\EAVBundle\Entity\Attribute;
 
 /**
  * @author mom <alinyonish@gmail.com>
@@ -18,6 +23,13 @@ class PopulateController
      * @var PopulateService
      */
     private $reindexEvent;
+
+    /**
+     * @var AuthorizationCheckerInterface
+     *
+     * @DI\Inject("security.authorization_checker")
+     */
+    private $securityChecker;
 
     /**
      * Elastica populate indexes
@@ -33,6 +45,9 @@ class PopulateController
      */
     public function reindexAction()
     {
+        if (!$this->securityChecker->isGranted(UniversalManageVoter::MANAGE, new FakeCollection(Attribute::class))) {
+            throw new AccessDeniedException();
+        }
         $this->reindexEvent->reindex();
 
         return (new Response())->setStatusCode(Response::HTTP_NO_CONTENT);
