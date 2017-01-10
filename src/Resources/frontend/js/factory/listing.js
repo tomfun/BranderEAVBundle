@@ -58,6 +58,13 @@ const factory = function (Filter, types, RowModel, RowCollection, ResultModel, d
 
   let ResultModelExtended = ResultModel.extend({
       'relations': convertToArray(relationHash), // process old and new relations. new can override old.
+      parse(data) {
+        let order = this.pageSize * (data.page - 1);
+        _.each(data.rows, function (v) {
+          v.explicitOrder = order++;
+        });
+        return data;
+      },
     }),
 
       /**
