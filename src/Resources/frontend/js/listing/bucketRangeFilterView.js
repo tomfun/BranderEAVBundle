@@ -28,10 +28,10 @@ export default BaseView.extend({
     ));
     this.slowClose = this.slowClose === false ? false : parseInt(this.slowClose);
 
-    this.on('render', function () {
-      let data,
-        field = this.model.get('field').join('.'),
-        tmp   = this.filter.get(field);
+    this.on('render', () => {
+      let data;
+      const field = this.model.get('field').join('.');
+      const tmp   = this.filter.get(field);
       switch (this.discriminator) {
         case 'numeric':
         case 'date':
@@ -41,30 +41,29 @@ export default BaseView.extend({
           }
           break;
       }
-      _.each(data, function (val, key) {
-        this.$('[name=' + key + ']').val(val);
-      }, this);
+      _.each(data, (val, key) => {
+        this.$(`[name=${key}]`).val(val);
+      });
       this.updateElements();
-    }, this);
+    });
   },
 
   updateElements() {
-    let that = this;
-    this.$('.bucket-range').each(function (i, el) {
+    this.$('.bucket-range').each((i, el) => {
       let it  = $(el),
-        lt  = it.data('lt'),
-        gte = it.data('gte');
+          lt  = it.data('lt'),
+          gte = it.data('gte');
       /*
-        less = _.findWhere(that.aggregations, {'key_value': lt}),
-        great = _.findWhere(that.aggregations, {'key_value': gte})
-      */
+       less = _.findWhere(that.aggregations, {'key_value': lt}),
+       great = _.findWhere(that.aggregations, {'key_value': gte})
+       */
       if (!lt) {
         lt = undefined;
       }
       if (!gte) {
         gte = undefined;
       }
-      if (lt === that.lt && that.gte === gte) {
+      if (lt === this.lt && this.gte === gte) {
         it.addClass('active');
       } else {
         it.removeClass('active');
@@ -73,7 +72,7 @@ export default BaseView.extend({
     this.$('.slide-holder').hide();
   },
 
-  'events': {
+  events: {
     'change [name]':       'dataConverter',
     'click .opener':       'toggleOpener',
     'click .bucket-range': 'setRangeClick',
@@ -81,7 +80,7 @@ export default BaseView.extend({
   },
 
   setRangeClick(e) {
-    let it = $(e.currentTarget);
+    const it = $(e.currentTarget);
     this.lt = it.data('lt');
     this.gte = it.data('gte');
     this.applyClick(e);
@@ -118,8 +117,8 @@ export default BaseView.extend({
       return;
     }
     let val   = target.val(),
-      type  = target.prop('name'),
-      field = this.model.get('field').join('.');
+        type  = target.prop('name'),
+        field = this.model.get('field').join('.');
     switch (this.discriminator) {
       case 'select':
         console.error('wrong filter type');

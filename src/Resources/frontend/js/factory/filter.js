@@ -23,41 +23,53 @@ const factory = function (routes, showMore) {
         'relatedModel': AttributesModel,
       },
     ],
-    'updateFilters':          undefined, // will be the method
-    'initialize'() {
-      Base.prototype.initialize.apply(this, arguments);
-      this.set({
-        'attributes': new AttributesModel(),
-      });
-      this.get('attributes').on('change', function () {
-        const lst = this.get('attributes').changedAttributes();
-        if (lst) { // process eav filters
-          // like resetPageHandler
-          let changed = _.keys(lst),
-            list    = _.intersection(this.ignorePageAttributes, changed);
-          if (list.length <= 0 && changed.length > 0) {
-            this.set({page: this.defaults.page}, {silent: true});
-          }
-          const attrs = this.get('attributes').attributes;
-          _.each(attrs, function (v, i) {
-            if (v === '') {
-              delete attrs[i];
-            }
-          });
+    updateFilters:          undefined, // will be the method
+    pageResetListener() {
+      const lst = this.changedAttributes();
+      if (lst) { // process eav filters
+        // like resetPageHandler
+        const changed = _.keys(lst);
+        const list    = _.intersection(this.ignorePageAttributes, changed);
+        if (list.length <= 0 && changed.length > 0 /*&& !changed.indexOf('page')*/) {
+          this.set({page: this.defaults.page}, {silent: true});
         }
-        this.trigger('change', this);
-      }, this);
-      let that          = this,
-        updateFilters = this.updateFilters = function () {
-          that.trigger('update-filters');
-        };
-      _.each(_.result(this, 'updateFilterAttributes'), function (fieldName) {
-        this.on('change:' + fieldName, updateFilters);
-      }, this);
+        const attrs = this.get('attributes') && this.get('attributes').attributes;
+        _.each(attrs, (v, i) => {
+          if (v === '') {
+            delete attrs[i];
+          }
+        });
+        // this.trigger('change', this);
+      }
+    },
+    initialize(...args) {
+      Base.prototype.initialize.apply(this, args);
+      this.on('change', this.pageResetListener);
+      this.on('change:attributes', () => {
+        if (this._knownAttributes) {
+          this.stopListening(this._knownAttributes);
+        }
+        const attrs = this.get('attributes');
+        if (!attrs) {
+          return;
+        }
+        this._knownAttributes = attrs;
+        this.listenTo(this._knownAttributes, 'change', () => {
+          this.set({page: this.defaults.page});
+          this.trigger('change', this);
+        });
+      });
+      this.set({
+        attributes: new AttributesModel(),
+      });
+      const updateFilters = this.updateFilters = () => this.trigger('update-filters');
+      _.each(_.result(this, 'updateFilterAttributes'), (fieldName) => {
+        this.on(`change:${fieldName}`, updateFilters);
+      });
     },
 
     // clean up
-    'toJSON'(category) {
+    toJSON(category) {
       const ret = Base.prototype.toJSON.apply(this, arguments);
 
       if (ret.attributes && !Object.keys(ret.attributes).length) {
@@ -67,22 +79,34 @@ const factory = function (routes, showMore) {
       return ret;
     },
 
-    set(path, value, ...args) {
-      const splitPath = _.split(path, '.', 2);
-      if (splitPath[0] === 'attributes' && splitPath.length === 2) {
+    set(pathOrData, ...args) {
+      let data;
+      let otherArgs;
+      if (!_.isObject(pathOrData)) {
+        data = {[pathOrData]: args[0]};
+        otherArgs = args.slice(1);
+      } else {
+        data = pathOrData;
+        otherArgs = args;
+      }
+      const specialKeys = _.keys(data).filter((k) => {
+        const pathArr = _.split(k, '.', 2);
+        return pathArr.length === 2 && pathArr[0] === 'attributes';
+      });
+      Base.prototype.set.call(this, _.omit(data, specialKeys), ...otherArgs);
+      _.each(_.pick(data, specialKeys), (value, path) => {
+        const splitPath = _.split(path, '.', 2);
         let attrs = this.get('attributes');
         if (attrs === null) {
           attrs = new AttributesModel();
-          this.set('attributes', attrs);
+          Base.prototype.set.call(this, 'attributes', attrs);
         }
         attrs.set(splitPath[1], value);
-      } else {
-        Base.prototype.set.call(this, path, value, ...args);
-      }
+      });
     },
 
     // is this filter equal to 'val'
-    'attrSelected'(attr, val) {
+    attrSelected(attr, val) {
       const a = this.get('attributes') ? this.get('attributes')[attr.id] : null;
       if (!a) {
         return false;
@@ -93,7 +117,7 @@ const factory = function (routes, showMore) {
       return true;
     },
 
-    'routingSet'(attributes) {
+    routingSet(attributes) {
       this.set(attributes, false);
       return this;
     },
