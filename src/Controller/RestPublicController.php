@@ -83,6 +83,8 @@ class RestPublicController
     public function collectionSetAction($manage = false)
     {
         $list = $this->repoSet->findAll();
+        $cxt = SerializationContext::create();
+        $groups = ['Default'];
         if ($manage) {
             if (!$this->securityChecker->isGranted(
                 UniversalManageVoter::MANAGE,
@@ -91,9 +93,11 @@ class RestPublicController
             ) {
                 throw new AccessDeniedException();
             }
+            $groups = ['Default', 'attributes', 'attributeselect_with_options', 'translations'];
         }
+        $cxt->setGroups($groups);
 
-        return $this->response($list, $manage);
+        return $this->response($list, $manage, $cxt);
     }
 
     /**
@@ -110,19 +114,18 @@ class RestPublicController
     {
         $list = $this->repoGroup->findAll();
         $cxt = SerializationContext::create();
+        $cxt->setGroups(['Default', 'translations']);
         if ($manage) {
             if (!$this->securityChecker->isGranted(
                 UniversalManageVoter::MANAGE,
-                new FakeCollection(AttributeGroup::class)
+                new FakeCollection(AttributeSet::class)
             )
             ) {
                 throw new AccessDeniedException();
             }
-            $cxt->setGroups(['Default', 'translations']);
         }
 
         return $this->response($list, $manage, $cxt);
-
     }
 
     /**
