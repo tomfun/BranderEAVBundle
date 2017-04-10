@@ -118,7 +118,7 @@ class RestPublicController
         if ($manage) {
             if (!$this->securityChecker->isGranted(
                 UniversalManageVoter::MANAGE,
-                new FakeCollection(AttributeSet::class)
+                new FakeCollection(AttributeGroup::class)
             )
             ) {
                 throw new AccessDeniedException();
