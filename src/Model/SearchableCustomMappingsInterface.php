@@ -13,6 +13,7 @@ interface SearchableCustomMappingsInterface extends SearchableEntityInterface
     const ELASTICA_MAPPING_FULLTEXT_ES = 'my_full_text_analyzer_es';
     const ELASTICA_MAPPING_FULLTEXT_EN = 'my_full_text_analyzer_en';
     const ELASTICA_MAPPING_GEO_POINT = 'geo_point';
+    const ELASTICA_MAPPING_FLOAT = 'float';
     const ELASTICA_MAPPING_NOT_ANALYZED = 'not_analyzed';
 
     /**

@@ -276,6 +276,12 @@ class BranderEAVExtension extends Extension implements PrependExtensionInterface
                         ];
                         continue;
                     }
+                    if ($analyzer === SearchableCustomMappingsInterface::ELASTICA_MAPPING_FLOAT) {
+                        $index['types']['entity']['mappings'][$fieldName] = [
+                            'type'    => 'float',
+                        ];
+                        continue;
+                    }
                     if ($analyzer === SearchableCustomMappingsInterface::ELASTICA_MAPPING_NOT_ANALYZED) {
                         $index['types']['entity']['mappings'][$fieldName] = [
                             'index' => 'not_analyzed',
